@@ -11,8 +11,8 @@ Really understanding more an input programming language.
 
 SE stuff: break up a compiler into manageable pieces
 
-	gcc: ~ 15 million LOC.
-  clang:	~ 4 million LOC.
+  gcc:   ~ 15 million LOC.
+  clang:  ~ 4 million LOC.
 
 They're neat!
 
@@ -21,83 +21,83 @@ The demands!  Fast!!  Correct!
 
 Random terminology:
 
-	compiler vs interpreter etc.
+  compiler vs interpreter etc.
 
-		* compiler: parse input language,
-								convert to another language
-								(usually lower level)
+    * compiler: parse input language,
+                convert to another language
+                (usually lower level)
 
-		* transpiler: parse input language,
-								convert to another (high-level) language
+    * transpiler: parse input language,
+                  convert to another (high-level) language
 
-		* interpeter: parse input lanugage,
-								  execute it
+    * interpeter: parse input lanugage,
+                  execute it
 
 
 Start with a wimpy compiler:
 
 Input: expressions with numbers, +, * in infix notation
-			 (want * to have higher precedence than +)
+       (want * to have higher precedence than +)
 
 Output: equivalent expression in postfix notation
 
 
 Formalize:
-		* zero or more operators
-    * numbers: non-negative integers: sequence of 1 or more digits (0..9)
-    * operators: +, * (higher precedence)
+  * zero or more operators
+  * numbers: non-negative integers: sequence of 1 or more digits (0..9)
+  * operators: +, * (higher precedence)
 
 We could extend these later
 
 Some examples:
 
-	Input:										Output:
-	3 + 4 + 5									3 4 + 5 +
-  3 * 4 * 5									3 4 * 5 *
-  3 * 4 + 5									3 4 * 5 +
-  3 + 4 * 5									3 4 5 * +
+  Input:                    Output:
+  3 + 4 + 5                 3 4 + 5 +
+  3 * 4 * 5                 3 4 * 5 *
+  3 * 4 + 5                 3 4 * 5 +
+  3 + 4 * 5                 3 4 5 * +
 
-	6 + 7 * 8									6 7 8 * +
+  6 + 7 * 8                 6 7 8 * +
 
 Note:
-	The specific number doesn't make a difference
+  The specific number doesn't make a difference
   with respect to the translation
   Operators do matter (or at least, precedence)
 
 
 Idea:
-	Could we do all the multiplies first?
+  Could we do all the multiplies first?
 
-	3 + (4 * 5)
+  3 + (4 * 5)
 
-	3 + (4 5 *)
+  3 + (4 5 *)
 
-	3 (4 5 *) +
+  3 (4 5 *) +
 
-	
-	1 + 2 + 3 + 4 + 5 * 6 + 7 * 8 * 9 * 10 + 11 + 12
-	1 + 2 + 3 + 4 + (5 * 6) + (7 * 8 * 9 * 10) + 11 + 12
-	1 + 2 + 3 + 4 + (5 6 * ) + (7 8 * 9 * 10 *) + 11 + 12
-	1 2 + 3 + 4 + (5 6 * ) + (7 8 * 9 * 10 *) + 11 + 12 +
-	1 2 + 3 + 4 + 5 6 *  + 7 8 * 9 * 10 * + 11 + 12 +
-	
-	(1) + (2) + (3) + (4) + (5 * 6) + (7 * 8 * 9 * 10) + (11) + (12)
+
+  1 + 2 + 3 + 4 + 5 * 6 + 7 * 8 * 9 * 10 + 11 + 12
+  1 + 2 + 3 + 4 + (5 * 6) + (7 * 8 * 9 * 10) + 11 + 12
+  1 + 2 + 3 + 4 + (5 6 * ) + (7 8 * 9 * 10 *) + 11 + 12
+  1 2 + 3 + 4 + (5 6 * ) + (7 8 * 9 * 10 *) + 11 + 12 +
+  1 2 + 3 + 4 + 5 6 *  + 7 8 * 9 * 10 * + 11 + 12 +
+
+  (1) + (2) + (3) + (4) + (5 * 6) + (7 * 8 * 9 * 10) + (11) + (12)
 
 Trick:
-	View input as "sum of 1 or more products"	
-	Each product is "product of 1 or more number"
+  View input as "sum of 1 or more products"
+  Each product is "product of 1 or more number"
 
-	(1) + (2) + (3) + (4) + (5 * 6) + (7 * 8 * 9 * 10) + (11) + (12)
-                          
+  (1) + (2) + (3) + (4) + (5 * 6) + (7 * 8 * 9 * 10) + (11) + (12)
+
 What does a product look like?
 
-	number
+  number
   number * number
-  or 
+  or
   number * ... * number
 
 When do we stop reading a product?  either we see a + or end of input stream
-	if next operator is + : stop
+  if next operator is + : stop
   if next operator is empty or end of input: stop
 
 
@@ -105,16 +105,11 @@ Parsing algorithm for products:
 
 Product()
 {
-		consume number	
+    consume number
     while next symbol is * :
-		{
-			consume *
+    {
+      consume *
       consume number
-		}
+    }
 }
-
- 
-
-
-
 
