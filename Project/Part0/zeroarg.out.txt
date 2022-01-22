@@ -1,0 +1,4 @@
+My bare-bones C compiler (for COM 440/540)
+	Written by Andrew Miner (asminer@iastate.edu)
+	Version 2.0
+	5 January, 2022

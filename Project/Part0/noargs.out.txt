@@ -1,0 +1,1 @@
+/bin/sh: ../Bare_0/mycc: No such file or directory
