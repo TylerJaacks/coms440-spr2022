@@ -1,0 +1,128 @@
+
+
+Start with a wimpy compiler:
+
+Input: expressions with numbers, +, * in infix notation
+       (want * to have higher precedence than +)
+
+Output: equivalent expression in postfix notation
+
+
+Formalize:
+  * zero or more operators
+  * numbers: non-negative integers: sequence of 1 or more digits (0..9)
+  * operators: +, * (higher precedence)
+
+We could extend these later
+
+Some examples:
+
+  Input:                    Output:
+  3 + 4 + 5                 3 4 + 5 +
+  3 * 4 * 5                 3 4 * 5 *
+  3 * 4 + 5                 3 4 * 5 +
+  3 + 4 * 5                 3 4 5 * +
+
+  6 + 7 * 8                 6 7 8 * +
+
+Note:
+  The specific number doesn't make a difference
+  with respect to the translation
+  Operators do matter (or at least, precedence)
+
+
+Idea:
+  Could we do all the multiplies first?
+
+  3 + (4 * 5)
+
+  3 + (4 5 *)
+
+  3 (4 5 *) +
+
+
+  1 + 2 + 3 + 4 + 5 * 6 + 7 * 8 * 9 * 10 + 11 + 12
+  1 + 2 + 3 + 4 + (5 * 6) + (7 * 8 * 9 * 10) + 11 + 12
+  1 + 2 + 3 + 4 + (5 6 * ) + (7 8 * 9 * 10 *) + 11 + 12
+  1 2 + 3 + 4 + (5 6 * ) + (7 8 * 9 * 10 *) + 11 + 12 +
+  1 2 + 3 + 4 + 5 6 *  + 7 8 * 9 * 10 * + 11 + 12 +
+
+  (1) + (2) + (3) + (4) + (5 * 6) + (7 * 8 * 9 * 10) + (11) + (12)
+
+Trick:
+  View input as "sum of 1 or more products"
+  Each product is "product of 1 or more number"
+
+  (1) + (2) + (3) + (4) + (5 * 6) + (7 * 8 * 9 * 10) + (11) + (12)
+
+What does a product look like?
+
+  number
+  number * number
+  or
+  number * ... * number
+
+When do we stop reading a product?  either we see a + or end of input stream
+  if next operator is + : stop
+  if next operator is empty or end of input: stop
+
+
+Parsing algorithm for products:
+
+Product()
+{
+    consume number
+    while next symbol is *
+    {
+      consume *
+      consume number
+    }
+}
+
+Parsing algorithm for sums:
+
+Sum()
+{
+    consume product
+    while next symbol is +
+    {
+      consume +
+      consume product
+    }
+}
+
+
+What about the output?
+
+* Numbers can be output right away
+* delay output of operators
+
+
+Let's modify Product and Sum to both parse and take care of the output
+
+Product()
+{
+    consume number
+    print number
+    while next symbol is *
+    {
+      consume *
+      consume number
+      print number *
+    }
+}
+
+Sum()
+{
+    Product()
+    while next symbol is +
+    {
+      consume +
+      Product()
+      print +
+    }
+}
+
+Let's implement this in C
+
+
