@@ -1,0 +1,164 @@
+
+Architecture for a "real" compiler:
+
+
+input stream (chars)
+
+    |
+    |
+    v
+
+Lexical analyzer (1)
+
+    |
+    | tokens
+    v
+
+Syntax analyzer (2)
+
+    |
+    | syntax tree
+    v
+
+Semantic analyzer (3)
+
+    |
+    | syntax tree maybe with more info attached
+    v
+
+Intermediate code generator (4)
+
+    |
+    | intermediate representation
+    v
+
+General optimizer (5)
+
+    |
+    | intermediate representation
+    v
+
+Target code generation (6)
+
+    |
+    | target code
+    v
+
+Target specific optimizer (7)
+
+    |
+    | target code
+    v
+
+target code
+
+
+More discussion of the seven pieces
+
+
+------------------------------------------------------------
+(1) Lexical analyzer aka scanner aka lexer
+------------------------------------------------------------
+
+  * convert input program from stream of characters
+    into a stream of "tokens"
+
+  * a token is an abstract name or ID plus zero or more attributes
+    number, and "what" attributes depend on the token
+
+Example:
+    reading a number might generate a token
+        <NUMBER, 37>
+    reading an operator might generate a token
+        <PLUS>
+
+A "lexeme" is a meaningful sequence of characters that produced the token.
+
+example:
+
+  372 + /* multiply these two first */  14 * 3
+
+Tokens:
+  <NUMBER, 372>     "372" is the lexeme
+  <PLUS>            "+"   is the lexeme
+  <NUMBER, 14>      "14"  is the lexeme
+  <STAR>            "*"   is the lexeme
+  <NUMBER, 3>       "3"   is the lexeme
+
+
+More fun stuff handled by the lexer maybe?
+
+  * discard white space, comments
+
+  * #include directives
+    (switch into the file, and start scanning tokens)
+
+  * #ifdefs and all of the preprocessor
+
+
+#ifdef MAC_OS
+
+  some code here
+
+#endif
+
+
+------------------------------------------------------------
+(2) Syntax analyzer
+------------------------------------------------------------
+Aka parser
+
+ * read tokens and create some intermediate representation
+   that depicts grammatical structure of the token stream
+
+  * check for and report syntax errors
+    3 + + 5
+
+  * Intermediate reps:
+    typically a syntax/parse tree
+
+  * is capable of, but might not, build the parse tree
+
+
+Example:
+
+    37 + 5 + 14 * 3 +
+
+This is lexically correct but not grammatically correct.
+
+
+------------------------------------------------------------
+(3) Semantic analyzer
+------------------------------------------------------------
+
+"Checks the source program for semantic consistency within
+ the language definition."
+
+For example in C
+
+typedef struct {
+  int a;
+  int b;
+} pair;
+
+int main()
+{
+  int x = 3;
+  pair y;
+
+  y = x;    // this is a type error
+
+  y = z;    // where was z defined?
+
+  foo(x, 4);
+}
+
+We'll need an internal data structure to keep track of
+  * which identifiers were declared
+  * what their types are
+  * what functions?  What are their parameters?
+
+
+All this goes in the "Symbol Table".
+
+

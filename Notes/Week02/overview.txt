@@ -126,3 +126,131 @@ Sum()
 Let's implement this in C
 
 
+see wimpy.c
+
+
+Some discussion:
+
+We got away with not storing the input expressions b/c the translation
+was very simple.  If we wanted to do some analysis first, we'd want
+some kind of internal representation for the expressions.
+
+For example:
+
+We could build say a list of terms where each term is a list of products.
+
+e.g.
+
+3 + 4 * 5 * 6 + 7 * 8
+
+
+Then we might want to store
+
+  * --> * --> *
+  |     |     |
+  v     v     v
+
+  3     4     7
+
+        |     |
+        v     v
+
+        5     8
+
+        |
+        v
+
+        6
+
+
+How would we change our code to build such a structure?
+
+We could for example:
+  Product() could return a list of numbers to multiply
+            (the vertical chains in the pic.)
+
+  Sum()     could return a list of product lists
+            (the main horizontal list in the pic.)
+
+
+Or we could build a "parse tree"
+
+
+For example:
+
+3 + 4 + 5:
+
+        +
+       / \
+      /   \
+     +     5
+    / \
+   /   \
+  3     4
+
+3 * 4 + 5:
+
+        +
+       / \
+      /   \
+     *     5
+    / \
+   /   \
+  3     4
+
+
+3 + 4 * 5:
+
+        +
+       / \
+      /   \
+     3     *
+          / \
+         /   \
+        4     5
+
+
+Note: inorder traversal of the parse tree: infix notation of the expression
+
+
+Our wimpy compiler had the following design:
+
+    |
+    |  input
+    |
+    v
+
+split the input into                -> This is called a "scanner" or "lexer".
+numbers, symbols
+
+    |
+    |
+    v
+
+match products                      -> This is called a "parser"
+and sums                               May need to look ahead some # symbols
+
+    |
+    |
+    v
+
+output                              -> "code generation"
+
+    |
+    |
+    v
+
+output stream
+
+
+Thought experiment: if we want to extend our wimpy compiler
+  * allow more operators like +, -, *, /, %
+    update the scanner and parser to handle extra operators
+
+  * allow integers or reals for the numbers?
+    just update "getNumber"?
+
+  * convert to prefix instead of postfix?
+    only changes the "code generator"
+
+
