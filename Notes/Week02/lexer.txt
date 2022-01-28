@@ -1,0 +1,100 @@
+
+======================================================================
+======================================================================
+
+Lexical analysis
+
+Dragon book ch 3
+Engineering a Compiler ch 2
+
+======================================================================
+======================================================================
+
+Goal:
+  * read from 1 or more input files (streams)
+  * produce a stream of tokens
+      each token has
+          + name or ID
+          + zero or more attributes that may depend on token name/ID
+
+  * lexeme: text from the input stream corresponding to the token
+
+
+Lecture plan:
+
+  * some "by hand" examples and discussion
+
+  * theory
+    why? can't I just do everything by hand?
+    yes of course, but what if you get stuck?  The theory can help.
+
+  * lexer generators (lex / flex)
+
+
+------------------------------------------------------------
+
+Motivation: so what?  Can't we just use scanf?
+  * scanf works "great" when you *know* for sure what is next.
+
+  * compilers don't have this luxury usually
+
+
+Motivating example:
+  take our wimpy compiler, modify it so that numbers can be
+  unsigned integers or reals.
+
+Before we had
+  unsigned getNumber()
+
+So now we'll use
+
+  char getNumber(unsigned *u, double *d);
+  /*
+      Consume the next number from the input stream,
+      either an unsigned integer or floating-point.
+      If integer, store it in u and return 'u'.
+      If floating-point, store it in d and return 'd'.
+      If neither, give an error message.
+  */
+
+
+Try with 2 scanf calls
+
+  %u then %lf:
+    when we type a float, it grabs the integer part, then
+    separately the fractional part.  BAD.
+
+
+  %lf then %u:
+    everything matches for floating point.  BAD.
+
+
+  other issues with scanf:
+      stray + signs and such
+      consumes newlines without telling us
+
+We'll need to write it ourselves "by hand".
+
+
+
+Let's draw a flowchart for how to recognize (non-negative) integers
+"by hand"; for now just collect into a lexeme.
+
+Flowchart just for an integer:
+
+
+    start          digit                                    digit
+    ----------> O ------------>      consume and add     -------\
+                |                    to the lexeme               |
+                | not a digit              |             <------/
+                |                          |
+                V                          |  not a digit
+                                           |
+            not an integer                 v
+                                        stop, got integer
+
+
+Flowchart for integer or float of the form dddddd.ddddddddddd:
+
+Homework: draw that flowchart
+

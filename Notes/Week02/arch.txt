@@ -162,3 +162,99 @@ We'll need an internal data structure to keep track of
 All this goes in the "Symbol Table".
 
 
+------------------------------------------------------------
+(4) Intermediate code generator
+------------------------------------------------------------
+
+* Most compilers don't generate target code directly
+
+* Instead generates "intermediate code"
+
+* Think of this as "simplified low level code"
+
+* Properties of intermediate code
+
+  (1) "easy" to generate from syntax tree after semantic analysis
+  (2) "easy" to produce target code from the intermediate
+
+We will discuss this more later but notice
+
+ + we could write an intepreter for the intermediate code
+   to run and test it
+
+ + this makes it easier to add different target code generators
+   for the same compiler / compiler family
+
+
+------------------------------------------------------------
+(5) general optimizer
+------------------------------------------------------------
+
+* This phase tries to optimize the intermediate code
+
+  + usually want "faster" code but
+    could want "smaller" code
+    or "power consumption"
+
+* Graph analysis on intermediate code
+
+  + detect unreachable code
+  + adjust code layout to avoid jumps
+
+------------------------------------------------------------
+(6) target code generator
+------------------------------------------------------------
+
+* generate target code from "optimized" intermediate code
+
+* some tricky things here
+
+  + instruction selection (each intermediate code "instruction"
+    may require one or more target code instructions)
+
+  + efficient register allocation
+
+  + where are local vars / global vars / parameters stored?
+
+    info will be added to the symbol table
+
+------------------------------------------------------------
+(7) target optimizations
+------------------------------------------------------------
+
+* target code specific optimizations
+  (could be CPU specific)
+
+
+
+======================================================================
+======================================================================
+Compiler "passes" vs "phases"
+
+* Can view each of the 7 steps as a phase of the compiler.
+
+* contiguous phases can be grouped into "passes"
+
+  + each "pass" reads an input file,
+    processes,
+    writes an output file.
+
+For example:
+
+  + pass 1: input: source, output: intermediate code
+    lexer, parser, semantic analyzer, intermediate code gen
+
+  + pass 2: input and output: intermediate code
+    intermediate optimizer
+
+  + pass 3: input: intermediate, output: target
+    target generator and optimizer
+
+
+Why?
+
+  New input language: pass 1 changes
+
+  New target machine: pass 3 changes
+
+
