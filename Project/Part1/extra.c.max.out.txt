@@ -1,0 +1,25 @@
+File extra.c Line     6 Token 301 Text char
+File extra.c Line     6 Token 306 Text a
+File extra.c Line     6 Token  61 Text =
+File extra.c Line     6 Token 302 Text '\n'
+File extra.c Line     6 Token  59 Text ;
+File extra.c Line     8 Token 301 Text int
+File extra.c Line     8 Token 306 Text b
+File extra.c Line     8 Token  61 Text =
+File extra.c Line     8 Token 303 Text 0x03a2ce
+File extra.c Line     8 Token  59 Text ;
+File extra.c Line    10 Token 301 Text float
+File extra.c Line    10 Token 306 Text c
+File extra.c Line    10 Token  61 Text =
+File extra.c Line    10 Token 304 Text 2.99792458e8
+File extra.c Line    10 Token  59 Text ;
+File extra.c Line    12 Token 401 Text const
+File extra.c Line    12 Token 301 Text char
+File extra.c Line    12 Token  42 Text *
+File extra.c Line    12 Token 306 Text d
+File extra.c Line    12 Token  61 Text =
+File extra.c Line    12 Token 305 Text "To put \" in a string, escape it with \\"
+File extra.c Line    12 Token  59 Text ;
+File extra.c Line    15 Token 301 Text int
+File extra.c Line    15 Token 306 Text this_is_a_very_long_identifier_name_designed_to_
+File extra.c Line    15 Token  59 Text ;

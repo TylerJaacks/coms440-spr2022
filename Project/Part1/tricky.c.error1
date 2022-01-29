@@ -1,0 +1,6 @@
+Lexer error in file tricky.c line 40 near text $
+	Unexpected symbol, ignoring.
+Lexer error in file tricky.c line 40 near text `
+	Unexpected symbol, ignoring.
+Lexer error in file tricky.c line 42
+	Unclosed comment.

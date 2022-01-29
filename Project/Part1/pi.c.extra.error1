@@ -1,0 +1,2 @@
+Lexer warning in file pi.c line 2:
+	Number too long; truncating to 3.1415926535897932384626433832795028841971693993
