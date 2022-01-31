@@ -1,0 +1,56 @@
+
+Flowchart just for an integer:
+
+
+    start          digit                                    digit
+    ----------> O ------------>      consume and add     -------\
+                |                    to the lexeme               |
+                | not a digit              |             <------/
+                |                          |
+                V                          |  not a digit
+                                           |
+            not an integer                 v
+                                        stop, got integer
+
+
+Flowchart for integer or float of the form dddddd.ddddddddddd:
+
+Homework: draw that flowchart
+                                          .
+                                      ___________________
+                                     /                   \
+  start      digit                  /           digit     \
+  ------> O -------->      consume and add   -------\      v          ---\
+          |                  to the lexeme          |     consume etc    | digit
+          | not a digit              |       <------/        |        <--
+          |                          |                       |
+          V                          |  not a digit          v
+                                     |                     stop got float
+      not an integer                 v
+                              stop, got integer
+
+
+
+Let's implement this in C
+
+
+How do we handle something like
+
+======
+
+==
+==
+=
+
+breakfast
+
+
+asdfahsdgfjkhasdgf
+
+piano garbage kick mother father
+
+toss me that piano
+
+that's all for today!
+
+
