@@ -1,0 +1,19 @@
+
+Some theory:
+
+* There are tools to build lexers.
+  -> specify patterns for each token
+  -> tool generates a recognizer flowchart for each token
+  -> then combined into one huge flowchart
+  -> from the flowchart, generate a state machine table
+  -> scanner runs using the table(s)
+
+
+Rest of lectures
+  -> how to specify patterns
+  -> how to build the flowcharts from the patterns
+  -> how to combine flowcharts
+  -> how to generate tables
+  -> A bit on flex/lex which is a "standard" tool.
+
+
