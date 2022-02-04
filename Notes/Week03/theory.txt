@@ -17,3 +17,172 @@ Rest of lectures
   -> A bit on flex/lex which is a "standard" tool.
 
 
+Crash course on regular expressions
+----------------------------------------------------------------------
+
+Regular chars: match themselves
+
+Meta chars: have meaning
+
+Character classes: specify a list, match one from the list
+  [aeiou]     : vowels
+  [a-z]       : lower case
+  [0-9]       : digits
+  [a-zA-Z]    : all letters
+  [a-zA-Z_]   : letters or underscore
+
+.             : match any char except newline
+
+?             : previous thing is optional
+*             : repeat previous thing zero or more times
++             : repeat previous thing one or more times
+
+Eg. dates
+
+  [01][0-9]/[0123][0-9]/[12][0-9][0-9][0-9]
+
+Valid C identifiers:
+
+  [A-Za-z_][A-Za-z_0-9]*
+
+  break
+
+
+valid hex integer
+
+  0x[0-9a-fA-F]+
+
+
+Theory underneath regular expressions
+------------------------------------------------------------
+
+* Let Sigma be an alphabet of symbols
+  (for us: ASCII text)
+
+* There is a special character, epsilon, denoting empty string
+
+* Given a regular expression r,
+  L(r): the language accepted by r: the set of all words that match
+        the regular expression r.
+
+  words are finite sequences of elements from Sigma.
+
+
+Rules:
+
+  L(epsilon)  =   { epsilon }
+
+  for any a in Sigma,
+
+  L(a)  =    { a }
+
+
+Operations allowed on regular languages
+
+Concatenation:  (r)(s)  or simply rs
+
+  L( (r)(s) ) = L(r)L(s)
+
+    What this says: any word that matches r, call it v,
+                    and any word that matches s, call it w,
+                    then vw matches rs
+
+  E.g.,
+    L(if) = L(i)L(f) = {i}{f} = {if}
+
+
+Choice: r | s
+
+  choose from r or s
+
+  L ( r | s ) = L(r)  U  L(s)
+                      ^ set union
+
+  L ( break | case | continue | .... )
+
+
+Star: (r)*
+
+  Zero or more occurrences of r, concatenated
+
+
+Theory-wise, this is everything because:
+
+  r?
+  same as:
+  (epsilon)|(r)
+
+
+  r+
+  same as:
+  (r)(r)*
+
+
+  [0-9]
+  same as:
+  0|1|2|3|4|5|6|7|8|9
+
+
+Given a regular expression, how to recognize a word that matches?
+
+Given a regex we can build a non-deterministic finite automaton (NFA)
+
+Formal definition:
+
+  NFA is a tuple (Q, Sigma, delta, qo, F)
+
+  Q: is a finite set of states
+
+  Sigma: set of input symbols
+
+  delta: transition function that says how to change states
+
+      delta: Q x (Sigma U {epsilon})   ->  2^Q
+
+                      ^ symbol or epsilon   ^ subset of Q
+
+  q0 from Q is the initial state
+
+  F subset of Q is the set of accepting states.
+
+
+Usually I'll draw them instead of formally defining them:
+
+Example:
+           i         n        t
+  --> q0 ---->  q1 ---->  q2 ---> f3
+
+means:
+
+  Q={q0, q1, q2, f3}
+
+  Sigma= at least {i, n, t}
+
+  delta(q0, i) = { q1 }
+  delta(q0, *) = { }  * is anything except i
+
+  delta(q1, n) = { q2 }
+  delta(q2, t) = { f3 }
+
+  F = { f3 }
+
+
+A "run" of an NFA on an input string:
+
+  * start in the initial state
+  * we can follow an epsilon edge out of a state whenever we want
+  * we can consume the next symbol in the word
+    if there's an edge out of our current state labeled with that symbol.
+    (follow the edge).
+
+
+  * A run is accepting if it finishes in one of the states in F
+    and the whole word is consumed
+
+  * A word is accepted if there exists an accepting run
+
+
+
+
+
+
