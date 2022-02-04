@@ -39,7 +39,7 @@ red()
 
 striplines()
 {
-  sed -n 's/^Error.*line *\([0-9]*\).*/Error \1/p'
+  sed -n 's/^Lexer error in .*line *\([0-9]*\).*/Error \1/p'
 }
 
 # Arg1: error file
