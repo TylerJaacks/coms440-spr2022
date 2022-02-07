@@ -1,0 +1,212 @@
+
+NFAs
+
+Simple example:
+
+
+
+                 a           b
+ epsilon--> q3 ----->  q4 ------> ((q5))  ----+  c
+       /                                  <---+
+      /
+--> q0
+      \
+       \
+    a   ---> q1  --->  ((q2))
+                  c
+
+
+
+A run for "a"
+
+  q0 -(a)-> q1    (stuck, no more input)
+
+Another run for "a"
+
+  q0 -()-> q3 -(a)-> q4 (stuck, no more input)
+
+
+A run for "ac"
+
+  q0 -(a) -> q1 -(c)-> q2   (stuck, no more input, accepting)
+
+Another run for "ac"
+
+  q0 -()-> q3 -(a)-> q4   (stuck, still have 'c' on input)
+
+
+This NFA will accept:
+
+  ac, ab, abc, abcc, abccc, abcccc, ....
+
+  (ac) | (abc*)
+
+
+
+How about the reverse, i.e., start with a regex, and build an NFA?
+
+Start with the "easy" ones:
+
+  a
+              a
+  --> (q0) ------>  ((q1))
+
+
+  epsilon
+            epsilon
+  --> (q0) -------> ((q1))
+
+
+
+How do I concatenate two NFAs?
+
+
+                      ((f1))  ----------------------------->   (s0)
+                                           ---------------->     ^
+  --> (r0)  (mysery NFA for r)            /                      start state
+                                         /                       for NFA for s
+                      ((f2))  ----------/
+
+
+Any word w accepted by r -> has an accepting run
+ -> ends in one of the final states ->
+ can epsilon over to the start of s -> can then do an
+ accepting run on s for word w' -> ww' is acceped by this NFA.
+
+
+
+Choice:
+  Have regex r, s
+  Want to match either don't care which
+
+
+
+    epsilon   ----> (r0)  ---- mystery NFA for r
+             /
+      (initial)
+             \-----> (s0)  ---- mystery NFA for s
+     epsilon
+
+
+
+Star:
+  Have regex r
+  Add epsilon transitions from every final state
+  back to the initial state
+
+  Also add epsilon transitions from initial
+  state to a new final state, to handle
+  "zero repetitions"
+
+
+
+          epsilon
+     /--------------------------\
+    |                           |
+    v                           |
+  (r0) ---> mystery NFA ---> ((f0))
+    |
+    |
+    | epsilon
+    |
+    |
+    v
+   ((new final))
+
+
+
+The story so far:
+
+* for any regex, we can build an NFA that accepts the same words as the regex.
+
+* for a scanner, we can basically do the same thing, but keep track of
+  which final state -> which token matches
+
+Idea:
+
+* Build NFA for each regex for each token
+
+* Keep each final state separate
+
+* Imagine we are running K NFAs in parallel
+
+* When we reach a final state for NFA k
+
+  -> advance a pointer in input stream (for the end of the lexeme)
+     to current position
+
+  -> remember "we matched regex k"
+
+  -> in case of ties (i.e., we match both j and k)
+     use some tie breaker.
+
+
+* Continue until all NFAs are stuck
+  (no chance to ever reach a final state)
+
+* Then look back at "what was the last match" and "where's the end of lexeme
+  pointer"
+
+
+Two last issues:
+
+(1) removing non-determinism
+(2) make the automaton more efficient?
+
+
+(1) How to remove non-determinism
+
+We need to build a deterministic finite automaton
+
+  same definition except delta has no non-determinsm
+
+    delta : Q x Sigma ---> Q
+
+    from a state q on symbol s, which state do I go to.
+
+
+How to convert from NFA to DFA:
+
+  Idea: keep track of "which states (as a set) in the NFA, might I be in"
+
+  DFA: each state is a set of NFA states
+
+       delta is given by "if I see an 'a' where can I go"
+       etc.
+
+       final?
+
+       sets of states with one NFA final state -> final state in DFA
+
+
+  Really a pain by hand
+
+
+(2) DFA minimization:
+  Idea: we can collapse states together sometimes
+
+        things like
+
+
+            a              b
+            /----> (q3) ---\
+           /                v
+        (q0)               ((q2))
+           \                ^
+            \----> (q1) ---/
+            a              b
+
+
+    Minimization idea is to merge q1 and q3 because we don't need both.
+
+
+NFA -> DFA
+
+    Could be expo blowup
+    2^n cost at worst
+
+DFA minimization:
+    quadratic in # of states
+
+
+
