@@ -1,6 +1,6 @@
-Lexer error in file tricky.c line 40:
+Lexer error in file tricky.c line 40
 	Ignoring unexpected symbol: $
-Lexer error in file tricky.c line 40:
+Lexer error in file tricky.c line 40
 	Ignoring unexpected symbol: `
-Lexer error in file tricky.c line 42:
+Lexer error in file tricky.c line 42
 	Unclosed comment

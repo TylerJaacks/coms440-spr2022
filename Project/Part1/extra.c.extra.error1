@@ -1,2 +1,2 @@
-Lexer warning in file extra.c line 15:
+Lexer warning in file extra.c line 15
 	Identifier too long; truncating to this_is_a_very_long_identifier_name_designed_to_
