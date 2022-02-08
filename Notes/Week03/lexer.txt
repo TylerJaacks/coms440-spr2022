@@ -54,3 +54,148 @@ toss me that piano
 that's all for today!
 
 
+"Fun" question: how many lookahead chars do we need?
+For C, I think, you can always get away with just one.
+
+Are there languages that require more than one lookahead char?
+YES
+
+Imagine a slick math program
+
+  2x + sin x + pi
+
+  2xy
+
+Single letter variables
+Trig functions
+
+  tan
+  tab
+
+This will require more than one char rollback in some cases
+
+How to deal with needing to roll back more than one char?
+
+Buffering input will solve this, and is good for speed anyway.
+
+How does this work when we can roll back perhaps over a buffer
+that we've already refilled?
+
+Common trick:
+
+  Use two buffers, each of size N > n
+  where n is max number of lookahead / rollback chars.
+
+  Can choose any N that's convenient for say I/O like multiple of
+  the disk page size
+
+
+  ---------------------------------------------------------------
+  |                              |                              |
+  ---------------------------------------------------------------
+  0                               N                              2N
+          ^           ^
+          used:       Peek: lookeahead.
+          will never roll back before this point.
+
+
+  used: all chars before this have been "consumed" which means
+        we will never roll back before this.
+
+  peek: used to look ahead, can go forward and back but not back
+        before used.
+
+
+  Imagine input is:  4x - tanx + pi
+
+  Suppose N=6.
+
+  -------------------------------------------------
+  | 4 | x |   | - |   | t || a | n | x |   | + |  |
+  -------------------------------------------------
+    0   1   2   3   4   5    6   7   8   9   10  11    12
+
+  we've consumed already "4x -"
+
+
+  used: 4
+  peek: 4
+
+  skip whitespace
+
+  used: 5
+  peek: 5
+
+  move peek to determine "yup its tan"
+  so say peek is now 7
+
+  used: 7
+  peek: 7
+
+  since used >= N we can refill the first buffer.
+
+  -------------------------------------------------
+  | p | i | \n| \0| \0| \0|| a | n | x |   | + |  |
+  -------------------------------------------------
+    0   1   2   3   4   5    6   7   8   9   10  11    12
+
+
+Summary:
+
+  Initialize: fill both buffers
+  scan and advance.
+  when used ptr moves out of a buffer, then it is safe to refill it.
+
+Special case:
+
+  If we only need one lookahead and never roll back,
+  can get away with one buffer, and just refill it when
+  we get to the end.
+
+
+Suggestions for the project:
+------------------------------------------------------------
+* you'll want "what's the next token" and "what's the next lexeme"
+* current file and line number
+* "advance to the next token" called explicitly
+
+token:
+  name for the thing we scanned
+
+lexeme:
+  the text in the input file that matched the token
+
+
+Dealing with keywords
+------------------------------------------------------------
+
+(1) Incorporate these into flowcharts / recognizer code
+
+    Good: it's efficient
+    Bad:  horrible code, hard to update
+
+    start        b       r        e          a       k       not letter or digit
+    -------> O ----> O ----> O  ----->  O  -----> O ----> O ------>  break
+             |
+             | c
+             v    a
+             O ----->
+
+
+    Implementation will be ugly
+
+
+(2) Scan an identifier, and for each identifier,
+    check if it is a keyword.
+
+    Can be clever like "don't search if we saw a digit"
+
+    How to store keywords:
+
+      sorted array - binary search
+      or hash
+
+    Good: code is "easier"
+          easier to add new keywords
+
+
