@@ -1,0 +1,122 @@
+\documentclass[10pt]{article}
+\usepackage{fullpage}
+\usepackage{url}
+\usepackage{color}
+\usepackage{listings}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{dkred}{rgb}{0.6,0,0}
+\definecolor{dkblue}{rgb}{0,0,0.7}
+
+\usepackage{tikz}
+\usetikzlibrary{automata, positioning, arrows}
+\tikzset{%
+  node distance=2.5cm,  
+  initial text={},      
+  every state/.style={  
+    semithick},
+  double distance=2pt,  % Accept state appearance
+  every edge/.style={   
+    draw,
+    ->,
+    >=stealth',
+    auto,
+    semithick} %
+}
+
+\lstdefinestyle{jvm}{
+  % aboveskip=3mm,
+  % belowskip=3mm,
+  xleftmargin=2em,
+  % xrightmargin=2em,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\ttfamily},
+  numbers=left,
+  moredelim=[s][\color{black}]{Ljava}{;},
+  morecomment=[l][\color{dkgreen}]{;},
+  morecomment=[l][\color{magenta}]{;;},
+  keywords={class,public,static,super,method,code,end},
+  keywordstyle=\color{dkblue},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=8
+}
+
+\renewcommand{\thepage}{~}
+
+\title{COM S 440/540 Homework 1}
+\date{}
+\author{Lexical Analysis 1}
+
+\begin{document}
+
+\maketitle
+
+\noindent
+Reminder: present your own work and properly cite any sources used.
+Solutions should be written satisfying the \emph{other student viewpoint},
+and must be prepared using \LaTeX.
+\renewcommand{\thepage}{~}
+ 
+%============================================================
+\section*{Question~1~\hfill 15 points}
+%============================================================
+
+Write a regular expression
+that accepts an HTML special character of the form
+\verb|&charname;|
+where a \verb|charname| consists
+of one or more letters (any case) or digits.
+The following are examples of words that should be accepted:
+\begin{quote}
+\begin{verbatim}
+		&frac34;
+		&nbsp;
+		&circledR;
+		&CenterDot;
+\end{verbatim}
+\end{quote}
+You do not need to check that the character name is valid.
+
+%============================================================
+\section*{Question~2~\hfill 25 points}
+%============================================================
+
+Write a C function, 
+with appropriate comments to explain how your code works,
+to scan a null-terminated string and return a pointer to the first
+``non-whitespace'' character in the string.
+If the string is entirely whitespace,
+then return a pointer to the terminating null character.
+For this exercise, whitespace includes spaces, tabs (\verb|'\t'|),
+newlines (\verb|'\n'|), and shell-style comments (between \verb|"#"| and newline).
+The function prototype should be
+\begin{verbatim}
+    const char* skipSpaces(const char* buffer);
+\end{verbatim}
+and as an illustrating example,
+should return the following pointers $p$ for the buffers shown below:
+\begin{quote} \tt
+\begin{tabbing}
+  "\=\verb|\n\t\n|~~\=4"\\
+  \> $\uparrow$ \> $\uparrow$ \\
+  \> buffer \> $p$ 
+\end{tabbing}
+\begin{tabbing}
+  "\=\# All whitespace \verb|\n|~~~~"\=\\
+  \> $\uparrow$ \> $\uparrow$ \\
+  \> buffer \> $p$ 
+\end{tabbing}
+\begin{tabbing}
+  "\=~~\verb|\t| \# This is a comment \verb|\n| ~ \# Another \# one \verb|\n\n| ~~\=here\verb|\n\t % #|"\\
+  \> $\uparrow$ \> $\uparrow$ \\
+  \> buffer \> $p$ 
+\end{tabbing}
+\end{quote}
+You may not call \emph{any} other functions,
+except for helper functions you provide.
+You will lose points for inefficiency 
+(e.g., scanning the string more than once).
+
+\end{document}
