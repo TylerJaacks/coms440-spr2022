@@ -1,0 +1,411 @@
+
+\documentclass{article}
+\usepackage{fullpage}
+\usepackage{url}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{longtable}
+
+\renewcommand{\topfraction}{0.99}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{muave}{rgb}{0.58,0,0.82}
+\definecolor{dkred}{rgb}{0.6,0,0}
+\definecolor{dkblue}{rgb}{0,0,0.7}
+
+\lstset{frame=none,
+  language=C,
+  % aboveskip=3mm,
+  % belowskip=3mm,
+  xleftmargin=2em,
+  % xrightmargin=2em,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\ttfamily},
+  numbers=left,
+  stepnumber=1,
+  keywordstyle=\color{dkblue},
+  directivestyle=\color{dkred},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{muave},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=2
+}
+
+\lstdefinestyle{Output}{
+  % aboveskip=3mm,
+  % belowskip=3mm,
+  xleftmargin=2em,
+  % xrightmargin=2em,
+  showstringspaces=false,
+  columns=fixed,
+  basicstyle={\ttfamily},
+  numbers=none,
+  keywordstyle=,
+  directivestyle=,
+  commentstyle=,
+  stringstyle=,
+  tabsize=8
+}
+
+\newcommand{\cpp}{C{\tt ++}}
+
+\newcommand{\gradeline}{ \cline{1-2} \cline{4-4} ~\\[-1.5ex] }
+
+\newenvironment{gradetable}{\begin{longtable}{@{}rrcp{5in}} \multicolumn{2}{l}{\bf Points} & & {\bf Description}\\ \gradeline}{\end{longtable}}
+
+\newcommand{\mainitem}[2]{\pagebreak[2] {\bf #1} &&& {\bf #2}}
+\newcommand{\mainpara}[1]{~ &&& {#1} }
+\newcommand{\inneritem}[2]{~ & #1 && #2}
+\newcommand{\innerpara}[1]{~ & ~ && #1}
+
+
+\title{COM S 440/540 Project part 2, entirely extra credit}
+\author{C Preprocessor}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+%======================================================================
+\section{Overview}
+%======================================================================
+
+When executed with a mode of 2,
+your compiler should read the specified input file
+and divide it into tokens that are written to the output stream.
+The format is similar to (and backward compatible with) part 1:
+each token should generate an output line of the form
+\begin{quote}
+  \emph{location} \verb|Token| \emph{number} \verb|Text| \emph{lexeme}
+\end{quote}
+where \emph{location} may be fancier than part~1 (see below).
+Extra credit may be earned by implementing certain preprocessor directives.
+
+All implementation must be C, C++, or Java.
+Instructor permission is required to use anything beyond
+the standard libraries for these languages.
+Submissions will be graded on {\tt pyrite.cs.iastate.edu},
+and therefore must build and run correctly there.
+
+%======================================================================
+\section{Preprocessor directives}
+%======================================================================
+
+All preprocessor directives will have the form
+\begin{quote}
+\begin{verbatim}
+  # directive possible other text newline
+\end{verbatim}
+\end{quote}
+i.e., will begin with the \verb|#| character
+and end with a newline character.
+However, note that comments within a preprocessor directive
+must be ignored and treated accordingly:
+C-style comments are equivalent to a space,
+while C++-style comments are equivalent to a newline.
+Note that whitespace (including comments!) may appear
+between the \verb|#| and the directive.
+Errors should be generated for badly-formed or unrecognized
+preprocessor directives.
+
+Conceptually,
+the preprocessor sits between the lexer and the parser.
+As such, preprocessor directives will be described in terms
+of \emph{tokens}.
+Students may, at their discretion,
+expand the list of tokens recognized by the lexer as needed to
+support the preprocessor,
+for example by adding the \verb|#| symbol
+and special keywords for preprocessor directives
+{\bf that are only recognized immediately following} \verb|#|.
+
+
+%-----------------------------------------------------------------
+\subsection{include}
+%-----------------------------------------------------------------
+
+The \verb|include| directive has the form
+\begin{quote}
+  \verb|#| \verb|include| \emph{filename}
+\end{quote}
+where \emph{filename} is a string literal.
+You do not need to support ``system'' includes\footnote{We
+  will not test for this, so if you prefer to
+  support those as well, you will not lose points.}
+that use angled brackets, for example \verb|#include <stdio.h>|.
+This directive switches the token input stream to the
+indicated file
+(with an error generated if the file cannot be opened).
+When the token stream from that file is exhausted,
+it reverts back to the original file.
+Of course, the included file may itself have include directives,
+which should be followed recursively.
+You may set a reasonable limit to the include depth (say, 256)
+with an appropriate error message if this depth is exceeded.
+
+In mode~2, your compiler should write a line to the output stream
+of the form
+\begin{quote}
+  \emph{location} \verb|include expansion|
+\end{quote}
+when an include directive is reached,
+i.e., immediately before switching the token stream.
+
+For extra extra credit,
+the preprocessor should check for ``include cycles''
+(for example, if file {\tt A} includes file {\tt B} which includes file {\tt C}
+which includes file {\tt A})
+and print an appropriate error message when this occurs.
+
+%-----------------------------------------------------------------
+\subsection{define and undefine}
+%-----------------------------------------------------------------
+
+The \verb|define| directive has the form
+\begin{quote}
+  \verb|#| \verb|define| \emph{macro} \emph{replacement}
+\end{quote}
+where \emph{macro} is an identifier\footnote{You
+  do not need to support macros with parameters.}
+and \emph{replacement} is any replacement text, including none.
+This directive defines a preprocessor identifier \emph{macro}
+with the specified replacement text.
+Then,
+whenever the input stream encounters an identifier
+that exactly matches the \emph{macro},
+the token stream switches to the replacement text.
+Once the replacement text is exhausted,
+the token stream reverts back to its original source.
+
+The \verb|undef| directive has the form
+\begin{quote}
+  \verb|#| \verb|undef| \emph{macro}
+\end{quote}
+where \emph{macro} is an identifier.
+This directive removes the definition for preprocessor identifier \emph{macro},
+if one exists.
+
+
+In mode~2, your compiler should write a line to the output stream
+of the form
+\begin{quote}
+  \emph{location} \verb|macro expansion|
+\end{quote}
+when a defined macro identifier is encountered.
+For extra extra credit,
+the preprocessor should allow \emph{nested macros},
+i.e., if the replacement text itself contains
+a macro identifier,
+then it should be recursively expanded.
+You may set a reasonable limit to the macro nesting depth (say, 256)
+with an appropriate error message if this depth is exceeded.
+For extra extra extra credit,
+the preprocessor should detect replacement cycles
+and issue an appropriate error message.
+
+%-----------------------------------------------------------------
+\subsection{ifdef}
+%-----------------------------------------------------------------
+
+The \verb|ifdef| directive has the form
+\begin{quote}
+  \verb|#| \verb|ifdef| \emph{macro}
+\end{quote}
+where \emph{macro} is an identifier.
+If \emph{macro} is currently defined
+(via a \verb|define| directive),
+then the token stream remains on;
+otherwise, the token stream is switched off.
+This lasts until either a matching \verb|else| directive,
+in which case the token stream is toggled,
+or a matching \verb|endif| directive.
+An \verb|ifdef| directive may have at most one \verb|else| directive.
+The preprocessor should issue an error if the \verb|ifdef| directive
+is not closed by an \verb|endif| directive,
+or if an \verb|else| or \verb|endif| directive
+does not have a corresponding \verb|ifdef| or \verb|ifndef| directive.
+
+The \verb|ifndef| directive has the form
+\begin{quote}
+  \verb|#| \verb|ifndef| \emph{macro}
+\end{quote}
+where \emph{macro} is an identifier.
+If \emph{macro} is currently defined
+(via a \verb|define| directive),
+then the token stream is switched off;
+otherwise, the token stream remains on.
+Like \verb|ifdef|, the \verb|ifndef| directive
+may have at most one \verb|else| directive,
+and must be closed by an \verb|endif| directive.
+
+Note that other preprocessor directives,
+including \verb|ifdef| and \verb|ifndef|,
+may appear within an \verb|ifdef| or \verb|ifndef| directive.
+In this case, if the token stream is switched off,
+the enclosed preprocessor directive(s) must be
+parsed as if the token stream were on,
+but not acted upon.
+
+
+%======================================================================
+\section{Formatting}
+%======================================================================
+
+\subsection{Compiler output}
+
+The \emph{location} information displayed for each token
+and for preprocessor actions
+has the following form.
+If the input stream is a file,
+then \emph{location} should be the text
+\begin{quote}
+  \verb|File| \emph{filename} \verb|Line| \emph{line number}
+\end{quote}
+and if the input stream is the replacement text of a macro,
+the \emph{location} should be the text
+\begin{quote}
+  \verb|Macro| \emph{macroname}
+\end{quote}
+Additionally, the \emph{location} should be indented
+by $2d$ \verb|'.'| characters,
+where $d \ge 0$ is the recursion depth
+caused by sequences of include directives and macro substitutions.
+
+\subsection{Error messages}
+
+Error messages generated by the preprocessor must
+be written to standard error,
+and have exactly the form
+\begin{quote}
+	\begin{tabbing}
+		{\tt Preprocessor} \= {\tt error in file} \emph{filename}
+		{\tt line} \emph{line number}
+	\\
+		\> \emph{Description}
+	\end{tabbing}
+\end{quote}
+The \emph{Description} should give a helpful description of the error,
+and may span more than one line if necessary.
+The error stream must be empty if no errors or warnings are generated.
+
+
+Example inputs, outputs, and errors are given below.
+Additionally, students are encouraged to check the output and error messages
+given for the example test files, for all parts of the project.
+For test files with errors,
+code is considered correct if the first error messages given
+occur on the same input line and the error messages describe the
+same error (as determined by a human).
+
+
+
+%======================================================================
+\section{Include example}
+%======================================================================
+
+\subsection{include1.h}
+
+\lstinputlisting{include1.h}
+
+\subsection{include2.h}
+
+\lstinputlisting{include2.h}
+
+\subsection{include3.h}
+
+\lstinputlisting{include3.h}
+
+\subsection{Output for include1.h in mode 2}
+
+\lstinputlisting[style=Output]{include1.h.extra.output2}
+
+
+%======================================================================
+\section{Macro example}
+%======================================================================
+
+\subsection{macros.c}
+
+\lstinputlisting{macros.c}
+
+\subsection{Output for macros.c in mode 2}
+
+\lstinputlisting[style=Output]{macros.c.extra.output2}
+
+
+%======================================================================
+\section{Ifdef example}
+%======================================================================
+
+\subsection{ifdefs.c}
+
+\lstinputlisting{ifdefs.c}
+
+\subsection{Output for ifdefs.c in mode 2}
+
+\lstinputlisting[style=Output]{ifdefs.c.extra.output2}
+
+\subsection{ifdef-bad.c}
+
+\lstinputlisting{ifdef-bad.c}
+
+\subsection{Error stream for ifdef-bad.c in mode 2}
+
+\lstinputlisting[style=Output]{ifdef-bad.c.extra.error2}
+
+
+%======================================================================
+\section{Grading}
+%======================================================================
+
+\noindent
+\begin{gradetable}
+  \mainitem{15}{Include directives}
+  \\
+  \inneritem{6}{Basic include}
+  \\
+	\inneritem{5}{Nested includes}
+  \\
+  \inneritem{4}{Include cycle detection}
+  \\[4mm]
+
+  \mainitem{15}{Define and undefine}
+	\\
+  \inneritem{4}{Basic macro substitution}
+	\\
+  \inneritem{3}{Undefine}
+	\\
+  \inneritem{4}{Nested replacement}
+	\\
+  \inneritem{4}{Cycle detection}
+  \\[4mm]
+
+  \mainitem{18}{Ifdefs}
+  \\
+  \inneritem{2}{Ifdef without else}
+  \\
+  \inneritem{2}{Ifdef with else}
+  \\
+  \inneritem{2}{Ifndef without else}
+  \\
+  \inneritem{2}{Ifndef with else}
+  \\
+  \inneritem{5}{Nested ifdefs, ifndefs}
+  \\
+  \inneritem{5}{Ifdef errors}
+\end{gradetable}
+
+
+\section{Submission}
+
+Be sure to commit your source code and documentation to your
+git repository, and to upload (push) those commits to the server
+so that we may grade them.
+Email the instructor or TA when your preprocessor is ready for grading.
+
+
+\end{document}
+

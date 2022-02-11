@@ -1,0 +1,25 @@
+File include1.h Line     1 Token 301 Text int
+File include1.h Line     1 Token 306 Text top
+File include1.h Line     1 Token  59 Text ;
+File include1.h Line     3 include expansion
+..File include2.h Line     1 include expansion
+....File include3.h Line     1 Token 301 Text int
+....File include3.h Line     1 Token 306 Text include3
+....File include3.h Line     1 Token  40 Text (
+....File include3.h Line     1 Token 301 Text int
+....File include3.h Line     1 Token 306 Text twice
+....File include3.h Line     1 Token  41 Text )
+....File include3.h Line     1 Token  59 Text ;
+..File include2.h Line     3 Token 305 Text "this is include2"
+..File include2.h Line     3 Token  59 Text ;
+..File include2.h Line     6 include expansion
+....File include3.h Line     1 Token 301 Text int
+....File include3.h Line     1 Token 306 Text include3
+....File include3.h Line     1 Token  40 Text (
+....File include3.h Line     1 Token 301 Text int
+....File include3.h Line     1 Token 306 Text twice
+....File include3.h Line     1 Token  41 Text )
+....File include3.h Line     1 Token  59 Text ;
+File include1.h Line     5 Token 301 Text int
+File include1.h Line     5 Token 306 Text top_again
+File include1.h Line     5 Token  59 Text ;

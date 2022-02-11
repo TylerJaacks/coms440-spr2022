@@ -1,0 +1,57 @@
+File macros.c Line     4 Token 301 Text float
+File macros.c Line     4 Token 306 Text area
+File macros.c Line     4 Token  40 Text (
+File macros.c Line     4 Token 301 Text float
+File macros.c Line     4 Token 306 Text radius
+File macros.c Line     4 Token  41 Text )
+File macros.c Line     5 Token 123 Text {
+File macros.c Line     6 Token 410 Text return
+File macros.c Line     6 macro expansion
+..Macro PI Token 304 Text 3.1415926
+File macros.c Line     6 Token  42 Text *
+File macros.c Line     6 Token 306 Text radius
+File macros.c Line     6 Token  42 Text *
+File macros.c Line     6 Token 306 Text radius
+File macros.c Line     6 Token  59 Text ;
+File macros.c Line     7 Token 125 Text }
+File macros.c Line    11 Token 301 Text int
+File macros.c Line    11 Token 306 Text test
+File macros.c Line    11 Token  40 Text (
+File macros.c Line    11 Token  41 Text )
+File macros.c Line    12 Token 123 Text {
+File macros.c Line    13 macro expansion
+..Macro PAIR Token 402 Text struct
+..Macro PAIR Token 306 Text pair
+File macros.c Line    13 Token 306 Text p
+File macros.c Line    13 Token  59 Text ;
+File macros.c Line    14 Token 125 Text }
+File macros.c Line    16 macro expansion
+..Macro PAIR Token 402 Text struct
+..Macro PAIR Token 306 Text pair
+File macros.c Line    20 Token 301 Text char
+File macros.c Line    20 Token 306 Text test2
+File macros.c Line    20 Token  40 Text (
+File macros.c Line    20 Token  41 Text )
+File macros.c Line    21 Token 123 Text {
+File macros.c Line    22 Token 306 Text PAIR
+File macros.c Line    22 Token 306 Text p
+File macros.c Line    22 Token  59 Text ;
+File macros.c Line    23 Token 125 Text }
+File macros.c Line    31 Token 301 Text int
+File macros.c Line    31 Token 306 Text five
+File macros.c Line    31 Token  61 Text =
+File macros.c Line    31 macro expansion
+..Macro FIVE macro expansion
+....Macro FOUR macro expansion
+......Macro THREE macro expansion
+........Macro TWO macro expansion
+..........Macro ONE Token 303 Text 1
+........Macro TWO Token  43 Text +
+........Macro TWO Token 303 Text 1
+......Macro THREE Token  43 Text +
+......Macro THREE Token 303 Text 1
+....Macro FOUR Token  43 Text +
+....Macro FOUR Token 303 Text 1
+..Macro FIVE Token  43 Text +
+..Macro FIVE Token 303 Text 1
+File macros.c Line    31 Token  59 Text ;

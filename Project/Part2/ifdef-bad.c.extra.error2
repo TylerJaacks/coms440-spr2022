@@ -1,0 +1,8 @@
+Preprocessor error in file ifdef-bad.c line 1
+	#else without #if, ignoring
+Preprocessor error in file ifdef-bad.c line 3
+	#endif without #if, ignoring
+Preprocessor error in file ifdef-bad.c line 8
+	second #else (first on line 6), ignoring
+Preprocessor error in file ifdef-bad.c line 10
+	#else on line 6 unclosed
