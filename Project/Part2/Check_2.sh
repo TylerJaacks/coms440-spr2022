@@ -39,14 +39,14 @@ red()
 
 striplines()
 {
-  sed -n 's/^Error.*line *\([0-9]*\).*/Error \1/p'
+  sed -n 's/^.* error in .*line *\([0-9]*\).*/Error \1/p'
 }
 
 # Arg1: error file
 firstError()
 {
-  awk '/^Lexer error in .*line *[0-9]*/ { errors++; if (errors>1) exit }\
-       /^Lexer warning in .*line *[0-9]*/ { errors++; if (errors>1) exit }\
+  awk '/^.* error in .*line *[0-9]*/ { errors++; if (errors>1) exit }\
+       /^.* warning in .*line *[0-9]*/ { errors++; if (errors>1) exit }\
                               { if (errors) print }' $1
 }
 
