@@ -165,6 +165,36 @@ Some interesting lex issues:
     flex: you need to control the buffers
           create, destroy, switch between buffers
 
+          yy_create_buffer(...)
+          yy_switch_to_buffer(...)
+          yy_delete_buffer(...)
+
+
+(3) line numbers
+
+      how to track in lex?
+
+      * by hand
+        \n    { linenumber++; }
+
+
+      * flex only:
+
+        %option yylineno
+
+        This causes flex to generate and use global variable
+
+            yylineno
+
+        which will be incremented whenever flex sees a newline char
+
+        * Not initialized
+        * NOT tied to input buffer or input file
+
+        You'll need to initialize and deal with switching files and such
+
+
+Proper scanner example: numbers2.l
 
 
 
