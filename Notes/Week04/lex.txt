@@ -1,0 +1,200 @@
+Lex and Flex
+------------------------------------------------------------
+
+Flex is a forward compatible replacement for Lex.
+
+
+Idea:
+
+* define patterns for lexemes using regular expressions
+
+* for each pattern, specify an action to take as C code
+
+* put this into a file with extension .l
+
+* run lex on the .l file
+
+  this will generate a "scanner" as C code
+  lex.yy.c
+
+* The "interface" you get is the following:
+
+  int yylex()
+
+  this will scan the input, run the state machine,
+  execute actions as patterns are matched,
+  until one of the actions returns an integer
+  and this will be returned by yylex()
+
+
+File format:
+
+--------------------------------------------------
+
+Declarations / definitions
+
+%%
+
+Patterns and actions
+
+%%
+
+other C code
+
+--------------------------------------------------
+
+
+Declarations:
+
+  * you can define C helper functions, include files, etc.
+    which goes in a block of C declarations and code
+
+    %{
+        C code here
+
+    %}
+
+  * you can define some regular expressions used later in patterns
+
+  * you can give some options to lex/flex
+
+
+Patterns and actions:
+
+  specified as
+
+    pattern (as a regex)    { /* C code to execute on match */ }
+
+  can put C code on more than one line.
+  This is the code executed when the pattern matches.
+
+
+Other C Code:
+
+  you could define
+
+  int main()
+
+  and then you get an entire? C program you can run
+
+
+Simple example:
+
+  Recognize an int or float constant
+
+  -> numbers.l
+
+
+To build:
+
+  lex numbers.l
+  or
+  flex numbers.l
+
+
+Some fun stuff in numbers.l in order
+
+* %option noyywrap
+
+  This option is about how lex handles EOF
+  and we're just saying, "eof means we're done!"
+
+* digit, space: me defining some regexes to use later
+
+* yytext:
+  this is a char* that lex maintains that is always the current lexeme
+  (whatever text matched the pattern)
+
+  - don't modify this
+  - don't free this
+  - lex updates it automatically
+    -> can't rely on this to stick around
+    -> make a copy if you need to save it longer
+
+
+* lex tries to match as much text as it can in a pattern
+
+  e.g.
+
+  12345
+
+  matches instead of 1 then 2 then 3
+
+* in case of a tie, use the earlier pattern in the file
+
+  e.g.,
+
+  input 3 matches both {digit+} and .
+
+* by default, yylex reads from stdin
+
+* yylex() - scan until some action returns, or eof
+  eof - it will return 0
+
+
+Some interesting lex issues:
+
+(1) how to deal with comments
+
+    can't I just write a clever regex for C comments?
+
+    Yes but there's better ways.
+
+    The "right" way to do this in lex is to use "states"
+
+        /*  -> switch to "in a comment" state
+        */  -> switch to "normal" state
+        if I'm "in a comment" then ignore everything that's not a close comment
+
+
+(2) input files
+
+    Easy - just "read from this file, then stop"
+
+    change the global FILE* variable yyin
+
+    before calling yylex just do
+
+    yyin = fopen(....)
+
+
+    Hard - what about #includes and stuff?
+
+    doesn't work b/c flex/lex buffer the input!
+
+    flex: you need to control the buffers
+          create, destroy, switch between buffers
+
+          yy_create_buffer(...)
+          yy_switch_to_buffer(...)
+          yy_delete_buffer(...)
+
+
+(3) line numbers
+
+      how to track in lex?
+
+      * by hand
+        \n    { linenumber++; }
+
+
+      * flex only:
+
+        %option yylineno
+
+        This causes flex to generate and use global variable
+
+            yylineno
+
+        which will be incremented whenever flex sees a newline char
+
+        * Not initialized
+        * NOT tied to input buffer or input file
+
+        You'll need to initialize and deal with switching files and such
+
+
+Proper scanner example: numbers2.l
+
+
+
