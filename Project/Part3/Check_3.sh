@@ -28,6 +28,11 @@ green()
   printf "[1;32m$1[0;39m$2"
 }
 
+cyan()
+{
+  printf "[1;36m$1[0;39m$2"
+}
+
 yellow()
 {
   printf "[1;33m$1[0;39m$2"
@@ -40,13 +45,13 @@ red()
 
 striplines()
 {
-  sed -n 's/^Syntax error in .*line *\([0-9]*\).*/Error \1/p'
+  sed -n 's/^.* error in .*line *\([0-9]*\).*/Error \1/p'
 }
 
 # Arg1: error file
 firstError()
 {
-  awk '/Parse error in .*line *[0-9]*/ { print; exit }' $1
+  awk '/^.* error in / { e++; if (e>1) exit; }  {if (e) print; }' $1
 }
 
 # Arg1: input file
@@ -187,6 +192,13 @@ compareInvalid()
     return 0
   fi
 
+  linetextoracle=`head -n 1 <<< "$firstoracle"`
+  linetextstudent=`head -n 1 <<< "$firststudent"`
+  if [ "$linetextoracle" == "$linetextstudent" ]; then
+    echo "c"
+    return 0
+  fi
+
   lineoracle=`striplines <<< "$firstoracle"`
   linestudent=`striplines <<< "$firststudent"`
   if [ "$lineoracle" == "$linestudent" ]; then
@@ -211,6 +223,8 @@ showStatus()
     red    "Output  is  different" "$2"
   elif [ "$1" == "g" ]; then
     green  "First  error  matches" "$2"
+  elif [ "$1" == "c" ]; then
+    cyan   "First error line+text" "$2"
   elif [ "$1" == "y" ]; then
     yellow "First error same line" "$2"
   elif [ "$1" == "r" ]; then
@@ -287,7 +301,7 @@ detailLine()
   fi
   echo "        Expected first error:"
   echo "        ---------------------------------------------------------"
-  firstError $4 | awk '{print "        | " $0}'
+  cat $4 | awk '{print "        | " $0}'
   echo "        ---------------------------------------------------------"
   echo
   echo "        Given first error:"
