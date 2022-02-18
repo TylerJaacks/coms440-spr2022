@@ -1,0 +1,194 @@
+
+Top-down parsing
+------------------------------------------------------------
+
+Idea: start at root of parse tree, and build down
+      until we obtain the input stream.
+
+One method: recursive descent
+
+ * conceptually "easy"
+
+ * can be efficient if care is taken
+
+ * write a function for each symbol in the grammar
+
+ * the function for a grammar symbol, tries to match
+   that symbol on the input stream.
+
+ * may require backtracking in general
+   (but we don't need this for C)
+
+
+Without backtracking, for a grammar symbol A, we might have
+
+  A -> X1 X2 X3 X4
+
+
+void A()
+{
+  choose (by magic) the correct production for A
+      A-> X1 X2 ... Xn
+
+  for i = 1 to n do
+      if Xi is a terminal symbol
+          the next input token must be Xi so
+            check that that's true, if not error
+            consume the token
+
+      if Xi is a non-terminal symbol
+          then call Xi()
+
+  end for
+}
+
+Let's write a helper function
+    match(token t):
+        make sure next token on the input stream is t
+        and consume it
+
+
+
+With backtracking: (can't *know* the next production)
+
+bool A()
+/* return true if the input stream matched symbol A, false otherwise */
+{
+  let P be the set of viable productions for A
+
+  while (P != {} )
+  {
+    choose and remove some production A-> X1 ... Xn from set P;
+    save a pointer to the current spot in the input stream of tokens;
+
+    success = true;
+    for i = 1 to n do
+        if Xi is a terminal symbol
+          success = (next input token is Xi and advance the token);
+
+        else Xi is a non-terminal
+          success = Xi();
+
+        if (!success) break;    // This production didn't work!
+
+    end for
+
+    if (success) return true; // the production worked!
+    roll back input stream to saved pointer
+  }
+
+  return false;
+}
+
+
+
+Difficulty: a left recursive grammar can get stick in infinite recursion.
+
+S -> S + P
+S -> P
+P -> P * number
+P -> number
+
+bool S()
+{
+  if (first production)
+  {
+      S();      // probably stuck here.
+      match('+');
+      P();
+  } else {
+      P();
+  }
+}
+
+3+4+5+6+7*8;
+
+
+Predictive parsers:
+------------------------------------------------------------
+
+* These are recursive descent with no backtracking
+
+* We will build a parse table that tells
+  current nonterminal symbol A and next k lookahead symbols
+    which production to use
+
+* This gives you a LL(k) parser
+
+* We'll use k=1
+
+* Parse table is an array M
+      first dimension: non-terminal symbols
+      second dimension: terminals
+
+      M[A, x]: which production to use for A when next input symbol is x.
+
+* Soon: algorithm to build M from a grammar
+
+* Algorithm may fail, if we try to assign more than one production
+  to a single M[A, x] element.
+  -> the grammar is not LL(1)
+
+* Algorithm may (will?) fail on ambiguous / left recursive grammars.
+
+* Can sometimes rewrite the grammar to fix these problems
+
+
+Idea first:
+------------------------------------------------------------
+
+When we have grammar symbol A,
+ then to choose M[A, x]:
+    look at the productions for A,
+      find the production whose first symbol can be x
+          set M[A, x] to this production
+
+
+S -> S + P
+S -> P
+P -> P * number
+P -> number
+
+
+
+Some theory/notation:
+
+For a grammar G, we can define the following useful functions
+
+  * for any sequence alpha, of term/nonterm in G
+    define:
+          First(alpha):   { t |  t is a terminal symbol,
+                                  that can begin some string derived from alpha}
+
+    As a special case, we say epsilon is in First(alpha)
+        if alpha ->* epsilon
+
+
+  * for any nonterminal A in G, define:
+
+        Follow(A):      { t | t is a terminal symbol,
+                              in some derivation we can have ....A t....... }
+
+    As a special case, we say $ (for end of input stream) is in Follow(A)
+        if there is a derivation where A is the rightmost symbol
+          i.e., there's some derivation .........A
+
+
+S -> S + P
+S -> P
+P -> P * number
+P -> number
+
+What's First(S): { number }
+       First(P): { number }
+
+What's Follow(P): { *, +, $ }
+       Follow(S): { +, $ }
+
+S
+S + P
+S + S + P
+S + S + S + P
+S + P + S + P
+S + P * number + S + P * number
+
