@@ -1,0 +1,220 @@
+
+How to compute first and follow sets?
+======================================================================
+
+First: what's the first symbol that could appear
+------------------------------------------------------------
+
+  * for any terminal symbol t, First(t) = { t }
+    we can include epsilon
+    First(epsilon) = { epsilon }
+
+  * For any non-terminal symbol A
+
+    Initialize First(A) = { }
+
+    For each production of A, A -> B1 B2 ... Bn
+        add everything in First(B1) to First(A) except epsilon
+
+        if epsilon is in First(B1) then
+            add everything in First(B2) to First(A) except epsilon
+            if epsilon is in First(B2) then
+
+                add everything in First(B3) to First(A) except epsilon
+                  ...
+
+                  add everything in First(Bn) to First(A), including epsilon
+
+
+
+  * For any sequence alpha = X1 X2 ... Xn
+
+    Initialize First(alpha) to { }
+      Add everything in First(X1) to First(alpha) except epsilon..
+
+        (essentially the same)
+
+
+Example(s):
+
+(1) S -> S + P
+(2) S -> P
+(3) P -> P * number
+(4) P -> number
+
+First(S)?
+  prod 1 says: add First(S+P) to First(S)
+    and maybe more if epsilon is in First(S) but we don't know that yet
+
+  prod 2 says: add First(P) to First(S)
+
+
+First(P)?
+  prod 3: says: add First(P*number) to First(P)
+
+  prod 4: says add First(number) to First(P)
+        -> number is in First(P)
+
+First(P) = { number }
+First(S) = { number }
+
+
+Building Follow(A): what comes after A in any derivation
+------------------------------------------------------------
+
+Apply these rules until nothing more can be added
+
+* If S is the start symbol, add $ to Follow(S)
+      ($ is a special "end of input" token)
+
+* For nonterminals A, B
+  and any sequence alpha, gamma
+
+    if there is a production  A -> alpha B gamma
+    then add everything except epsilon in First(gamma) to Follow(B)
+
+    if epsilon in First(gamma) then add Follow(A) to Follow(B)
+
+Example(s):
+
+(1) S -> S + P
+(2) S -> P
+(3) P -> P * number
+(4) P -> number
+
+  Follow(S) = { $, + }
+  Follow(P) = { $, +, * }
+
+first rule adds $ to Follow(S)
+
+  production 1 says add First(+P) to Follow(S) : that's +
+  production 2 says add Follow(S) to Follow(P)
+
+  production 3 says add First(*P) to Follow(P) : that's *
+
+
+S $
+...
+(some sentence) $
+
+
+Building a predictive, recursive descent parser
+------------------------------------------------------------
+
+M[A, x] : which production to use on grammar symbol A,
+          when the next input symbol is x
+
+Initialize M[A, x] to empty set for all A, x
+
+For each production A -> alpha in the grammar, do
+  (1) For each terminal x in First(alpha),
+        add A -> alpha to M[A, x]
+  (2) If epsilon is in First(alpha), then
+        for each terminal x or $ in Follow(A),
+          add A->alpha to M[A, x]
+End for
+
+If |M[A, x]| > 1 then fail  (the grammar as given is not LL(1))
+
+For our example grammar:
+
+  (3) P->P*number
+        what's First(P)?  First(P) = {number}
+        add (3) to M[P, number]
+
+  (4) P->number
+        add (4) to M[P, number]
+
+        FAIL
+
+
+The algorith fails if there are productions for a symbol X
+    X -> alpha
+    X -> beta
+
+    when First(alpha) \cap First(beta) then the algorithm will fail
+
+
+Can we fix it with right recursion?
+
+  S -> P + S
+  S -> P
+  P -> number * P
+  P -> number
+
+(Ignore: this is right associative, other was left assoc.)
+
+This will also FAIL and for the same reason.
+
+Need to remove right recursion!
+
+Here's a common, "simple" case
+------------------------------------------------------------
+
+  A -> A alpha
+  A -> beta
+
+This could derive what?
+
+  beta
+  beta alpha
+  beta alpha alpha
+  beta alpha alpha alpha ...
+
+  A' -> beta A"
+  A" -> alpha A"
+  A" -> epsilon
+
+Can generalize this
+  A -> A alpha1
+  A -> A alpha2
+  ...
+  A -> A alpham
+  A -> beta1
+  ...
+  A -> betan
+
+rewrites to
+
+  A' -> beta1 A" | beta2 A" | ... | betan A"
+  A" -> alpha1 A" | alpha2 A" | ... | alpham A" | epsilon
+
+------------------------------------------------------------
+
+Rewrite this left-recursive grammar:
+
+  S -> S + P
+  S -> P
+  P -> P * number
+  P -> number
+
+Get:
+
+S' -> P' S"
+S" -> + P' S"       /* S" : zero or more +P'    */
+S" -> epsilon
+
+P' -> number P"
+P" -> * number P"   /* P" : zero or more *number  */
+P" -> epsilon
+
+First(S') : First(P') : { number }
+First(S") : { +, epsilon }
+
+First(P') : First(number) : { number }
+First(P") : { *, epsilon }
+
+Follow(S') : { $ }
+Follow(S") : { $ }
+  S' -> P' S" says add Follow(S') to Follow(S")
+
+Follow(P') : { +, $ }
+  S' -> P' S" says add First(S") to Follow(P') except epsilon
+  epsilon in S" says add Follow(S') to Follow(P')
+
+Follow(P") : { +, $ }
+  P' -> number P" says add Follow(P') to Follow(P")
+
+
+Next time:
+  Build the M table for this grammar
