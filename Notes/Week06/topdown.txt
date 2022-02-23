@@ -216,5 +216,288 @@ Follow(P") : { +, $ }
   P' -> number P" says add Follow(P') to Follow(P")
 
 
-Next time:
-  Build the M table for this grammar
+======================================================================
+Building the LL(1) parser if we can
+======================================================================
+
+(1) S' -> P' S"
+(2) S" -> + P' S"       /* S" : zero or more +P'    */
+(3) S" -> epsilon
+
+(4) P' -> number P"
+(5) P" -> * number P"   /* P" : zero or more *number  */
+(6) P" -> epsilon
+
+Prod1:
+  for each x in First(P' S") , make M[S', x] = (1)
+  -> M[S', number] = (1)
+
+Prod2:
+  for each x in First(+ P' S"), make M[S", x] = (2)
+  -> M[S", +] = (2)
+
+Prod3:
+  for each terminal x or $ in Follow(S"), add (2) to M[S", x]
+  -> M[S", $] = (3)
+
+Prod4:
+  for each x in First(number P"),
+  -> M[P', number] = (4)
+
+Prod5:
+  for each x in First(* number P"),
+  -> M[P", *] = (5)
+
+Prod6:
+  for each terminal x or $ in Follow(P"), add (6)
+  -> M[P", +] = (6)
+  -> M[P", $] = (6)
+
+No conflicts!
+
+S'()
+{
+  if (next token is number)
+  {
+    P'()
+    S"()
+  }
+  else syntax error
+    "We expected a number, instead we saw (token)"
+}
+
+S"()
+{
+  if (next token is +)
+  {
+    match(+)    // make sure next token is + and advance to next token
+    P'()
+    S"()
+  }
+  else if (next token is $)
+  {
+    // do nothing to match epsilon
+  } else
+  {
+    syntax error
+        expected + got ?
+  }
+}
+
+P'()
+{
+  if (next token is number)
+  {
+    match(number)
+    P"()
+  }
+  else syntax error
+}
+
+P"()
+{
+  switch (next token)
+      case *:
+        match(*)
+        match(number)
+        P"()
+        break;
+
+      case +:
+      case $
+          // epsilon
+        break
+
+      default:
+        syntax error
+}
+
+
+// We could tweak this code some for example let's "fix" S"
+
+
+S"()
+{
+  if (next token is +)
+  {
+    match(+)    // make sure next token is + and advance to next token
+    P'()
+    S"()
+  }
+  else if (next token is $)
+  {
+    // do nothing to match epsilon
+  } else
+  {
+    syntax error
+        expected + got ?
+  }
+}
+
+Ok new and improved:
+
+S"()
+{
+  while (next token is +)
+  {
+    match(+)
+    P'()
+  }
+  if next token is not $ then syntax error
+}
+
+Ok new and more improved?
+
+S"()
+{
+  while (next token is not $)
+  {
+    match(+)    // any other tokens cause a syntax error here
+    P'()
+  }
+}
+
+If we combine S' and S" we get
+
+S'()
+{
+  P'()
+  while (next token is not $)
+  {
+    match(+)    // any other tokens cause a syntax error here
+    P'()
+  }
+}
+
+^^^^^ This is the code from day 1 wimpy compiler
+
+============================================================
+
+Let's generalize this for expressions with precedence levels
+
+T: terms (numbers, variables)
+
+En: expression for binary ops of prec level n
+    (higher integer n means higher precedence)
+
+
+left associative:
+
+En -> En (op) En+1            S -> S + P
+En -> En+1                    S -> P
+
+right assoc:
+
+En -> En+1 (op) En
+En -> En+1
+
+
+En()
+{
+  En+1()
+  while (next operator has precedence n)
+  {
+    consume a level n prec operator
+    En+1()
+  }
+}
+
+
+Example:
+
+  x < y + z
+
+  x < (y+z)
+
+suppose < has prec 5, and + has prec 8
+
+    E1
+    |
+    v
+    E2
+    |
+    v
+    E3
+    |
+    v
+    E4
+    |
+    v
+    E5
+   /|\
+  / | \
+E5  <  E6
+|       |
+v       v
+...    E7
+|       |
+v       v
+Emax    E8
+|       /|\
+v      / | \
+T     E8 +  E9
+|     |     |
+v     v     v
+x     ..    ..
+       T    T
+       |    |
+       v    v
+       y    z
+
+
+============================================================
+============================================================
+Precedence climbing algorithm
+============================================================
+============================================================
+============================================================
+
+expr(int min_prec)    // minimum prec level
+{
+    term()
+    while next token is a binary op with prec >= min_prec
+        op = next token
+        consume next token
+        if (op is left assoc)
+            next_level = prec(op) + 1
+        else
+            next_level = prec(op)
+        end if
+        expr(next_level);
+}
+
+
+// What if we need to build a parse / AS tree
+
+    <
+   / \
+  /   \
+ x     +
+      / \
+     /   \
+    y     z
+
+
+To build a parse tree or AST:
+Take our LL parse functions and have them return
+nodes in a parse tree
+
+
+node* expr(int min_prec)    // minimum prec level
+{
+    result = term()
+    while next token is a binary op with prec >= min_prec
+        op = next token
+        consume next token
+        if (op is left assoc)
+            next_level = prec(op) + 1
+        else
+            next_level = prec(op)
+        end if
+        rhs = expr(next_level);
+        result = new node(result, op, rhs)
+
+    return result
+}
+
+
