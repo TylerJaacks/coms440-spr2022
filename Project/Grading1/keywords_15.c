@@ -1,0 +1,11 @@
+tricky_idents
+_
+__
+___
+_3
+i
+i2
+i3
+i12312
+TrickyIdents
+TRICKY-IDENTS
