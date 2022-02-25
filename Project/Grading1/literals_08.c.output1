@@ -1,0 +1,4 @@
+File literals_08.c Line     1 Token 305 Text "hello world"
+File literals_08.c Line     2 Token 305 Text "this is a string"
+File literals_08.c Line     3 Token 305 Text "          "
+File literals_08.c Line     4 Token 305 Text "3+4=7; right?"

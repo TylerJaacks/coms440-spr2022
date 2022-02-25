@@ -1,0 +1,14 @@
+File symbols_13.c Line     1 Token  62 Text >
+File symbols_13.c Line     2 Token 353 Text >=
+File symbols_13.c Line     3 Token 353 Text >=
+File symbols_13.c Line     3 Token  61 Text =
+File symbols_13.c Line     4 Token 352 Text !=
+File symbols_13.c Line     4 Token  61 Text =
+File symbols_13.c Line     5 Token 124 Text |
+File symbols_13.c Line     6 Token 357 Text ||
+File symbols_13.c Line     7 Token 357 Text ||
+File symbols_13.c Line     7 Token 124 Text |
+File symbols_13.c Line     8 Token  38 Text &
+File symbols_13.c Line     9 Token 358 Text &&
+File symbols_13.c Line    10 Token 358 Text &&
+File symbols_13.c Line    10 Token  38 Text &

@@ -1,1 +1,2 @@
-./Check_1.sh: line 397: mycc_extra: command not found
+Lexer warning in file ex_trunc2.c line 6
+	Identifier too long; truncating to really_long_identifier_that_will_be_truncated_Wh

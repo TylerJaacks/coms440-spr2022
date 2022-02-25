@@ -1,0 +1,12 @@
+File symbols_15.c Line     1 Token 306 Text _
+File symbols_15.c Line     1 Token 355 Text ++
+File symbols_15.c Line     2 Token 306 Text _
+File symbols_15.c Line     2 Token 355 Text ++
+File symbols_15.c Line     2 Token  43 Text +
+File symbols_15.c Line     2 Token 306 Text _
+File symbols_15.c Line     2 Token 356 Text --
+File symbols_15.c Line     3 Token 306 Text a
+File symbols_15.c Line     3 Token  42 Text *
+File symbols_15.c Line     3 Token 363 Text *=
+File symbols_15.c Line     3 Token 355 Text ++
+File symbols_15.c Line     3 Token 306 Text b

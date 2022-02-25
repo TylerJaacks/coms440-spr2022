@@ -1,0 +1,8 @@
+File ex_char1.c Line     1 Token 302 Text 'a'
+File ex_char1.c Line     2 Token 302 Text '\a'
+File ex_char1.c Line     3 Token 302 Text 'b'
+File ex_char1.c Line     4 Token 302 Text '\b'
+File ex_char1.c Line     5 Token 302 Text 't'
+File ex_char1.c Line     6 Token 302 Text '\t'
+File ex_char1.c Line     7 Token 302 Text 'n'
+File ex_char1.c Line     8 Token 302 Text '\n'

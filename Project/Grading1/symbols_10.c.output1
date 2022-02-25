@@ -1,0 +1,13 @@
+File symbols_10.c Line     1 Token 306 Text x
+File symbols_10.c Line     1 Token 355 Text ++
+File symbols_10.c Line     1 Token  59 Text ;
+File symbols_10.c Line     2 Token 356 Text --
+File symbols_10.c Line     2 Token 306 Text y
+File symbols_10.c Line     2 Token  59 Text ;
+File symbols_10.c Line     3 Token 306 Text a
+File symbols_10.c Line     3 Token  91 Text [
+File symbols_10.c Line     3 Token 355 Text ++
+File symbols_10.c Line     3 Token 306 Text i
+File symbols_10.c Line     3 Token  93 Text ]
+File symbols_10.c Line     3 Token 356 Text --
+File symbols_10.c Line     3 Token  59 Text ;

@@ -1,0 +1,6 @@
+File ex_str3.c Line     1 Token 305 Text "\\"
+File ex_str3.c Line     2 Token 305 Text "what"
+File ex_str3.c Line     3 Token 305 Text "\\\""
+File ex_str3.c Line     4 Token 305 Text "the"
+File ex_str3.c Line     5 Token 305 Text "\\\\\"\"\\\\"
+File ex_str3.c Line     6 Token 305 Text "heck"

@@ -1,0 +1,4 @@
+File ex_str2.c Line     1 Token 305 Text " more fun strings "
+File ex_str2.c Line     2 Token 305 Text "Non-tricky escapes \t here"
+File ex_str2.c Line     4 Token 305 Text "an escape: \\ by itself"
+File ex_str2.c Line     5 Token 305 Text ""

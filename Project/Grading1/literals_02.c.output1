@@ -1,0 +1,10 @@
+File literals_02.c Line     1 Token 303 Text 1
+File literals_02.c Line     1 Token 303 Text 2
+File literals_02.c Line     1 Token 303 Text 3
+File literals_02.c Line     1 Token 303 Text 4
+File literals_02.c Line     2 Token 303 Text 56789
+File literals_02.c Line     3 Token 303 Text 123
+File literals_02.c Line     4 Token 303 Text 123456
+File literals_02.c Line     5 Token 303 Text 1234567890
+File literals_02.c Line     6 Token 303 Text 123456789012345
+File literals_02.c Line     7 Token 303 Text 12345678901234567890
