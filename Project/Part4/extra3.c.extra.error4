@@ -1,0 +1,4 @@
+Type checking error in file extra3.c line 4
+	Initialization for 'b' has wrong type: float
+Type checking error in file extra3.c line 6
+	Cannot modify const variable 'c'

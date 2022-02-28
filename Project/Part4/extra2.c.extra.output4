@@ -1,0 +1,16 @@
+Line   2: global int a
+Line   4: function int bar
+    Line   4: parameter const int c
+    Line   6: expression has type const int
+    Line   7: expression has type const int
+    Line   8: expression has type const int
+Line  12: function int foo
+    Line  12: parameter int b
+    Line  14: local const int c
+    Line  14: local const int d
+    Line  14: local const int e
+    Line  15: local int f
+    Line  16: expression has type const int
+    Line  17: expression has type const int
+    Line  18: expression has type const int
+    Line  19: expression has type int

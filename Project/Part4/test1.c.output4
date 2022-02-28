@@ -1,0 +1,13 @@
+Line   2: global float A
+Line   4: function int f
+    Line   4: parameter int A[]
+    Line   4: parameter int n
+    Line   6: expression has type int[]
+    Line   7: expression has type int
+    Line   8: expression has type int
+Line  15: function void g
+    Line  17: expression has type float
+    Line  18: local int b[50]
+    Line  19: expression has type int
+    Line  20: local int c
+    Line  21: expression has type int

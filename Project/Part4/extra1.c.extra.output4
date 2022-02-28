@@ -1,0 +1,7 @@
+Line   1: global int A[1000]
+Line   3: function float f
+    Line   3: parameter char c
+    Line   5: expression has type int
+Line   9: function void g
+    Line  11: expression has type int
+    Line  12: expression has type char

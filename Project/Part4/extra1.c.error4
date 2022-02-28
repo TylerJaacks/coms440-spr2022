@@ -1,0 +1,6 @@
+Type checking error in file extra1.c line 5
+	Array index should be integer, was char
+Type checking error in file extra1.c line 6
+	Return type mismatch: was int, expected float
+Type checking error in file extra1.c line 12
+	Mismatched operand types float > int

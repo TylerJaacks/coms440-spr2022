@@ -1,0 +1,25 @@
+Line   2: global struct pair
+    Line   3: member int x
+    Line   3: member int y
+Line   6: global struct triangle
+    Line   7: member char color
+    Line   8: member struct pair vertex[3]
+Line  11: function void foo
+    Line  13: local struct pair p
+    Line  13: local struct pair q
+    Line  15: expression has type struct pair
+    Line  16: expression has type int
+    Line  17: expression has type int
+    Line  19: local struct ornament
+        Line  20: member struct pair hook
+        Line  21: member int length
+        Line  22: member struct triangle faces[24]
+    Line  25: local struct ornament t
+    Line  27: expression has type struct ornament
+    Line  28: expression has type struct pair
+    Line  29: expression has type int
+    Line  30: expression has type struct triangle[]
+    Line  31: expression has type struct triangle
+    Line  32: expression has type char
+    Line  33: expression has type struct pair
+    Line  34: expression has type int
