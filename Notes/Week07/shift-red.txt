@@ -1,0 +1,88 @@
+
+Shift-reduce parsing
+======================================================================
+
+Bottom-up parsers
+  -> goes from "sentence" to "start symbol"
+  -> get a rightmost derivation
+  -> reductions: apply a production in reverse
+        replace rhs of a production with the lhs
+
+
+Idea:
+  + scan input (stream of tokens)
+    conceptually: we have a "current position" pointer ^
+    left of ^: tokens we've seen
+    right of ^: tokens still on the input stream
+
+number + number + number * number
+               ^
+
+  + Left of ^ : stack
+
+    will contain tokens (terminals) and non-terminals
+
+
+  +  look at top so many elements of the stack
+     and 'next token' (to the right of ^)
+     and we will do one of two things:
+        shift: move ^ to the right one symbol
+              which means: consume the token and push onto the stack
+
+        reduce: top n symbols of the stack correspond to rhs of some
+                production, pop those off, replace with lhs of the production
+                (apply production in reverse)
+
+        error: syntax / parse error
+                how to recover - tricky
+
+        accept:
+                S ^ $
+
+
+
+Example:
+
+  (1) S -> S + P
+  (2) S -> P
+  (3) P -> P * number
+  (4) P -> number
+
+
+Shift-reduce table:
+
+Top of stack          Next symbol           Action
+---------------       ---------------       ---------------
+(empty)               number                shift
+number                +, *, $               reduce (4)
+P                     *                     shift
+P                     +, $                  reduce (2)
+P *                   number                shift
+P * number            +, *, $               reduce (3)
+S                     $                     accept
+S                     +                     shift
+S +                   number                shift
+S + number            +, *, $               reduce (4)
+S + P                 +, $                  reduce (1)
+S + P                 *                     shift
+
+More specific rules override less specific rules
+
+Missing entry?  Error.
+
+
+Stack                 Remaining input                   Action
+--------------------  -------------------------------   ---------
+(empty)               number + number * number $        shift
+number                + number * number $               reduce (4)
+P                     + number * number $               reduce (2)
+S                     + number * number $               shift
+S +                   number * number $                 shift
+S + number            * number $                        reduce (4)
+S + P                 * number $                        shift
+S + P *               number $                          shift
+S + P * number        $                                 reduce (3)
+S + P                 $                                 reduce (1)
+S                     $                                 accept
+
+
