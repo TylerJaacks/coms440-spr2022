@@ -486,6 +486,7 @@ nodes in a parse tree
 node* expr(int min_prec)    // minimum prec level
 {
     result = term()
+
     while next token is a binary op with prec >= min_prec
         op = next token
         consume next token
@@ -499,5 +500,106 @@ node* expr(int min_prec)    // minimum prec level
 
     return result
 }
+
+======================================================================
+Example sentence and trace the algo:
+a + b - c * d $
+              ^
+
++ : 4     left
+- : 4     left
+* : 7     left
+
+expr(1):
+  result = a
+  while yes
+  op = +
+  next_level = 5
+  rhs = expr(5)             expr(5):
+  rhs is b                    result = b
+  result (a+b)                return b
+  while yes
+  op = -                    expr(5)
+                              result = c
+                              while yes
+                              op = *
+                              expr(8)                 expr(8)
+                              rhs is d                result = d
+                              result is (c*d)         return d
+                              return (c*d)
+
+  rhs is (c*d)
+  (a+b) - (c*d)
+
+Will give a parse tree like
+
+          -
+        /   \
+       /     \
+      +        *
+     / \      / \
+    /   \    /   \
+    a   b   c    d
+
+a+b-(c*d)
+
+
+Example sentence and trace the algo:
+a + b - c * d $
+            ^
+
++ : 4     right
+- : 4     right
+* : 7     right
+
+expr(1):
+  result = a
+  while yes
+  op = +
+  next_level = 4
+  rhs = expr(4)             expr(4):
+                              result = b
+                              while yes
+                              op = -
+                              rhs = expr(4)         expr(4):
+                                                    result = c
+                                                    while yes                                                                       op = *
+                                                    rhs = expr(7)
+                                                    rhs = d
+                                                    result = (c*d)
+                                                    return (c*d)
+                              result = b - (c*d)
+                              return (b - (c*d))
+  result is a + (b - (c*d))
+
+a + (b - (c*d))
+
+
+            +
+          /   \
+         a      -
+               /  \
+              b     *
+                   / \
+                  c   d
+
+
+a - b
+
+
+  struct node {
+    char type;    // v, c, i, f
+    char is_array;
+    char what_is_it;    // +, i, l
+    char* name;
+    struct node* left;
+    struct node* right;
+  }
+
+term()
+
+  node* buildBinary(node* left, tokentype op, node* right)
+
+
 
 
