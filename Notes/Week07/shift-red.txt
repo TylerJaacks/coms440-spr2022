@@ -86,3 +86,179 @@ S + P                 $                                 reduce (1)
 S                     $                                 accept
 
 
+
+Let's look at left vs right recursion
+------------------------------------------------------------
+
+Left recursion:
+(1)   varlist -> varlist , IDENT
+(2)   varlist -> IDENT
+
+Right recursion:
+(3)   varlist -> IDENT , varlist
+(4)   varlist -> IDENT
+
+
+IDENT , IDENT , IDENT , IDENT , IDENT
+      ^
+
+Left recursion:
+
+IDENT , IDENT , IDENT , IDENT , IDENT
+      ^ (reduce 2)
+
+varlist , IDENT , IDENT, IDENT , IDENT
+                ^ (reduce 1)
+          varlist , IDENT, IDENT,
+                  ^
+
+Stack depth is limited to 3
+
+Right recursion:
+
+IDENT , IDENT , IDENT , IDENT , IDENT
+                                       ^  (reduce 4)
+
+IDENT , IDENT , IDENT , IDENT , varlist
+                                        ^ (reduce 3)
+
+IDENT , IDENT , IDENT , varlist
+
+Stack depth grows with size of the list, that's bad.
+
+This example shows why right recursion is worse than left for shift-reduce
+b/c you store more on the stack.
+
+
+
+LR-parsing
+======================================================================
+An LR parser is similar to a shift reduce but
+(1) We'll push states, instead of symbols
+(2) reductions will change state
+(3) we'll get algorithms to build this parse table automatically
+(4) only need to look at the top of the stack
+
+The parse table has 2 parts:
+
+Action table
+------------------------------------------------------------
+  rows are states
+  columns are terminals including special symbol $ for end of input
+
+  Action[i, a]  tells what to do in state i, on input a
+
+  options are:
+      * shift j, where j is a state  (pushes onto the stack)
+
+      * reduce, for a particular production/reduction
+
+      * accept
+
+      * error
+
+
+Goto table
+------------------------------------------------------------
+  rows are states
+  columns are grammar non-terminals
+
+  Goto[i, A]  is a state
+
+
+LR parsing algorithm - how does it run using the tables?
+------------------------------------------------------------
+let a be the first input symbol from lexer
+stack = 0  (state 0 special empty stack state)
+for (;;) {
+  let s be the state on the top of the stack
+  if (Action[s, a] == shift t) {
+      push t onto the stack
+      a gets next input symbol from lexer
+      continue
+  }
+  if (Action[s, a] == reduce A -> B1 B2 B3 ... Bn)  {
+      pop n states off the stack (n is number of symbols in rhs of production)
+      let t be the new top of the stack
+      push Goto[t, A] onto the stack
+      continue
+  }
+  if (Action[s, a] == accept) break;    // Done parsing!
+  // still here? must be an error!
+  fprintf(stderr, "Syntax error!\n");
+}
+
+
+Example:
+
+  (1) S -> S + P
+  (2) S -> P
+  (3) P -> P * number
+  (4) P -> number
+
+
+Parse table:
+
+            Action              Goto
+State   number  +   *   $      S    P
+-----  --------------------   --------
+  0     s3                     1    2
+  1            s4       acc
+  2            r2   s5  r2
+  3            r4   r4  r4
+  4     s3                          6
+  5     s7
+  6            r1   s5  r1
+  7            r3   r3  r3
+
+
+number + number * number
+
+
+Stack            remaining input                  action    reductions
+---------------  ------------------------------   -----     ---------
+0                number + number * number $       s3
+0 3              + number * number $              r4        P->number
+0 2              + number * number $              r2        S->P
+0 1              + number * number $              s4
+0 1 4            number * number $                s3
+0 1 4 3          * number $                       r4        P->number
+0 1 4 6          * number $                       s5
+0 1 4 6 5        number $                         s7
+0 1 4 6 5 7      $                                r3        P->P * number
+0 1 4 6          $                                r1        S->S+P
+0 1              $                                acc
+
+
+If you replace in the stack above:
+  0 -> (empty)
+  1 -> S
+  2 -> P
+  3 -> number
+  4 -> +
+  5 -> *
+  6 -> P
+  7 -> number
+
+Then this "run" becomes identical to the previous example on the
+shift-reduce parser!
+
+
+Wrap up LR parsing algorithm
+------------------------------------------------------------
+
+Why use this instead of shift-reduce?
+
+-> we have algorithms to generate the LR parse tables
+-> just check top of the stack
+-> can use different strengths of parsers
+   (LR(0), LR(1), LALR, etc.)
+
+What's next:
+    LR(0)
+
+    Idea: we'll discuss algos to generate the parse tables
+      automatically from the grammar
+
+
+
