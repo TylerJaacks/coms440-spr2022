@@ -1,0 +1,313 @@
+
+From last time:
+
+
+Constructing SLR parsing tables
+------------------------------------------------------------
+(1) Build LR(0) automaton for the grammar
+(2) Number the states of the automaton
+    with S' -> • S appearing in state #0
+(3) Build the Action table as follows:
+    * for terminal b, if item [ A -> alpha • b gamma ] is in I_i
+      and Goto(I_i, b) = I_j then set
+      Action[i, b] to "shift j"
+
+    * if [ A -> alpha • ] is in I_i, A != S', then set
+      Action[i, b] to "reduce A->alpha" for all b in Follow(A)
+
+    * if [ S' -> S • ] is in I_i then set
+      Action[i, $] to "accept"
+
+
+    When we finish, any blank action entries are "error"
+
+    If we try to assign more than one rule, it's called a "conflict"
+
+      shift/reduce conflicts
+      reduce/reduce
+
+    A conflict means: not in SLR, FAIL.
+
+(4) Build the Goto table as follows:
+
+      For nonterminal A, if Goto(I_i, A) = I_j then set
+      Goto[i, A] = j
+      ^
+      parse table
+
+
+(5) the inital state is 0
+
+
+Set of Items#0
+
+S' -> • S
+-------------
+S -> • S + P
+S -> • P
+P -> • P * number
+P -> • number
+Goto:
+  Goto(#0, S)       --> set of items #1
+  Goto(#0, P)       --> set of items #2
+  Goto(#0, number)  --> set of items #3
+
+
+Set of Items#1
+
+S' -> S •
+S -> S • + P
+-------------
+Goto:
+  $ b/c we're done with S' -> S
+  Goto(#1, +)       --> set of items #4
+
+
+Set of Items#2
+
+S -> P •
+P -> P • * number
+-------------
+Goto:
+  Goto(#2, *)       --> set of items #5
+
+
+Set of Items #3
+
+P -> number •
+-------------
+Goto:
+  Can't go anywhere!
+
+Set of Items #4
+
+S -> S + • P
+-------------
+P -> • P * number
+P -> • number
+Goto:
+  Goto(#4, P)         --> set of items #6
+  Goto(#4, number)    --> set of items #3
+
+
+Set of Items #5
+
+P -> P * • number
+-------------
+Goto:
+  Goto(#5, number)    --> set of items #7
+
+
+
+Set of items #6
+
+S -> S + P •
+P -> P • * number
+-------------
+Goto:
+  Goto(#6, *)         --> set of items #5
+
+
+Set of items #7
+
+P -> P * number •
+-------------
+Goto:
+  Can't go anywhere!
+
+
+======================================================================
+======================================================================
+======================================================================
+======================================================================
+
+Let's build the LR(0) parse table for our example
+
+            Action                               Goto
+State   number      +      *      $             S    P
+-----   -----------------------------         ----------
+0         s3                                    1    2
+
+          ^                                     ^
+          b/c                                   these are from Goto(0, S)
+          Goto(0, number) = 3                       and Goto(0,P)
+
+          No items in set #0 with a • at the end, so we're done
+
+1                  s4              accept
+                   ^                      ^ special rule for $ and accept
+                   b/c Goto(1, +) = 4
+
+
+2                  r2      s5      r2
+
+          Add Reduce S->P for all b in Follow(S)
+          Follow(S) = { +, $ }
+
+3                  r4      r4      r4
+
+          Add Reduce P->number
+          for all b in Follow(P)
+          Follow(P) = { +, *, $ }
+
+
+
+
+Motivation for LR(1):
+======================================================================
+
+Let's not add "reduce A->alpha" for ALL symbols that could follow A,
+let's be smarter and only do this for symbols that could come after A
+when we used this production.
+
+LR(1): we'll keep track of "next symbol" when we build items
+
+An LR(1) item is an LR(0) item plus one symbol of lookahead
+
+      [ A -> alpha • beta, x ]
+
+A-> alpha beta is a production
+x is a terminal symbol or $
+This says: x is the symbol that will come after A
+
+
+Closure for LR(1) items:
+
+
+Closure(I)
+  * add everything in I to Closure(I)
+  * if [ A -> alpha • B gamma, x ] is in Closure(I) and
+    B -> delta is a production, then
+        add [ B -> • delta, y ] to Closure(I) for all y
+          in First(gamma x)
+
+  * repeat until no more items can be added
+
+
+Goto(I, X)
+  for each item [ A -> alpha • X gamma, z ] in I
+      add Closure([ A -> alpha X • gamma, z ]) to  Goto(I, X)
+
+Note this ignores z (except for inside Closure)
+
+Algorithm to build the LR(1) automaton
+(same as we had for LR(0) but use LR(1) items, closure, and goto everywhere
+    start with [ S' -> • S, $ ] )
+
+
+Algorithm to build the LR(1) parse table
+------------------------------------------------------------
+(1) Build LR(1) automaton for the grammar
+(2) Number the states of the automaton
+    with [ S' -> • S,  $ ] appearing in state #0
+(3) Build the Action table as follows:
+    * for terminal b, if item [ A -> alpha • b gamma , z] is in I_i
+      and Goto(I_i, b) = I_j then set
+      Action[i, b] to "shift j"
+
+     vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+   ** if [ A -> alpha • , x ] is in I_i, A != S', then set
+      Action[i, x] to "reduce A->alpha"
+
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+    * if [ S' -> S • , $ ] is in I_i then set
+      Action[i, $] to "accept"
+
+
+(4) Build the Goto table as follows:
+
+      For nonterminal A, if Goto(I_i, A) = I_j then set
+      Goto[i, A] = j
+      ^
+      parse table
+
+
+(5) the inital state is 0
+
+
+======================================================================
+Painful example to convince you to never do LR(1) by hand
+if you can help it
+======================================================================
+
+"Build the LR(1) automaton for our example grammar"
+
+(a)   [S' -> • S, $]
+--------------------
+from (a) add S productions with lookaheads from First(epsilon $)
+(b)   [ S -> • S + P, $ ]
+(c)   [ S -> • P, $ ]
+
+from (b) add S productions with lookaheads from First(+P$)
+(d)    [ S -> • S + P, + ]
+(e)    [ S -> • P, + ]
+
+from (c) add P productions with lookaheads from First(epsilon $)
+(f)    [ P -> • P * number, $ ]
+(g)    [ P -> • number, $ ]
+
+(d) same as (b)
+from (e) add P productions with lookaheads from First(epsilon +)
+(h)    [ P -> • P * number, + ]
+(i)    [ P -> • number, + ]
+
+from (h) add P productions with lookaheads from First(*number+)
+(j)    [ P -> • P * number, * ]
+(k)    [ P -> • number, * ]
+
+
+So in the end set of items #0 will be:
+[ S' -> • S, $ ]
+[ S -> • S + P, $ ]
+[ S -> • P, $ ]
+[ S -> • S + P, + ]
+[ S -> • P, + ]
+[ P -> • P * number, $ ]
+[ P -> • number, $ ]
+[ P -> • P * number, + ]
+[ P -> • number, + ]
+[ P -> • P * number, * ]
+[ P -> • number, * ]
+
+
+If we were to complete this exercise:
+
+  Still get the same number of states
+
+
+But there are grammars where LR(0) will fail and LR(1) will not
+
+  S' -> S
+  S  -> L = R
+  S  -> R
+  L  -> *R
+  L  -> ident
+  R  -> L
+
+
+Set of Items 1:
+  S -> L • = R
+  R -> L •
+
+Goto(1, =) is state 2
+
+Set of Items 2:
+  S -> L = • R
+  R -> • L
+  L -> • * R
+  L -> • id
+
+
+Where does LR(0) fail?
+
+  first production: Action [1, =] is shift 2
+  second production: Action [1, b] is Reduce R -> L for all b in Follow(R)
+                          but = is in Follow(R)
+                      this gives a shift/reduce conflict
+
+This conflict goes away if you build the LR(1) parse table.
+
+
