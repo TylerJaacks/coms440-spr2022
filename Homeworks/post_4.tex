@@ -1,0 +1,123 @@
+\documentclass[10pt]{article}
+\usepackage{fullpage}
+\usepackage{url}
+\usepackage{color}
+\usepackage{listings}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{dkred}{rgb}{0.6,0,0}
+\definecolor{dkblue}{rgb}{0,0,0.7}
+
+\usepackage{tikz}
+\usetikzlibrary{automata, positioning, arrows}
+\tikzset{%
+  node distance=2.5cm,  
+  initial text={},      
+  every state/.style={  
+    semithick},
+  double distance=2pt,  % Accept state appearance
+  every edge/.style={   
+    draw,
+    ->,
+    >=stealth',
+    auto,
+    semithick} %
+}
+
+\lstdefinestyle{jvm}{
+  % aboveskip=3mm,
+  % belowskip=3mm,
+  xleftmargin=2em,
+  % xrightmargin=2em,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\ttfamily},
+  numbers=left,
+  moredelim=[s][\color{black}]{Ljava}{;},
+  morecomment=[l][\color{dkgreen}]{;},
+  morecomment=[l][\color{magenta}]{;;},
+  keywords={class,public,static,super,method,code,end},
+  keywordstyle=\color{dkblue},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=8
+}
+
+\renewcommand{\thepage}{~}
+
+\title{COM S 440/540 Homework 4}
+\date{}
+\author{LL Parsing}
+
+\begin{document}
+
+\maketitle
+
+\noindent
+Reminder: present your own work and properly cite any sources used.
+Solutions should be written satisfying the \emph{other student viewpoint},
+and must be prepared using \LaTeX.
+\renewcommand{\thepage}{~}
+%============================================================
+\section*{Question~1~\hfill 30 points}
+%============================================================
+
+Consider the grammar below,
+for declaring one or more variables in C,
+with multiple levels of pointers allowed.
+Symbols \emph{type}, \emph{ident}, \verb|*|, \verb|;|, and \verb|,|
+are terminals.
+\begin{eqnarray}
+	S & \rightarrow & \mathit{type} ~ V ~ \verb|;|
+\\
+	V & \rightarrow & I ~ L
+\\
+	L & \rightarrow & \verb|,| ~ I ~ L
+\\
+	L & \rightarrow & \epsilon
+\\
+	I & \rightarrow & \verb|*| ~ I
+\\
+	I & \rightarrow & \mathit{ident}
+\end{eqnarray}
+Build the LL(1) parse table $M$ for this grammar.
+For full credit, show how each entry was obtained.
+
+%============================================================
+\section*{Question~2~\hfill 20 points}
+%============================================================
+
+Based on your answer to the previous question, 
+write a predictive, recursive-descent parser,
+as pseudocode for each non-terminal grammar symbol.
+
+
+%============================================================
+\section*{Question~3~~(Extra credit for students in 440)\hfill 10 points}
+%============================================================
+
+Give a modified version of the grammar
+(you may introduce new grammar symbols if needed)
+that remains in $LL(1)$,
+and the recursive-descent pseudocode that matches it,
+to allow for optional \emph{const} designators
+(assume \emph{const} is a terminal symbol in the grammar)
+according to the following rules.
+\begin{enumerate}
+	\item
+	The initial \emph{type} can be modified by
+	a \emph{const} keyword, either before or after
+	the \emph{type}, but not both.
+
+	\item
+	A \emph{const} keyword may appear after each \verb|*|.
+\end{enumerate}
+For example, the new grammar should accept
+the following sentences (where {\tt int} is a \emph{type}).
+\begin{verbatim}
+	const int a, b, c;
+	int const d, *e, *const f;
+	int g, * const h, **const***const*i;
+\end{verbatim}
+
+\end{document}
