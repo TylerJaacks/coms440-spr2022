@@ -1,0 +1,264 @@
+
+Simple LR (SLR)
+======================================================================
+
+Want: given a grammar G,
+      automatically generate an LR parse table
+      for use with the LR parsing algorithm
+
+Different ways to do this based on
+    * how many look ahead symbols do we keep track of
+    * reducing the number of states in the parse table
+
+Start with "simple" LR or LR(0)
+
+
+
+Some notation/definitions and such
+
+
+LR(0) items
+------------------------------------------------------------
+  For a grammar G its LR(0) items are
+  productions with a dot inserted somewhere in the rhs
+  •
+  idea - we keep track of "where are we so far" in each production
+
+example grammar
+
+  (1) S -> S + P
+  (2) S -> P
+  (3) P -> P * number
+  (4) P -> number
+
+example:
+  S -> • S + P
+  S -> S • + P
+  S -> S + • P
+  S -> S + P •
+
+  S -> • P
+  S -> P •
+
+etc.
+
+
+Idea: we'll have a bizarro state machine where states are sets of these items
+      and we'll change state by "consuming" a symbol which really means
+      advancing the dot.
+
+Canonical LR(0) collection for grammar G
+
+  * Make a new start symbol S' and add a new production
+
+          S' -> S
+
+    this forces a rule that is only used once, and matches the entire input.
+    Will be used to accept inputs.
+
+  * function "Closure"
+    (expands an item or set of items, into a larger and still equivalent set)
+
+  * function "Goto"
+
+
+Closure:
+------------------------------------------------------------
+
+Given a set of items I
+Determine a new set of items Closure(I) as follows:
+
+  * anything from I is also in Closure(I)
+
+  * if an item
+
+            A -> alpha • B gamma  is in Closure(I)
+
+                  (alpha, gamma are sequences of symbols (terminals, non))
+
+            and
+
+            B -> delta  (another sequence)
+
+            then
+
+            add B -> • delta   to Closure(I)
+
+
+  * repeat until nothing new can be added to Closure(I)
+
+
+Examples:
+
+  Closure( { S -> S • + P } )   =   { S -> S • + P }
+
+        after all • are terminals, so don't need to add anything.
+
+  Closure( { S -> S + • P } )   =   { S -> S + • P  ,
+                                      P -> • P * number  ,
+                                      P -> • number }
+
+
+        we have P after a • so add all productions for P with • at beginning
+
+
+Goto:
+------------------------------------------------------------
+
+For a set of items I, and a grammar symbol X (term or non-term)
+
+Goto(I, X) is built as follows.
+
+  * intially, Goto(I, X) is empty
+
+  * for all   A -> alpha • X gamma      in I
+
+        add  Closure( { A -> alpha X • gamma } ) to Goto(I, X)
+
+
+Can view this as edges in an automaton
+states are sets of items
+
+
+Algorithm to build the LR(0) automaton
+------------------------------------------------------------
+
+C = { Closure( { S' -> • S } ) }
+
+repeat
+    for each set of items I in C
+        for each grammar symbol X
+            I' = Goto(I, X)
+            if (I' != {}) and (I' is not already in C)
+                add I' to C
+until nothing more can be added to C
+
+
+Example: build the LR(0) automaton for our grammar
+
+
+Set of Items#0
+
+S' -> • S
+-------------
+S -> • S + P
+S -> • P
+P -> • P * number
+P -> • number
+Goto:
+  Goto(#0, S)       --> set of items #1
+  Goto(#0, P)       --> set of items #2
+  Goto(#0, number)  --> set of items #3
+
+
+Set of Items#1
+
+S' -> S •
+S -> S • + P
+-------------
+Goto:
+  $ b/c we're done with S' -> S
+  Goto(#1, +)       --> set of items #4
+
+
+Set of Items#2
+
+S -> P •
+P -> P • * number
+-------------
+Goto:
+  Goto(#2, *)       --> set of items #5
+
+
+Set of Items #3
+
+P -> number •
+-------------
+Goto:
+  Can't go anywhere!
+
+Set of Items #4
+
+S -> S + • P
+-------------
+P -> • P * number
+P -> • number
+Goto:
+  Goto(#4, P)         --> set of items #6
+  Goto(#4, number)    --> set of items #3
+
+
+Set of Items #5
+
+P -> P * • number
+-------------
+Goto:
+  Goto(#5, number)    --> set of items #7
+
+
+
+Set of items #6
+
+S -> S + P •
+P -> P • * number
+-------------
+Goto:
+  Goto(#6, *)         --> set of items #5
+
+
+Set of items #7
+
+P -> P * number •
+-------------
+Goto:
+  Can't go anywhere!
+
+
+Could draw as a graph
+
+Observation: all incoming edges into a set of items
+      must be labeled with the same symbol
+
+
+Constructing SLR parsing tables
+------------------------------------------------------------
+(1) Build LR(0) automaton for the grammar
+(2) Number the states of the automaton
+    with S' -> • S appearing in state #0
+(3) Build the Action table as follows:
+    * for terminal b, if item [ A -> alpha • b gamma ] is in I_i
+      and Goto(I_i, b) = I_j then set
+      Action[i, b] to "shift j"
+
+    * if [ A -> alpha • ] is in I_i, A != S', then set
+      Action[i, b] to "reduce A->alpha" for all b in Follow(A)
+
+    * if [ S' -> S • ] is in I_i then set
+      Action[i, $] to "accept"
+
+
+    When we finish, any blank action entries are "error"
+
+    If we try to assign more than one rule, it's called a "conflict"
+
+      shift/reduce conflicts
+      reduce/reduce
+
+    A conflict means: not in SLR, FAIL.
+
+(4) Build the Goto table as follows:
+
+      For nonterminal A, if Goto(I_i, A) = I_j then set
+      Goto[i, A] = j
+      ^
+      parse table
+
+
+(5) the inital state is 0
+
+
+Next time:
+    example!
+
+
+
