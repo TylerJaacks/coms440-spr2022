@@ -1,0 +1,126 @@
+
+YACC
+======================================================================
+* Bison is a forward compatible replacement for yacc
+
+* yacc stands for "yet another compiler compiler"
+
+* input file: something.y
+
+    has the grammar, disambiguating rules, other stuff
+
+* yacc uses the efficient LALR algorithm
+
+* generates C code
+
+      y.tab.c
+
+* function yyparse()
+
+      will invoke the parser, returns 0 on success, 1 on failure
+
+* assumes function
+
+        int yylex()
+
+          to return the next token on input stream, 0 on end of file
+
+* can specify actions as C code to perform when reductions occur
+
+        -> "easy" for building a parse tree or AST
+            other stuff may be trickier
+
+* Will tell you if there are shift/reduce or reduce/reduce errors
+
+* Can debug (painful) using an option to output the LALR automaton
+    to a text file
+
+
+File format:
+
+
+Declarations/definitions
+
+%%
+
+RULES
+
+%%
+
+Other C code
+
+
+Declarations:
+------------------------------------------------------------
+* Can include C code like in lex:
+
+  %{
+      /* C code */
+  %}
+
+* can define token names using:
+
+  %token  PLUS STAR NUMBER
+
+
+All caps is convention.
+
+***** Yacc / bison will automatically generate a header file
+                  -d switch
+    y.tab.h
+
+  with integer constants or enum type for all the token names
+    (like tokens.h from part 1)
+
+
+USE THIS IN YOUR LEXER TO KEEP EVERYTHING SYNCHRONIZED!
+
+
+* can specify operator precedence and associativity as follows:
+
+%left (list of token names that are left assoc.)
+
+%right (list of token names that are right assoc.)
+
+%nonassoc (list of tokens that are not assoc.)
+
+
+Does two things:
+(1) specifies the associativity of the token
+(2) everthing in the same %left will have the same precedence, which is
+      LOWER than anything following it
+
+Earlier in the file has LOWER precedence.
+
+RULES
+------------------------------------------------------------
+
+Productions go here
+
+syntax:
+    : for ->
+    | for |
+    ; to end the production
+
+Grammar:
+    E -> E + E
+    E -> E * E
+    E -> number
+
+would be written in yacc as:
+
+%token PLUS STAR NUMBER
+%left PLUS
+%left STAR
+%%
+
+expr  : expr PLUS expr
+      | expr STAR expr
+      | NUMBER
+      ;
+
+%%
+
+Example full of our wimpy compiler:
+  wimpy.l for lex  / flex
+  wimpy.y for yacc / bison
