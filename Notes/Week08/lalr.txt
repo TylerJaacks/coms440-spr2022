@@ -1,0 +1,169 @@
+
+LALR motivation
+======================================================================
+
+LR(0):  items don't have lookaheads
+        reductions : use Follow set
+        works well, small #states
+        for a language like Java: ~1,000 states
+
+        downside: shift/reduce reduce/reduce conflicts
+
+        LR(0) is not quite strong enough for some languages
+
+
+LR(1):  deal with lookaheads by tracking them with the items
+        at a cost of more states
+        gives fewer shift/reduce reduce/reduce conflicts
+
+        LR(1) is strong enough for most programming languages
+
+        for a language like Java: ~10,000 states
+
+Want: something with states like LR(0) but more clever than LR(0)
+      about keeping track of lookaheads.
+
+This is the idea behind LALR
+      States will be similar LR(0)
+      Clever but not as strong as LR(1) for tracking lookaheads
+
+      LR(0) < LALR < LR(1)
+
+      Most PL are LALR
+
+
+Conceptual idea:
+    could start with LR(1) automaton and then build the set of LR(0) items
+    by discarding the lookaheads.  This is called a "core"
+
+    Core(I)
+      I is a set of LR(1) items
+      output is a set of LR(0) items
+
+      [ A -> alpha • beta , x ]   ->  [ A -> alpha • beta ]
+
+
+    Observation:
+      If Ia and Ib have the same core, meaning Core(Ia) = Core(Ib)
+      then
+      Goto(Ia, X) and Goto(Ib, X) will have the same core
+
+
+Impractical algorithm to build LALR tables:
+  (1) Build LR(1) automaton
+  (2) Build the merged automaton (aka LALR(1) automaton)
+          For any pair of items, Ia and Ib, if
+          Core(Ia) = Core(Ib)
+          then replace sets Ia and Ib with Iab = Ia union Ib
+
+          Turns out outgoing edges from Ia will be "the same" as from Ib
+          (because Goto on the same core)
+
+          Incoming edges to Ia -> Iab
+          Incoming edges to Ib -> Iab
+
+      repeat until we cannot merge any more
+
+  (3) Run the LR(1) table generation algorithm using our LALR(1) automaton
+
+
+Clever bit:
+  Let's instead built the LALR automaton from the LR(0) automaton
+  and this means we need a clever way to decide the lookahead symbols
+  for each set of items.
+
+
+Rough idea:
+(1) we can represent any set of LR(0) or LR(1) items by its "kernel"
+      set of items that are either
+          - an initial item
+          - do not start with a dot
+      If we take the closure of a kernel we should obtain the original set
+      of items.
+
+     bison -> shows the automaton with kernels as states
+
+(2) Build LR(0) automaton, but use kernels for states
+
+(3) Add the lookaheads in a clever way
+    -> LALR(1) automaton
+
+(4) Run the LR(1) algorithm on the LALR(1) automaton
+
+
+Clever bit: how to add lookaheads
+------------------------------------------------------------
+
+Thought experiment: how did we get lookaheads in LR(1)
+
+I.e.,
+  we start with a set of items I
+  with J = Goto(I, x)
+  and if J contains
+          [ B -> gamma • delta, b ]
+    how did the b get there?
+
+  and suppose I contains [ A -> alpha • beta, x ]
+
+
+Two possibilities:
+(1) We have [ A -> alpha • beta, x] in kernel of I
+    we get  [ B -> gamma • delta, b] in J, regardless of x
+      -> b was added because of some production somewhere in the LR(1)
+          clsure of some item, and we had to do First(...) that gave us b
+
+      -> we say b is "spontaneously generated"
+
+(2) We have [ A -> alpha • beta, b] in kernel of I
+    we get  [ B -> gamma • delta, b] in J only because there was the b
+    in that other item
+
+      -> for any [ A -> alpha • beta, x] we would have
+                 [ B -> gamma • delta, x]
+
+      -> we say lookaheads "propagate" from
+          [ A -> alpha • beta] in I to
+          [ B -> gamma • delta] in J
+
+
+How do we figure out which symbols propagate and which spontaneously appear?
+
+For each item A -> alpha • beta in (kernel of) I
+    J = LR1_closure( { [ A -> alpha • beta, # ] } )
+
+    if [ B -> gamma • X delta, b] is in J, b != #
+      conclude that b is spontaneously generated for
+          B -> gamma X • delta in Goto(I, X)
+
+    if [ B -> gamma • X delta, #] is in J
+      conclude that lookaheads propagate from
+          A-> alpha • beta in I to B -> gamma X • delta in Goto(I, X)
+
+
+Note:
+    for kernel items where • appears before symbol X
+    if  [ A -> alpha • X beta, # ] is in I then it will also be in closure(I)
+
+    lookaheads will always propagate from A -> alpha • X beta to
+                                          A -> alpha X • beta along X edge
+
+
+Efficient LALR(1) automaton construction:
+
+(1) build LR(0) automaton
+    collapse each state from "set of items" to "kernel of set of items"
+
+(2) For each LR(0) state (kernel),
+    run the "determine spontaneous  or propagated lookahead" alg.
+
+    Add the spontaneous lookaheads.
+    Keep track of the edges along which lookaheads propagate
+
+    Also add $ as a spontaneous lookahead for item S' -> • S in initial kernel
+
+(3) Propagate lookaheads along edges.
+    Repeat until we can't add any more
+
+
+
+

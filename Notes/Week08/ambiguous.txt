@@ -1,0 +1,66 @@
+
+Ambiguous grammars with LR(1) or LR(0) or LALR or ...
+======================================================================
+
+Suppose we have the grammar
+
+  E -> E + E
+  E -> E * E
+  E -> number
+
+If we plug this into the LR(0) algorithm
+
+
+We will eventually get a state like this:
+
+  E -> E + E•
+  E -> E• + E
+  E -> E• * E
+
+When we build the LR(0) parse table:
+
+  b/c • before + we'll have a "shift wherever we go for +"
+  b/c • before * we'll have a "shift wherever we go for *"
+
+  Also have "reduce E -> E + E"
+    for every symbol in Follow(E) = {+, *, $}
+
+
+Shift/reduce conflict on +
+  E + E • + E
+
+reduce says  (E + E) + E
+shift says   E + (E + E)   probably?
+
+This could be resolved if we told the parser generator: + is left associative
+
+    left assoc: break conflict by reducing
+    right assoc: break conflict by shifting
+
+Shift/reduce conflict on +, *
+   E + E • * E
+
+reduce says   (E + E) * E
+shift  says   E + (E * E)
+
+We can tell the parser generator: + is lower prec than *
+
+If the choices are "reduce on +" or "shift on *"
+we break that by precedence: whichever is higher
+
+These are called "disambiguating rules"
+
+Tell the parser generator: operator precedence, associativity
+
+Why?
+  (1) B/c it's easier to express certain constructs (like expressions)
+        this way
+
+  (2) more efficient parser
+        b/c we skip "useless" grammar productions like
+          S -> P
+
+
+On to bison/yacc:
+
+
