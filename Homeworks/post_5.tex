@@ -1,0 +1,113 @@
+\documentclass[10pt]{article}
+\usepackage{fullpage}
+\usepackage{url}
+\usepackage{color}
+\usepackage{listings}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{dkred}{rgb}{0.6,0,0}
+\definecolor{dkblue}{rgb}{0,0,0.7}
+
+\usepackage{tikz}
+\usetikzlibrary{automata, positioning, arrows}
+\tikzset{%
+  node distance=2.5cm,  
+  initial text={},      
+  every state/.style={  
+    semithick},
+  double distance=2pt,  % Accept state appearance
+  every edge/.style={   
+    draw,
+    ->,
+    >=stealth',
+    auto,
+    semithick} %
+}
+
+\lstdefinestyle{jvm}{
+  % aboveskip=3mm,
+  % belowskip=3mm,
+  xleftmargin=2em,
+  % xrightmargin=2em,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\ttfamily},
+  numbers=left,
+  moredelim=[s][\color{black}]{Ljava}{;},
+  morecomment=[l][\color{dkgreen}]{;},
+  morecomment=[l][\color{magenta}]{;;},
+  keywords={class,public,static,super,method,code,end},
+  keywordstyle=\color{dkblue},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=8
+}
+
+\renewcommand{\thepage}{~}
+
+\title{COM S 440/540 Homework 5}
+\date{}
+\author{LR Parsing}
+
+\begin{document}
+
+\maketitle
+
+\noindent
+Reminder: present your own work and properly cite any sources used.
+Solutions should be written satisfying the \emph{other student viewpoint},
+and must be prepared using \LaTeX.
+\renewcommand{\thepage}{~}
+%============================================================
+
+\begin{eqnarray}
+  S & \rightarrow & S ~+~ F
+\\
+  S & \rightarrow & F
+\\
+  F & \rightarrow & \mathit{number}
+\\
+  F & \rightarrow & \mathit{ident} ~(~ S ~)
+\end{eqnarray}
+
+
+%============================================================
+\section*{Question~1~\hfill 10 points}
+%============================================================
+
+Determine the LR(0) \textsc{Closure} of item ~~
+$F$ $\rightarrow$ $\mathit{ident}$ $($ $\bullet$ $S$ $)$
+
+%============================================================
+\section*{Question~2~\hfill 10 points}
+%============================================================
+
+Using {\tt bison -g}, generate a DOT file of the automaton
+for this grammar.
+Then, use {\tt dot -Tpdf} to produce a PDF of the automaton.
+Either include this in your \LaTeX{} submission, or submit it separately
+in Canvas.
+
+
+%============================================================
+\section*{Question~3~\hfill 45 points}
+%============================================================
+
+Using the automaton states as numbered by {\tt bison},
+give the LR(0) \textsc{Action} and \textsc{Goto} tables
+for this grammar.
+Indicate if there are any conflicts.
+
+
+%============================================================
+\section*{Question~4~~(extra credit for students in 440)\hfill 10 points}
+%============================================================
+
+Trace the execution of your LR(0) parser on the input string
+\[
+\mathit{number} ~+~ \mathit{number} ~)~ \mathit{ident} ~\$
+\]
+by indicating the stack contents, remaining input, and
+action(s) taken at each step.
+
+\end{document}
