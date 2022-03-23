@@ -208,4 +208,130 @@ What about the other way?
   foo(A);   // NOT ALLOWED
 
 
+Subtypes
+----------------------------------------------------------------------
+* If S is a subtype of T, it means
+  we can safely use an item of type S
+  anywhere an item of type T is expected.
+      -> all operations on T can also be performed on S
+
+
+* Usually this is for polymorphism / class hierarchy stuff
+
+  i.e.
+    if class S is derived from class T, then
+    S is a subtype of T
+
+* We now have (maybe) a situation where we know an object is of type T
+    but we don't know exactly which subtype it is.
+
+* Usually then the soundness definition is relaxed
+
+    for all expressions E, if the type system predicts that E has type T
+    (at compile time)
+    then the actual type of E (at runtime) is a subtype of T
+
+    (Any type is a subtype of itself)
+
+
+Type inference / synthesis
+----------------------------------------------------------------------
+Given
+  * a type system
+  * an expression
+
+How to determine the type of the expression?
+
+This is an example of something called a "synthesized attribute"
+
+-> can build by traversing the AST
+   from the bottom up
+
+-> for a node like
+    x + y
+    (left child will be x, right child will be y)
+    get type of x
+    get type of y
+    determine type of x+y using type system rules
+
+-> All of this is more tricky with things like
+      coersions
+      user-defined types
+      subtypes
+      function overloading
+
+Example of type synthesis / preview of attribute grammars
+------------------------------------------------------------
+Type system
+    int {+,-,*,/,%} int   ->  int
+    float {+,-,*,/} int,float -> float
+    int,float {+,-,*,/} float -> float
+
+Build the type for
+
+    (3*x + 7)/4
+
+Grammar:
+  S -> S + P
+  S -> S - P
+  S -> P
+  P -> P * T
+  P -> P / T
+  P -> T
+  T -> ident
+  T -> number
+  T -> ( S )
+
+
+Parse tree:
+                     S
+                     |
+                     P
+                    /|\
+                   / | \
+                  P  /  T
+                 /      |
+                /      number
+               T         4
+              /|\
+             / | \
+            /  |  \
+           (   S   )
+              /|\
+             / | \
+            /  |  \
+           S   +   P
+          /        |
+         /         T
+        /          |
+       P          number
+      /|\           7
+     / | \
+    P  *   P
+    |      |
+    T      T
+    |      |
+  number   ident
+    3      x
+
+
+Then we start at the leaves and push up the type information.
+
+Note an AST could shrink this down to something like:
+
+            /
+          /   \
+         /     4
+        +
+       / \
+      /   \
+     *     7
+    / \
+   /   \
+  3     x
+
+
+That's it for types.
+
+
 

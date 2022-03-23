@@ -1,0 +1,73 @@
+
+Symbol table
+======================================================================
+* keeps track of all identifiers in the source program
+    * name
+    * type, is it const, is it an array, etc.
+    * variable? local, global, parameter, etc.
+    * array? how many dimensions?
+    * function? type of parameters, how many?
+    * storage location
+
+* used by front-end (type checker)
+    * check identifier types
+    * check existence
+    * duplicate declarations
+
+* used by back end for code generation
+
+
+Design choices:
+  * what to track?  (depends on code gen and such)
+
+  * one huge table, or split, or what?
+
+
+Operations we need:
+  * look up an identifier by name
+  * add new identifiers
+
+  * in some cases, we may have identifiers with the same name
+
+  * identifer name space is not uniform, random
+      names like i, j, k, x, y are very common
+
+  * ideally fast for common names
+
+  * One big table: need to remove variables as they leave scope
+
+  * multiple tables: more natural for scoping
+
+  * Common: hash tables, self-balancing binary trees,
+      even linked lists are maybe fine
+
+For the project:
+
+  Linked list of functions is fine (keep forever)
+  Linked list of global variables is fine (keep forever)
+  Linked list of structs is fine
+  Linked list of local variables is fine, can trash at the end of the function
+
+What about real life where we could have stuff like (oh joy of joys)
+
+  int a, b;
+
+  void foo()
+  {
+      int a, x;
+
+      for (;;)
+      {
+              int b, x;
+      }
+
+  }
+
+
+Essentially you want a stack of symbol tables
+
+  On { push a new table
+  On } pop the table on top
+
+
+
