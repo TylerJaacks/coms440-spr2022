@@ -1,0 +1,125 @@
+\documentclass[10pt]{article}
+\usepackage{fullpage}
+\usepackage{url}
+\usepackage{color}
+\usepackage{listings}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{dkred}{rgb}{0.6,0,0}
+\definecolor{dkblue}{rgb}{0,0,0.7}
+
+\usepackage{tikz}
+\usetikzlibrary{automata, positioning, arrows}
+\tikzset{%
+  node distance=2.5cm,  
+  initial text={},      
+  every state/.style={  
+    semithick},
+  double distance=2pt,  % Accept state appearance
+  every edge/.style={   
+    draw,
+    ->,
+    >=stealth',
+    auto,
+    semithick} %
+}
+
+\lstdefinestyle{jvm}{
+  % aboveskip=3mm,
+  % belowskip=3mm,
+  xleftmargin=2em,
+  % xrightmargin=2em,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\ttfamily},
+  numbers=left,
+  moredelim=[s][\color{black}]{Ljava}{;},
+  morecomment=[l][\color{dkgreen}]{;},
+  morecomment=[l][\color{magenta}]{;;},
+  keywords={class,public,static,super,method,code,end},
+  keywordstyle=\color{dkblue},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=8
+}
+
+\renewcommand{\thepage}{~}
+
+\title{COM S 440/540 Homework 6}
+\date{}
+\author{Attribute grammars}
+
+\begin{document}
+
+\maketitle
+
+\noindent
+Reminder: present your own work and properly cite any sources used.
+Solutions should be written satisfying the \emph{other student viewpoint},
+and must be prepared using \LaTeX.
+\renewcommand{\thepage}{~}
+%============================================================
+\section*{Question~1~\hfill 20 points}
+%============================================================
+
+\begin{eqnarray}
+  S & \rightarrow & S ~+~ F
+\\
+  S & \rightarrow & F
+\\
+  F & \rightarrow & \mathit{number}
+\\
+  F & \rightarrow & \mathit{ident} ~(~ S ~)
+\end{eqnarray}
+For the grammar above, give semantic rules to build
+a synthesized attribute named \emph{max}, 
+which keeps track of the largest \emph{number} appearing in the expression.
+You may introduce other attributes,
+and give rules for them,
+as needed.
+For example, the sentence
+\[
+1 + f(~g(5+4) + h(2) + 3~)
+\]
+should have a \emph{max} attribute equal to 5.
+
+%============================================================
+\section*{Question~2~\hfill 30 points}
+%============================================================
+
+\begin{eqnarray}
+  \mathit{func} & \rightarrow & \mathit{header} ~ \mathit{block}
+\\
+  \mathit{block} & \rightarrow & \{ ~ \mathit{slist} ~ \}
+\\
+  \mathit{slist} & \rightarrow & \mathit{slist} ~ \mathit{stmt}
+\\
+  \mathit{slist} & \rightarrow & \epsilon
+\\
+  \mathit{stmt} & \rightarrow & \mathit{expr} ~;
+\\
+  \mathit{stmt} & \rightarrow & \mathbf{while} ~ ( ~ \mathit{expr} ~ ) ~ \mathit{block}
+\end{eqnarray}
+For the grammar above, give semantic rules to build 
+an inherited attribute named \emph{depth},
+which keeps track of the depth of each statement
+(grammar symbol \emph{stmt})
+in terms of braces.
+For example, for the input
+\begin{verbatim}
+  int main()
+  {
+    x=0;
+    while(x<10) {
+      i=x;
+      while (i-- >= 0) { putchar(' '); }
+      printf("%d\n", x++);
+    }
+  }
+\end{verbatim}
+statement ``\verb|while(x<10)|'' has depth~1,
+statement ``\verb|i=x|'' has depth~2, 
+and statement ``\verb|putchar(' ');|'' has depth~3.
+
+
+\end{document}
