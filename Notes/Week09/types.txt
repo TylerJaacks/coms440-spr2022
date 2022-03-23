@@ -1,0 +1,211 @@
+Semantic analysis aka type checking and such
+======================================================================
+
+* Last phase in the  front-end
+
+* Can sometimes be done during parsing
+  or could be done in a separate "pass"
+
+* We'll assume the parser builds a parse tree or
+  more likely an AST (abstract syntax tree)
+
+  (ASTs can ignore things like  S -> P )
+
+* Semantic analysis could use the AST or could be done
+  while building the AST.
+
+Main jobs of semantic analysis pass:
+------------------------------------------------------------
+* Extract and check types and other info from input program
+* Check any language rules that go beyond the grammar
+  e.g. when you call function f(a, b, c):
+      (1) there's a prototype for function f
+      (2) function f takes 3 parameters
+      (3) types of parameters match
+
+* Could be other errors (e.g., break not within a loop)
+
+    int foo()
+    {
+        break;    /* part 6 error */
+    }
+
+* Assign storage locations for variables (and maybe functions?)
+
+
+Type systems
+======================================================================
+A type defines
+  * a set of value (possibly machine dependent)
+  * a collection of operations that could be done on those values
+
+E.g.
+    Boolean:
+        * set of value {true, false}
+        * operations: not, and, or, xor, nand
+
+    integers:
+        * set of values: conceptually Z (set of all integers)
+          in practice {-2^31, ..., 2^31-1}
+
+        * operations: +, -, *, /, %
+
+
+A type system is a collection of rules that assign types to program constructs.
+
+  * provide a concise formalization of semantic checking rules
+  * rules are defined on the structure of expressions
+
+Each language may define its own type system.
+
+
+Why type systems
+----------------------------------------------------------------------
+* Help detect errors AT COMPILE TIME!!!!
+    -> can't add integer to a string
+    -> can't modify const variables
+    -> can't access private field/method outside the class
+
+
+* Help the compiler produce faster code
+    For example:
+      x+y
+    What would "type checking at runtime" look like here?
+      you'd have code like
+        if x,y are integers then do integer +
+        else if x,y are reals then do double +
+        else if x,y are strings then do concatenation
+        else ...
+
+
+Some terminology:
+Type checking: process of verifying fully typed programs
+              technically - assignments ( =, or passing parameters)
+
+Type inference: process of determining the type of something
+                  (usually an expression, could be a variable)
+
+Statically typed languages:
+  most/all type checking occurs at compile time
+  C, C++, Java
+
+Dynamically typed languages:
+  most/all type checking occurs at runtime
+  Python, Scheme, Javascript
+
+Untyped languages:
+  No type checking
+  assembly language (sort of?)
+  bash (ok kind of but everything is a string)
+
+Soundness:
+  A type system is sound if,
+  for all expressions E,
+  the type system prediction for type of E at compile time
+  =
+  the actual type of E at runtime
+
+
+In designing a type system, there are usually tradeoffs between
+    flexibility (not constraining the programmer) and
+    soundness / safety
+
+C always chooses flexibility
+
+
+More defs:
+
+Type coercion (or conversion): change of type, usually implicit
+
+e.g.
+    int x = 'a';      // char coerced to an int
+    float y = x;      // int coerced into a float
+
+Usually:
+  * coercions are allowed implicitly if the new type's set of values
+      is a superset of the old type's set of values.
+      (no information loss)
+
+        bool p = 1;   {0, 1} range
+        int x = p;
+
+
+  * "narrowing" coercion: new type set of values is a subset of old type
+      then this is usually required to be explicit
+      i.e., usually requires a cast
+
+      (C doesn't!!!! for integers)
+
+      int x = 275619875615;
+      char c = x;
+
+      This could lose information so thus normally
+      you must explicitly cast
+
+  * int -> float
+
+    this is usually allowed implicitly even though you could lose information
+
+
+Implicit coercions (widening extra credit for part 4):
+
+  * makes type checking a bit more complicated
+
+  * C++ can have user-defined implicit type coercions!
+
+
+Coercions to and from const
+
+  int foo(const int a)    // this says a will not be changed inside foo
+  {
+
+  }
+
+  when we call foo, we can put in a regular non-const int or a const one
+
+  int x;
+  x=3;
+  foo(x)
+  x=4;
+
+
+  const int a = x;    // also allowed b/c we must be able to initialize
+                      // const variables
+
+
+So we can initialize a const variable from a non-const one.
+
+
+  int foo(const int a[])    // this still says a won't be changed
+  {
+      a[3] = 7;   // error
+  }
+
+  int A[50];
+
+  foo(A);
+
+
+What about the other way?
+
+  int foo(int a)    // this says foo could modify a
+  {
+  }
+
+  const int pi = 3;
+  foo(pi);    // fine because we're copying pi into a
+
+  int x = 4;
+  x = pi;
+
+^^^^ All this is fine b/c not arrays
+
+  int foo(int a[])    // this says foo could modify a
+  {
+  }
+
+  const int A[5] = { 1, 2, 3, 4, 5 };
+  foo(A);   // NOT ALLOWED
+
+
+
