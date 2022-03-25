@@ -1,0 +1,225 @@
+Attribute grammars
+======================================================================
+
+Attribute grammar / syntax-directed definition (SDD)
+
+Attribute:
+  * Associated with grammar symbols
+  * If X is a grammar symbol, and a is one of its attributes,
+    write X.a to denote the value of attribute a at a parse tree
+    labeled with X
+
+  * Attributes can be integers, strings, structs, objects, ...
+
+
+Rules:
+  * Associated with productions
+  * usually construct / modify attributes
+  * conceptually: executed on the parse tree
+
+
+Simple, and useful case: synthesized attributes
+----------------------------------------------------------------------
+
+An attribute is synthesized if, for node N,
+    the attribute is defined only in terms of attributes of children of N
+    or N itself
+
+We say an SDD  is S-attributed if every attribute is synthesized.
+
+=> Rules to 'compute' attributes that are synthesized will
+      compute an attribute on the LHS of the production from
+      attributes on the RHS of the production.
+
+Example:
+  Our wimpy grammar with "value" attribute
+
+Production              Semantic rule
+--------------------   ----------------------------------------
+S -> S1 + P             {  S.value = S1.value + P.value; }
+
+S -> P                  {  S.value = P.value; }
+
+P -> P1 * number        {  P.value = P1.value * number.value; }
+
+P -> number             {  P.value = number.value; }
+
+
+Note:
+* Symbols S, P, and number have integer attribute "value"
+* All attributes are synthesized
+* Attributes of terminal symbols are assigned by the lexical analyzer
+* Rules tell how to construct attributes for LHS of each production.
+
+
+When can we evaluate the S-attribute rules?
+------------------------------------------------------------
+
+When an SDD is S-attributed, we can evaluate the rules
+in any bottom-up order on the parse tree nodes.
+  (b/c a node's attributes depend on the children)
+
+-> Works great with LR parsers, b/c they build the parse tree bottom up
+    -> we can execute the rules when the reductions are performed.
+
+-> LR parsing corresponds to a postorder traversal of the parse tree
+  -> conceptually if we have a parse tree, we could also do a postorder
+      traversal of the parse tree to execute the rules.
+
+
+Example:
+    3 + 4 * 5
+
+Parse tree:
+                                    S
+                                  / | \
+                                /   |   \
+                              /     |     \
+                             S      +      P
+                            /             /|\
+                           /             / | \
+                          P             P  *  number
+                          |             |
+                          number        number
+
+
+Post-order traversal labeled with attributes
+
+                                    S   (8) S.value = 3 + 20 = 23
+                                  / | \
+                                /   |   \
+                              /     |     \
+(3) S.value = 3              S      +      P  (7) P.value = 4 * 5 = 20
+                            /             /|\
+                           /             / | \
+(2) P.value = 3           P         4-> P  *  number   (6) number.value = 5
+                          |             |
+(1) number.value = 3      number        number   (4) number.value = 4
+    from the lexer
+
+
+Root gets the value of 23 which is the value of expression 3 + 4 * 5
+
+
+Another example:
+Same grammar, but infix to postfix conversion is the goal
+
+Let "postfix" be an attribute, it's the string representation of the expression
+in postfix notation with a space at the end
+
+
+Production              Semantic rule
+--------------------   ----------------------------------------
+S -> S1 + P             S.postfix = concatenate(
+                            S1.postfix, P.postfix, "+ "
+                        );
+
+S -> P                  S.postfix = P.postfix;
+
+P -> P1 * number        P.postfix = concatenate(
+                            P1.postfix, number.postfix, "* "
+                        );
+
+P -> number             P.postfix = number.postfix;
+
+Note that number's postfix string is probably just the number with
+a space after it.
+
+Observation:
+  If attributes are built left to right in the children
+  THEN we can just print the strings instead of concatenating them.
+
+(hint: this has to do with "incremental code generation")
+
+
+Yet another example:
+Build the AST for the expression.
+Same grammar, but want to synthesize the AST
+
+Let "node" be an attribute, it's an AST node
+
+Production              Semantic rule
+--------------------   ----------------------------------------
+S -> S1 + P             S.node = makeNode(S1.node, '+', P.node);
+
+S -> P                  S.node = P.node;
+
+P -> P1 * number        P.node = makeNode(P1.node, '*', number.node);
+
+P -> number             P.node = number.node;
+
+number's node is a leaf node that contains the number.
+
+
+What about top-down parsing?
+======================================================================
+* Can we (easily?) evaluate rules in an S-attributed SDD using
+  recursive descent parsing?
+
+  YES.
+
+Idea: modify our parser to return the attributes.
+
+attribute A()
+{
+  choose production A -> X1 X2 .. Xn based on lookahead
+  for (i = 1 to n) {
+    if (Xi is non-terminal)
+        attribute[i] = Xi()
+    else {
+        if next token is Xi then
+            attribute[i] = attribute_of_xi_from_lexer();
+        else
+              error
+  }
+  return attribute of A constructed from attribute[1], attribute[2], etc.
+}
+
+
+Top-down parsers: return attributes from functions
+
+
+Example: recursive descent built AST
+
+Production              Semantic rule
+--------------------   ----------------------------------------
+S -> S1 + P             S.node = makeNode(S1.node, '+', P.node);
+
+S -> P                  S.node = P.node;
+
+P -> P1 * number        P.node = makeNode(P1.node, '*', number.node);
+
+P -> number             P.node = number.node;
+
+
+node* number()
+{
+    // build a node attribute from a number token
+    return match(number);     // match checks that next token is number,
+                              // and if so, returns a node attribute
+}
+
+node* S()
+{
+    node* root = P();
+    while (next != $)
+    {
+        match(+);
+        root = new node(root, '+', P());
+    }
+    return root;
+}
+
+node* P()
+{
+    node* root = number();
+    match(number);
+    while (next == *)
+    {
+        match(*);
+        root = new node(root, '*', number());
+    }
+    return root;
+}
+
+
