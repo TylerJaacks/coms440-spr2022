@@ -532,8 +532,8 @@ Excess points will count as extra credit.
   \mainitem{4}{Smart stack management}
   \\[1mm]
   \mainpara{%
-    Avoid using the stack for top-level expressions,
-    when those values are ultimately going to be popped off
+    Avoid saving assignment, update, and increment results on
+    the stack for cases where those values will be popped off
     and discarded.
   }
   \\[4mm]
