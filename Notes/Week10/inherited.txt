@@ -1,0 +1,177 @@
+
+Inherited attributes
+======================================================================
+
+An attribute is inherited if, for each node N, the attribute is defined
+  only in terms of attributes of N's parent node, or N's sibling nodes,
+  or N itself.
+
+
+Typically we don't allow terminals to have inherited attributes
+  because we assume all terminal attributes are handled by lexer.
+
+Not a restriction really b/c we can make up a new grammar symbol if needed:
+
+e.g
+
+  nt_number -> NUMBER
+
+use nt_number for our inherited attribute
+
+
+Motivating example:
+------------------------------------------------------------
+
+var_decl -> type varlist ;
+varlist -> varlist , var
+varlist -> var
+var -> IDENT
+
+Attributes:
+  type of a variable
+  name of a variable
+
+What are the rules for the grammar?
+
+Production                        Rule:
+------------------------------    ------------------------------
+var_decl -> type varlist ;        varlist.type = type.type;
+
+varlist -> varlist , var          varlist1.type = varlist.type;
+                                  var.type = varlist.type;
+                                  add_to_symbol_table(var.type, var.name);
+
+varlist -> var                    var.type = varlist.type;
+                                  add_to_symbol_table(var.type, var.name);
+
+var -> IDENT                      var.name = IDENT.name;
+
+Attribute "name" is synthesized
+Attribute "type" is inherited
+
+
+Note:
+  Synthesized attributes are "pushed up" the parse tree
+      -> from child to parent
+      -> build parent's attribute from children
+
+  Inherited attributes are "psuhed down" the parse tree
+      -> from parent to child
+      -> build child's attribute from parent / sibling
+
+
+How to deal with inherited attributes?
+
+(1) Hack and rewrite the grammar slightly
+
+    var_decl -> savedtype varlist ;
+
+    savedtype -> type
+    {
+        remember_type = $1
+        ^
+        global variable
+    }
+
+    This works assuming we do the reduction
+      savedtype -> type
+    before
+      all reductions that build the varlist
+
+    (This IS the case with LR parsing)
+
+    Works but relies on knowledge of how LR parsing works
+
+
+(2) bison hack
+
+    can refer to attributes below us on the stack
+
+      A -> B C D
+
+      $$ : attribute for A
+      $1 : attribute for B
+      $2 : attribute for C
+      $3 : attribute for D
+
+      $0 : attribute below A on stack
+      $-1 : attribute below $0 on stack
+
+      W -> X Y Z A
+
+            this says $0 would be attribute for Z
+                      $-1 is attribute for Y
+            etc.
+
+BUT:
+
+      ->  No type checking on $0, $-1 etc.
+
+      ->  Breaks horribly with other productions
+
+
+      S -> T V A
+
+      In this case $0 could be attribute of V or Z no guarantees!!!!!! UGH!!!
+
+
+(3)   Convert the inherited attribute into a synthesized one
+
+      Typically done by building a list of items that need the inherited
+      attribute, and push the list up the tree
+      until attribute is known, then go through the list and update
+      all the attributes.
+
+      For our example:
+        varlist will keep a list of variables that we don't know their types
+
+
+Production                      Rule
+------------------------------  ------------------------------
+var_decl -> type varlist ;      for each item in varlist.list
+                                    add_symbol(type.type, item.name);
+
+varlist -> varlist1 , var       varlist.list = append(varlist1, var.name);
+
+varlist -> var                  varlist.list = append(null, var.name);
+
+var -> IDENT                    var.name = IDENT.name;
+
+
+
+(4)   What about recursive descent?
+
+        * synthesized attributes: passed up by returning them from functions
+
+        * inherited attributes: passed down as parameters into functions
+
+
+var_decl()
+{
+  tattribute = type();
+  var_list(tattribute);
+}
+
+varlist(typeid tattribute)
+{
+  while (1)
+  {
+    name = identifier();
+    add_symbol(tattribute, name);
+    if (, != next) return;
+    match(,);
+  }
+}
+
+
+This works as long as attributes can be built in the same order we call
+the functions.
+
+  A -> B C
+
+  and
+
+  B's attribute depends on C
+
+
+
