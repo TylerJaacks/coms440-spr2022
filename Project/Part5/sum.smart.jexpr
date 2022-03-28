@@ -1,0 +1,66 @@
+I main (  )
+{
+    ;; local 0 d1 sum.c 10
+    ;; local 1 d2 sum.c 10
+    ;; local 2 sum sum.c 10
+    ;; expression sum.c 11
+    calling libc::getchar()
+    d1 = libc::getchar() - 48
+    ;; expression sum.c 12
+    calling libc::getchar()
+    d2 = libc::getchar() - 48
+    ;; expression sum.c 13
+    sum = d1 + d2
+    ;; expression sum.c 14
+    calling libc::putchar(d1 + 48)
+    pop libc::putchar(d1 + 48)
+    ;; expression sum.c 15
+    calling libc::putchar(43)
+    pop libc::putchar(43)
+    ;; expression sum.c 16
+    calling libc::putchar(d2 + 48)
+    pop libc::putchar(d2 + 48)
+    ;; expression sum.c 17
+    calling libc::putchar(61)
+    pop libc::putchar(61)
+    ;; expression sum.c 23
+    calling libc::putchar(sum / 10 + 48)
+    pop libc::putchar(sum / 10 + 48)
+    ;; expression sum.c 24
+    calling libc::putchar(sum % 10 + 48)
+    pop libc::putchar(sum % 10 + 48)
+    ;; expression sum.c 25
+    calling libc::putchar(10)
+    pop libc::putchar(10)
+    ;; return sum.c 26
+    ireturn sum
+    ;
+    ; Requested stack size 3
+    ; Required  stack size 2
+    ; 0 items remaining on the stack
+    ;
+}
+
+V <init> (  )
+{
+    calling {local 0}.<init>()
+    ;
+    ; Requested stack size 1
+    ; Required  stack size 1
+    ; 0 items remaining on the stack
+    ;
+}
+
+V main ( [Ljava/lang/String; )
+{
+    calling sum::main()
+    {local 1} = sum::main()
+    calling java/lang/System.out.print('Return code: ')
+    calling java/lang/System.out.println({local 1})
+    ;
+    ; Requested stack size 2
+    ; Required  stack size 2
+    ; 0 items remaining on the stack
+    ;
+}
+

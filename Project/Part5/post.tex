@@ -1,0 +1,597 @@
+
+\documentclass{article}
+\usepackage{fullpage}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{longtable}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{muave}{rgb}{0.58,0,0.82}
+\definecolor{dkred}{rgb}{0.6,0,0}
+\definecolor{dkblue}{rgb}{0,0,0.7}
+
+\lstset{frame=none,
+  language=C,
+  % aboveskip=3mm,
+  % belowskip=3mm,
+  xleftmargin=2em,
+  % xrightmargin=2em,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\ttfamily},
+  numbers=left,
+  keywordstyle=\color{dkblue},
+  directivestyle=\color{dkred},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{muave},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=2
+}
+
+\lstdefinestyle{jvm}{
+  % aboveskip=3mm,
+  % belowskip=3mm,
+  xleftmargin=2em,
+  % xrightmargin=2em,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\ttfamily},
+  numbers=left,
+  moredelim=[s][\color{black}]{L}{;},
+  morecomment=[l][\color{dkgreen}]{;},
+  morecomment=[l][\color{magenta}]{;;},
+  keywords={class,public,static,super,method,code,end},
+  keywordstyle=\color{dkblue},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=8
+}
+
+
+\newcommand{\gradeline}{ \cline{1-2} \cline{4-4} ~\\[-1.5ex] }
+
+\newenvironment{gradetable}{\begin{longtable}{@{~~}rrcp{5in}} \multicolumn{2}{l}{\bf Points} & & {\bf Description}\\ \gradeline}{\end{longtable}}
+
+\newcommand{\mainitem}[2]{\pagebreak[2] {\bf #1} &&& {\bf #2}}
+\newcommand{\mainpara}[1]{~ &&& {#1} }
+\newcommand{\inneritem}[2]{~ & #1 && #2}
+\newcommand{\innerpara}[1]{~ & ~ && #1}
+
+\newcommand{\markedinneritem}[2]{\multicolumn{1}{@{}l}{$\dagger$} & #1 && #2}
+
+\newcommand{\parser}{3}
+\newcommand{\typecheck}{4}
+\newcommand{\codegen}{5}
+\newcommand{\nextgen}{6}
+
+
+\title{COM S 440/540 Project part \codegen}
+\author{Code generation: expressions}
+\date{}
+
+\newenvironment{quotewide}[1]{\begin{minipage}[b]{#1} \vspace{1mm} \begin{quote}} {\end{quote} \vspace{1mm} \end{minipage}}
+
+\begin{document}
+
+\maketitle
+
+%======================================================================
+\section{Requirements for part \codegen}
+%======================================================================
+
+When executed with a mode of \codegen,
+your compiler should read the specified input file,
+and check it for correctness (including type checking) as done in part~\typecheck.
+If there are no errors, then your compiler should output
+an equivalent program in our target language
+(see Section~\ref{SEC:target}).
+For this part of the project,
+your compiler must generate correct code for only some types of
+statements:
+namely, expressions (except for the ternary operator),
+including function calls and returns.
+Control flow (conditionals, the ternary operator, and loops)
+will be required for the next and final part of the project.
+As usual,
+any error messages should be written to standard error,
+and your compiler may make a ``best effort'' to continue processing
+the input file, or exit.
+Errors detected in this part of the project should have format
+\begin{quote}
+  \begin{tabbing}
+		{\tt Code ge}\={\tt neration error in file }\emph{filename}
+		{\tt line }\emph{line number}
+	\\
+		\> \emph{Description}
+  \end{tabbing}
+\end{quote}
+where line numbers will be specified below if not obvious.
+
+
+
+
+%======================================================================
+\section{I/O}
+%======================================================================
+
+To manage I/O,
+for this and the next part of the project,
+you should assume that our source language has
+the following \emph{built-in} functions
+(i.e., you should add them to your symbol table before compilation starts).
+\begin{itemize}
+  \item \lstinline|int getchar()|:
+    This should behave the same as {\tt getchar()} in {\tt stdio.h}.
+
+  \item \lstinline|int putchar(int c)|:
+    This should behave the same as {\tt putchar()} in {\tt stdio.h}.
+\end{itemize}
+These functions will be implemented in a supporting library file,
+{\tt libc.class}, that will be placed in the same directory
+as your assembled class file.
+
+Most C compilers will correctly compile source inputs
+that call {\tt getchar()} and {\tt putchar()}
+without including {\tt stdio.h};
+this will allow you to test your compiler against any production C compiler
+on the same input programs.
+Alternatively,
+you can add prototypes for {\tt getchar()} and {\tt putchar()}
+at the beginning of your test code,
+assuming your compiler correctly handles
+multiple prototypes for the same function (as it should).
+
+%======================================================================
+\section{The target language} \label{SEC:target}
+%======================================================================
+
+The target language is Java assembly language,
+as read by the Krakatau Java assembler
+(written in Python and available on github at
+\url{https://github.com/Storyyeller/Krakatau}).
+You will build assembly code for a class whose name
+matches the source file being compiled,
+with global variables becoming static members,
+and functions becoming static methods.
+The produced class should be derived from {\tt java/lang/Object}.
+
+Blank lines may be added to improve readability of the output file.
+Comments,
+which begin with a semi-colon and end with a newline character,
+may appear on an empty line or at the end of a valid line.
+Students are encouraged to generate comments to help debug their compilers.
+
+Global variables may appear in output in any order
+(recommended is to output them as encountered)
+as long as they appear before they are used.
+
+Your compiler {\bf may not} invoke the Java compiler.
+However, it is perfectly fine to ``reverse engineer'' the Java compiler,
+to help you figure out which assembly instructions to use for translation.
+For instance, you could write Java code, compile it, then use the Krakatau
+disassembler to view the assembly code generated by the Java compiler,
+to help you learn and understand the Java bytecode instructions.
+
+\subsection{User-defined functions}
+
+Each function with a body in the C source
+should cause the generation of (Java assembly for)
+a static method.
+User-defined methods should appear before the special ones (see below).
+It is recommended, but not required,
+to generate assembly for functions in the same order as
+they appear in the input file,
+and as they are encountered.
+
+\subsection{Java's main method}
+
+Your compiler should produce (Java assembly for) a Java {\tt main()}
+method.
+In Java source, the method would have prototype
+\begin{quote}
+  \begin{lstlisting}[numbers=none]
+    public static void main(String args[]);
+  \end{lstlisting}
+\end{quote}
+and its job is to invoke the static {\tt main()} method
+and to display the returned integer
+(making it easier to test your compiler).
+Assume the C main method has prototype
+\begin{quote}
+  \begin{lstlisting}[numbers=none]
+    int main()
+  \end{lstlisting}
+\end{quote}
+and use the format
+\begin{quote}
+  \tt Return code: \emph{code}
+\end{quote}
+to display the returned integer from C's {\tt main()} function.
+
+
+\subsection{Special method {\tt <init>}}
+
+You will need to output (Java assembly for) the special method {\tt <init>}
+to construct an instance of the class.
+For the generated code,
+this method does not need to do anything
+except invoke the constructor for base class {\tt java/lang/Object}.
+
+\subsection{Special method {\tt <clinit>}}
+
+The special method {\tt <clinit>}
+is used to initialize any static members that require initialization.
+For the C source code,
+this includes global arrays and global variables that were initialized
+when declared (this was extra credit in parts \parser{} and \typecheck{}).
+If there are no such items to initialize, then method {\tt <clinit>}
+may be omitted.
+
+
+
+
+
+
+
+\subsection{Annotations}
+\label{SEC:annotations}
+
+Special comments that begin with a double semi-colon
+and appear on their own line
+are used to annotate the assembly code
+for use with a utility that we will use to check your code
+  (see Section~\ref{SEC:checking}).
+All annotations should end with the \emph{location}
+in the source (the file name and line number)
+that caused the annotation.
+The following annotations should be used.
+
+\paragraph{Parameters and local variables.}
+For each user-defined function that appears in the generated assembly code,
+the name and ``address''
+(non-negative index) for each parameter and local variable
+should be given
+somewhere in the function body, before its first use.
+The format should be
+``parameter'' or ``local'',
+followed by the address,
+followed by the name,
+followed by the location.
+The JVM requires that parameters have addresses that start from 0 and
+correspond to parameter order,
+and local variables have addresses following the parameters.
+For example, the C function
+\begin{lstlisting}
+  int foo(int a, int b)
+  {
+    int c, d;
+    return 0;
+  }
+\end{lstlisting}
+could generate annotations
+\begin{lstlisting}[style=jvm]
+  ;; parameter 0 a foo.c 1
+  ;; parameter 1 b foo.c 1
+  ;; local 2 c foo.c 3
+  ;; local 3 d foo.c 3
+\end{lstlisting}
+where parameter {\tt a} \emph{must} have address 0,
+parameter {\tt b} \emph{must} have address 1,
+and parameters {\tt c} and {\tt d} can have any addresses 2 or higher.
+
+
+\paragraph{Expressions and return statements.}
+For each top-level expression statement or return statement,
+an annotation should be given with the input file name and line number
+where the expression appears in the source file.
+The format should be
+``expression'' or ``return'',
+followed by the location.
+The annotation should appear immediately before the code generated
+to implement the expression or return statement.
+For example, the C function
+\lstinputlisting{foo.c}
+might generate the following annotated code.
+\lstinputlisting[style=jvm,firstline=5,lastline=20]{foo.smart.j}
+
+
+%======================================================================
+\section{Checking your generated code} \label{SEC:checking}
+%======================================================================
+
+\subsection{Test by running}
+
+You should be able to assemble the code generated by your compiler
+(using the Krakatau assembler)
+to obtain a class file.
+You can then run this class file,
+just as if it were compiled from Java source.
+The script {\tt CheckR\_5.sh} is based on this idea:
+\begin{enumerate}
+  \item
+  It runs your compiler with mode {\tt -\codegen} on the C source code,
+    and produces a {\tt .j} file containing the Java assembly code.
+
+  \item
+  It runs the assembler on the {\tt .j} file produced by your compiler.
+
+  \item
+  It  runs the resulting {\tt .class} file on a JVM,
+    with one or more input files (named {\tt .input1}, etc)
+  and checks the output against the expected output.
+\end{enumerate}
+The expected outputs are obtained using {\tt gcc} to compile
+the C source
+(modified to print the value returned by {\tt main()}).
+You can generate your own test programs and inputs,
+using a C file {\tt base.c},
+and
+inputs {\tt base.input001}, {\tt base.input002}, etc.
+Then, use {\tt CheckR\_5.sh -G base.c}
+to automatically generate the ``correct'' outputs.
+Use {\tt CheckR\_5.sh "run your compiler" base.c},
+where the string {\tt "run your compiler"}
+is replaced by the command used to run your compiler,
+to test your compiler.
+
+\subsection{Compare assembly code or analyzed expressions}
+
+The script {\tt CheckJ\_5.sh} compares your compiler output against
+the instructor output.
+The {\tt -j} switch causes the script to compare raw assembly.
+However, different assembly instructions may still produce correct code.
+Running with {\tt -x} or with no switch causes the script to analyze
+what is computed on the JVM stack using the {\tt jexpr} utility.
+Output is compared for each annotated line.
+
+\subsection{The {\tt jexpr} utility}
+
+The {\tt jexpr} utility
+(source code available in the course repository)
+examines Java assembly code and runs it,
+keeping track of what is computed.
+This can help you to debug stack errors,
+and gives a somewhat more readable summary of what each function computes.
+See Section~\ref{SEC:examples} for example output.
+
+
+
+%======================================================================
+\section{Examples} \label{SEC:examples}
+%======================================================================
+
+\subsection{Input: {\tt sum.c}}
+
+\lstinputlisting{sum.c}
+
+\subsection{Output: {\tt sum.j}}
+
+\lstinputlisting[style=jvm]{sum.basic.j}
+
+\subsection{Output with smart stack management (extra credit)}
+\label{SEC:smartstack}
+
+\lstinputlisting[style=jvm]{sum.smart.j}
+
+\subsection{Output of {\tt jexpr} on \ref{SEC:smartstack} code}
+
+\lstinputlisting[style=jvm]{sum.smart.jexpr}
+
+%======================================================================
+\section{Grading} \label{SEC:grading}
+%======================================================================
+
+For all students: implement as many or as few features listed below as you wish,
+but keep in mind that some features will make testing your code \emph{much}
+easier (features needed to test your code for part~\nextgen{}
+are marked with $\dagger$),
+and a deficit of points will impact your overall grade.
+Excess points will count as extra credit.
+
+
+\noindent
+\begin{gradetable}
+  \mainitem{15}{Documentation}
+  \\[1mm]
+  \inneritem{3}{\tt README.txt}
+  \\[1mm]
+  \innerpara{%
+    How to build the compiler and documentation.
+    Updated to show which part \codegen{} features are implemented.
+  }
+  \\[1mm]
+  \inneritem{12}{\tt developers.pdf}
+  \\[1mm]
+  \innerpara{%
+    New section for part \codegen{}, that explains
+    the purpose of each source file,
+    the main data structures used (or how they were updated),
+    and gives a high-level overview of how the target code
+    is generated.
+  }
+  \\[4mm]
+
+  \mainitem{10}{Ease of grading}
+  \\[1mm]
+  \inneritem{4}{Building}
+  \\[1mm]
+  \innerpara{%
+    How easy was it for the graders to build your compiler and
+    documentation?
+    For full credit, simply running ``{\tt make}''
+    should build both the documentation and the compiler executable,
+    and running ``{\tt make clean}'' should remove
+    all generated files.
+  }
+  \\[1mm]
+  \inneritem{6}{Output and formatting}
+  \\[1mm]
+  \innerpara{%
+    Assembly code is annotated as discussed in Section~\ref{SEC:annotations},
+    so it can be parsed and analyzed by grading scripts.
+  }
+  \\[4mm]
+
+  \mainitem{10}{Still works in modes 0 through \typecheck}
+  \\[4mm]
+
+  \mainitem{10}{Always present output}
+  \\[1mm]
+  \markedinneritem{3}{Class with proper name; super}
+  \\[1mm]
+  \markedinneritem{3}{Special method {\tt <init>}}
+  \\[1mm]
+  \markedinneritem{4}{Java {\tt main()}, calls C {\tt main()} and shows return value}
+  \\[4mm]
+
+  \mainitem{10}{Code for user functions}
+  \\[1mm]
+  \markedinneritem{3}{Correct parameters and return type}
+  \\[1mm]
+  \markedinneritem{2}{Correct {\tt .method} and {\tt .code} blocks}
+  \\[1mm]
+  \markedinneritem{3}{Reasonable stack limit}
+  \\[1mm]
+  \markedinneritem{2}{Correct local count}
+  \\[4mm]
+
+  \mainitem{15}{Function calls and returns}
+  \\[1mm]
+  \markedinneritem{4}{Parameter set up}
+  \\[1mm]
+  \inneritem{3}{Function call}
+  \\[1mm]
+  \markedinneritem{4}{Correct calls to built-ins {\tt getchar} and {\tt putchar}}
+  \\[1mm]
+  \inneritem{4}{Void, char, int, float returns}
+  \\[4mm]
+
+  \mainitem{10}{Expressions: literals, variables}
+  \\[1mm]
+  \markedinneritem{3}{Character, integer, and float literals}
+  \\[1mm]
+  \markedinneritem{3}{Reading local variables and parameters}
+  \\[1mm]
+  \inneritem{4}{Reading global variables}
+  \\[4mm]
+
+  \mainitem{15}{Operators}
+  \\[1mm]
+  \markedinneritem{10}{Binary operators {\tt +}, {\tt -}, {\tt *}, {\tt /}, {\tt \%}}
+  \\[1mm]
+  \inneritem{5}{Unary operators and type conversions}
+  \\[4mm]
+
+  \mainitem{15}{Global variable, local variable, and parameter writes}
+  \\[1mm]
+  \inneritem{3}{Local variable initialization}
+  \\
+  \innerpara{%
+    Requires variable initialization support,
+    which was extra credit for parts~\parser{} and \typecheck{}.
+  }
+  \\[1mm]
+  \markedinneritem{4}{Assignment expressions with {\tt =}}
+  \\[1mm]
+  \inneritem{4}{Update assignments: {\tt +=}, {\tt -=}, {\tt *=}, {\tt /=}}
+  \\[1mm]
+  \inneritem{4}{Pre and post increment and decrement}
+  \\[4mm]
+
+  \mainitem{18}{Arrays}
+  \\[1mm]
+  \inneritem{3}{Local array initialization}
+  \\[1mm]
+  \inneritem{3}{Reading array elements in expressions}
+  \\[1mm]
+  \inneritem{3}{Array element assignments with {\tt =}}
+  \\[1mm]
+  \inneritem{3}{Array element updates: {\tt +=}, {\tt -=}, {\tt *=}, {\tt /=}}
+  \\[1mm]
+  \inneritem{3}{Passing arrays as parameters}
+  \\[1mm]
+  \inneritem{3}{Passing string literals as {\tt char[]} parameters}
+  \\[4mm]
+
+  \mainitem{10}{Special method {\tt <clinit>}}
+  \\[1mm]
+  \inneritem{4}{Initializes global arrays}
+  \\[1mm]
+  \inneritem{4}{Initializes global variables}
+  \\
+  \innerpara{%
+    Requires variable initialization support,
+    which was extra credit for parts~\parser{} and \typecheck{}.
+  }
+  \\[1mm]
+  \inneritem{2}{Method is present when needed, omitted when not needed}
+  \\[4mm]
+
+  \mainitem{4}{Smart stack management}
+  \\[1mm]
+  \mainpara{%
+    Avoid saving assignment, update, and increment results on
+    the stack for cases where those values will be popped off
+    and discarded.
+  }
+  \\[4mm]
+
+  \mainitem{4}{Missing return statements}
+  \\[1mm]
+  \mainpara{%
+    Checks for missing return statements.
+    Gives an error (with a line number as close as possible
+    to the end of the function body) for non-void functions
+    without a return statement.
+    Adds a return statement if needed for void functions.
+  }
+  \\[4mm]
+
+  \mainitem{4}{Dead code elimination}
+  \\[1mm]
+  \mainpara{%
+    Statements following a return statement
+    are eliminated.
+  }
+  \\[4mm]
+
+  \gradeline
+  \mainitem{100}{Total for students in 440 (max points is 120)}
+  \\
+  \mainitem{120}{Total for students in 540 (max points is 140)}
+\end{gradetable}
+
+
+%======================================================================
+\section{Submission}
+%======================================================================
+
+\begin{table}[h]
+\centering
+
+  \begin{tabular}{lcr}
+    {\bf Part} & ~~~~ & {\bf Penalty applied} \\ \cline{1-1}\cline{3-3}
+    Part 0 && 40\% off \\
+    Part 1 && 30\% off \\
+    Part \parser{} && 20\% off \\
+    Part \typecheck{} && 10\% off
+  \end{tabular}
+
+\caption{Penalty applied when re-grading}
+\label{TAB:penalties}
+\end{table}
+
+Be sure to commit your source code and documentation to your
+git repository, and to upload (push) those commits to the server
+so that we may grade them.
+In Canvas,
+indicate which parts you would like us to re-grade for reduced credit
+(see Table~\ref{TAB:penalties} for penalty information).
+Otherwise, we will grade only part \codegen.
+
+
+
+
+\end{document}
