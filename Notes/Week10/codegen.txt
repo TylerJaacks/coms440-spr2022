@@ -1,0 +1,144 @@
+
+Intermediate code generation (ch 6)
+======================================================================
+
+* Goal: start from AST
+        end with code in some intermediate representation (IR)
+
+
+We might instead use a directed acyclic graph (DAG) to represent expressions
+because they naturally expose repeated sub-expressions.
+
+  -> nodes can have more than one parent
+  -> common sub-expressions will be nodes that are "shared"
+      i.e. have more than one parent
+
+
+Consider expression
+  (x+1)*(x+1) + 2*(x+1)*(y-1) + (y-1)*(y-1) - x*y
+
+
+AST:
+
+                      +
+            _________/ \_____
+           /                 \
+          *                   +
+     ____/ \___           ___/ \_________
+    /          \         /               \
+    +          +        *                 -
+   / \        / \      / \               /  \_____
+  x   1      x   1    2   *             *         \
+                         / \           / \         *
+                        /   \         /   \       / \
+                       +     -       -     -     x   y
+                      / \   / \     / \   / \
+                     x   1 y   1   y   1 y   1
+
+
+DAG:
+
+                      +
+            _________/ \_____
+           /                 \
+          *                   +
+     ____/ \___           ___/ \_________
+    /          \         /               \
+    \           \       *                 -
+     \           \     / \               /  \_____
+      \____      |    2   *             *         \
+           \_____|       / \______     / |         *
+                  \___  /         \_  /_/         / \
+                       +             -           |    other y
+                      / \           / \        other x
+                     x   1         y   1
+
+
+Idea is to squeeze out all the repeated computations
+
+AST: 14 computation nodes
+DAG: 10 compuation nodes
+
+Question:
+  (1) Can we always merge common subexpressions?
+  (2) How can we build this DAG efficiently?
+
+(1) Can we always merge?
+
+    What about x++?
+
+    Any subexpression that has "side effects" (like changing a variable,
+    writing to a file, etc) should not be merged.
+
+    (Avoid merging for function calls or assignments)
+
+(2) How can we build this DAG efficiently?
+
+Idea:
+  * use the same algorithm to build the AST
+  * whenever we create a new node, before adding to the DAG
+    check if it matches an exsiting node
+        if yes: discard the new one, and re-use the old one
+        if no : use the new one
+
+  * in practice: hash table of nodes
+
+Code would look something like this:
+
+AST:
+  node* createNode(node* left, operator op, node* right)
+  {
+    node* n = malloc(sizeof(node));
+    if (0==n) exit(1);    // out of memory
+
+    n->left = left;
+    n->op = op;
+    n->right = right;
+
+    return n;
+  }
+
+
+DAG:
+  node* createNode(node* left, operator op, node* right)
+  {
+    node* find = FindExistingNode(left, op, right);     /* NEW */
+      // assume this returns null if no match
+    if (find) return find;                              /* NEW */
+
+    node* n = malloc(sizeof(node));
+    if (0==n) exit(1);    // out of memory
+
+    n->left = left;
+    n->op = op;
+    n->right = right;
+
+    AddToNodes(n);      /* NEW */
+    return n;
+  }
+
+Need to implement FindExistingNode, AddToNodes
+(recommended: hash table)
+
+
+Value number method:
+------------------------------------------------------------
+* Store DAG nodes in an array of structs
+* Interior nodes:
+      operator code
+      left node (number: array index)
+      right node (number: array index)
+
+* Leaf:
+      operator code: literals, variables, etc
+      left: pointer to symbol table for vars,
+            either the actual literal or maybe pointer to literal table
+                for literals
+
+The array index is called the value number of the node/expression.
+
+Usually: the number of the children is lower than the number
+          of the node
+
+Next time: draw this for our DAG.
+

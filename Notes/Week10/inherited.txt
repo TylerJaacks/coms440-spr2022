@@ -174,4 +174,38 @@ the functions.
   B's attribute depends on C
 
 
+(5) If all else fails: build the AST and then you can traverse the AST
+    however you like.
+
+    If we have a function/method to traverse the tree
+
+    traverse()
+
+    then synthesized: return from traverse function,
+         inherited  : pass as parameters to traverse function
+
+    We can traverse more than once if needed.
+
+    ASTs are synthesized attributes.
+
+From now on mostly: will be attribute grammars, and not specifying
+how they are implemented.
+
+Traversal example:
+
+  double compute(expr* e)
+  {
+    if (e is a binary op)
+    {
+        L = compute(e->left);     // all recursion
+        R = compute(e->right);
+        return L (operator for e) R;
+    }
+    if (e is a unary op)
+    {
+        L = compute(e->left);
+        return (operator for e) L;
+    }
+  }
+
 
