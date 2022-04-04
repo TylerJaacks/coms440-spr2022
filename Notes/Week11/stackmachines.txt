@@ -1,0 +1,264 @@
+
+Stack machines:
+======================================================================
+In a stack machine, most operations pull their arguments from
+a runtime stack.
+  -> need operations to push literals, vars, etc onto the stack
+  -> operations don't specify addresses
+
+
+Common instruction forms:
+
+(1)   push  x
+        x is a program variable or literal
+
+      push  x[i]
+        if x is an array
+        x, i could come from the stack
+
+
+(2)   pop  x
+        pop and store into x and
+
+      pop  x[i]
+        again x, i might come from the stack
+
+
+
+(3)   binary operations: x = y (op) z
+
+      (op)
+
+        e.g. + or "integer +"
+
+      instruction "+" would mean
+          pop the right arg
+          pop the left arg
+          push left + right
+
+
+(3')  unary operations:  x = (op) z
+
+      (op)
+
+        e.g. "unary - on integers"
+
+      instruction "unary -" would mean
+          pop an argument
+          push -argument
+
+
+(4)   uncondition jump:     goto L5
+
+(5)   conditional jumps:      iftrue x goto L
+          the thing we're checking for true (x)
+          will be popped off the stack
+
+      iftrue goto L5:
+          pop x off the stack
+          if x is true then goto L5
+
+(6)   fancy conditional jumps
+
+      if relop goto L
+
+      e.g.
+
+      if < goto L:
+          pop right off the stack
+          pop left off the stack
+          if left < right goto L
+
+(7)   function calls:
+
+      usually assume parameters are already on the stack
+      so no "param" statements
+
+        call procedure p,n
+            pop the n parameters for procedure p, then call p(...)
+
+
+
+Example:
+
+Source:
+
+    do {
+      i = i + 1;
+    } while (a[i] < v);
+
+Three-address:
+    L:
+        t1 = i + 1;
+        i  = t1;
+        t2 = i * 8;     // elements are 8 bytes each
+        t3 = a[t2];
+        if (t3 < v) goto L;
+
+
+Stack machine:
+    L:
+        push i
+        push 1
+        + (int)
+        pop i
+        push a
+        push i
+        push 8
+        * (int)     /* stack is now a, i*8 */
+        []          /* get array element */
+        push v
+        if < goto L
+
+
+The Java Virtual Machine
+======================================================================
+
+* (Abstract) machine that can execute Java bytecode
+
+* Will read and execute .class files
+
+* Is a 32-bit stack machine
+    -> each stack slot is 32 bits
+    -> long, double consume 2 slots
+    -> int and float are 32-bits (1 slot)
+    -> bool, char, byte, short are operated on as 32-bit integers
+       (arrays are likely compressed)
+
+
+Frames:
+  * Memory space for a function / method call
+  * A new frame is created for each function call
+  * The frame is destoyed when the function returns
+  * A frame contains:
+      - An array of local variable slots numbered from 0
+        This includes parameters
+        Parameters are numbered 0 .. n-1
+      - an operand (runtime) stack for performing computations
+        (initially empty)
+
+
+Java bytecode instructions (some)
+------------------------------------------------------------
+https://en.wikipedia.org/wiki/Java_bytecode_instruction_listings
+
+
+Arithmetic ops (binary)
+------------------------------------------------------------
+
+  Tadd +
+  Tsub -
+  Tmul *
+  Tdiv /
+  Trem %
+
+  T: type of the operands, one of
+        i: integer
+        c: char
+        f: float
+        a: reference (arrays for us)
+
+  For arith: T is i or f
+
+  iadd:
+      top of the stack are 2 integers, add them, push result
+
+
+Unary ops:
+
+  Tneg -
+    T is i or f for unary - here
+
+
+Load and store for local vars/params:
+
+  Tload index       : push value of local variable #index onto the stack
+                      assuming it is of type T
+
+  Tstore index      : pop value off stack, store it in local var #index
+
+  Special case:
+      For indexes 0 through 3:   Tload_index, Tstore_index
+
+
+Load for constant literals:
+
+  bipush byte     (small integer consts)
+  sipush short    (medium integer consts)
+  ldc    val      (large integer consts, or floats)
+
+  Special cases:
+    fconst_0, fconst_1, fconst_2                : float consts 0.0, 1.0, 2.0
+    iconst_m1, iconst_0, const_1, .., const_5   : -1, 0, 1, ..., 5
+
+
+Array load and store:
+
+              Stack before:           Stack after:
+  Taload        ..., A, index         ..., A[index]
+
+  Tastore       ..., A, index, value  ....,
+                                      and sets A[index] = value
+
+
+  T can be c, i, f
+
+
+Global variables:
+Static field load and store:
+
+    getstatic Field (classname) (fieldname) type    -> pushes onto stack
+
+    putstatic Field (classname) (fieldname) type    -> pops and stores
+
+Warning: the type here is not the usual i,c,f, but something else
+
+
+Calling methods:
+
+    invokestatic Method (classname) (methodname) paramthing
+                                                 (.....)
+
+    Will pop #params needed off the stack, call the method,
+    returned value from the method will be pushed onto the stack.
+
+
+Returning from a method:
+
+    Treturn         pop the specified value off the stack,
+                    and return it from this method
+
+    T: i, f
+
+For void methods:
+
+    return          just sends control back to caller
+
+
+Stack manipulation:
+
+instruction       stack before      stack after
+---------------   ---------------   ---------------
+swap              ..., v2, v1       ..., v1, v2
+pop               ..., v1           ...,
+dup               ..., v1           ..., v1, v1
+dup_x1            ..., v2, v1       ..., v1, v2, v1
+dup_x2            ..., v3, v2, v1   ..., v1, v3, v2, v1
+
+
+Conversions:
+  f2i     - float to int
+  i2f     - int to float
+  i2c     - int to char (discard top bits)
+
+
+Specialty:
+  iinc    - add a constant to a local variable
+
+  iinc (varindex) (delta)
+
+
+Next time: still even more instructions
+
+  ldc "hello world!"
+
