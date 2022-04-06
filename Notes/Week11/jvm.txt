@@ -1,0 +1,365 @@
+
+The Java Virtual Machine
+======================================================================
+
+* (Abstract) machine that can execute Java bytecode
+
+* Will read and execute .class files
+
+* Is a 32-bit stack machine
+    -> each stack slot is 32 bits
+    -> long, double consume 2 slots
+    -> int and float are 32-bits (1 slot)
+    -> bool, char, byte, short are operated on as 32-bit integers
+       (arrays are likely compressed)
+
+
+Frames:
+  * Memory space for a function / method call
+  * A new frame is created for each function call
+  * The frame is destoyed when the function returns
+  * A frame contains:
+      - An array of local variable slots numbered from 0
+        This includes parameters
+        Parameters are numbered 0 .. n-1
+      - an operand (runtime) stack for performing computations
+        (initially empty)
+
+
+Java bytecode instructions (some)
+------------------------------------------------------------
+https://en.wikipedia.org/wiki/Java_bytecode_instruction_listings
+
+
+Arithmetic ops (binary)
+------------------------------------------------------------
+
+  Tadd +
+  Tsub -
+  Tmul *
+  Tdiv /
+  Trem %
+
+  T: type of the operands, one of
+        i: integer
+        c: char
+        f: float
+        a: reference (arrays for us)
+
+  For arith: T is i or f
+
+  iadd:
+      top of the stack are 2 integers, add them, push result
+
+
+Unary ops:
+
+  Tneg -
+    T is i or f for unary - here
+
+
+Load and store for local vars/params:
+
+  Tload index       : push value of local variable #index onto the stack
+                      assuming it is of type T
+
+  Tstore index      : pop value off stack, store it in local var #index
+
+  Special case:
+      For indexes 0 through 3:   Tload_index, Tstore_index
+
+
+Load for constant literals:
+
+  bipush byte     (small integer consts)
+  sipush short    (medium integer consts)
+  ldc    val      (large integer consts, or floats)
+
+  Special cases:
+    fconst_0, fconst_1, fconst_2                : float consts 0.0, 1.0, 2.0
+    iconst_m1, iconst_0, const_1, .., const_5   : -1, 0, 1, ..., 5
+
+
+Array load and store:
+
+              Stack before:           Stack after:
+  Taload        ..., A, index         ..., A[index]
+
+  Tastore       ..., A, index, value  ....,
+                                      and sets A[index] = value
+
+
+  T can be c, i, f
+
+
+Global variables:
+Static field load and store:
+
+    getstatic Field (classname) (fieldname) type    -> pushes onto stack
+
+    putstatic Field (classname) (fieldname) type    -> pops and stores
+
+Warning: the type here is not the usual i,c,f, but something else
+
+
+Calling methods:
+
+    invokestatic Method (classname) (methodname) paramthing
+                                                 (.....)
+
+    Will pop #params needed off the stack, call the method,
+    returned value from the method will be pushed onto the stack.
+
+
+Returning from a method:
+
+    Treturn         pop the specified value off the stack,
+                    and return it from this method
+
+    T: i, f
+
+For void methods:
+
+    return          just sends control back to caller
+
+
+Stack manipulation:
+
+instruction       stack before      stack after
+---------------   ---------------   ---------------
+swap              ..., v2, v1       ..., v1, v2
+pop               ..., v1           ...,
+dup               ..., v1           ..., v1, v1
+dup_x1            ..., v2, v1       ..., v1, v2, v1
+dup_x2            ..., v3, v2, v1   ..., v1, v3, v2, v1
+
+
+Conversions:
+  f2i     - float to int
+  i2f     - int to float
+  i2c     - int to char (discard top bits)
+
+Stack before:
+    ..., v_original
+
+Stack after:
+    ..., v_converted
+
+
+Specialty:
+  iinc    - add a constant to a local variable
+
+  iinc (varindex) (delta)
+
+  (doesn't touch stack)
+
+
+Conditionals
+======================================================================
+
+ifeq, ifne, ifge, ifgt, ifle, iflt L
+
+  if ==, !=, >=, >, <=, <
+
+  pull an integer off the stack, check if it ==0, !=0, >=0, etc.
+
+  if so jump to label L
+
+
+Special case: integer comparisons
+
+if_icmpeq, if_icmpne,
+if_icmp* for * in eq, ne, ge, gt, le, lt
+
+  pulls 2 integers off the stack, compares, if comp is true jump to label
+
+  Before stack:
+    ...., v1, v2
+
+  if_cmplt L:
+      if v1 < v2 then goto L
+
+  After stack:
+    ...,
+
+
+
+Float comparisons (also double):
+
+Instruction:          stack before:         stack after:
+    d/fcmpg           ..., v1, v2           ..., result
+    d/fcmpl           ..., v1, v2           ..., result
+
+compare two floats (f) or doubles (d), store result:
+
+    g: 1 on NaN
+    l: -1 on NaN
+
+
+Small example by hand:
+
+source:
+
+  do {
+    i = i + 1;
+  } while (A[i] < v);
+
+// assume A is an array of doubles
+
+Stack machine code:
+
+  L:  push i
+      push 1
+      +
+      pop i       // i = i+ 1
+      push A
+      push i
+      push 8
+      *           // i * 8 for number of bytes
+      []          // A[i]
+      push v
+      if < goto L
+
+
+  i: local var #3
+  A: local var #0
+  v: local var #1/2
+
+JVM code:
+
+  L:  iload_3
+      iconst_1
+      iadd
+      istore_3      // i = i +1
+      ;
+      aload_0       // A onto the stack
+      iload_3       // i onto the stack
+      daload        // stack is now A[i]
+      dload_1       // stack is now A[i], v
+      dcmpg         // compare A[i] with v
+      iflt L        // if A[i] < v goto L
+
+
+T is c,i,f,d,l,a for *instructions*
+
+
+How to specify types in Java assembly, not for instructions
+======================================================================
+
+Used for things like getstatic/putstatic, method calls, method blocks, etc.
+
+    V: void
+    C: char
+    I: int
+    F: float
+
+    [: array of
+
+              [C
+
+    objects:
+
+        L(object name);
+
+
+Example:
+
+    To read from static variable   funky.fld  of type int, store on the stack:
+
+    getstatic Field funky fld I
+
+
+    To call a method:
+        give the param types in () with no spaces, followed by the return type
+
+
+    if we have a method in class funky
+
+          public static void foo(char c[], int N);
+
+    to call this:
+
+          invokestatic Method   funky  foo  ([CI)V
+
+          JVM knows to pop two items from the stack
+              a char array, and an int
+          sends to function foo, nothing returned
+
+
+
+Miscellaneous:
+======================================================================
+
+Minimal file header for Krakatau assembler:
+------------------------------------------------------------
+
+.class public (classname)   -> use the input filename without .c
+.super java/lang/Object
+
+There could be more but this will work.
+
+
+"Global variables":
+------------------------------------------------------------
+
+.field public static (varname) (type)
+
+
+
+Method blocks:
+------------------------------------------------------------
+.method public static (name) : (types)return
+  .code stack INT locals INT
+      (list of instructions)
+  .end code
+.end method
+
+
+  locals: the integer here is number of parameters + number of locals
+
+  stack: you must indicate the max size of the stack
+      how to get this?
+          (1) synthesize an estimate based on the code you would generate
+          (2) buffer the instructions, then go through and count stack depth
+
+
+There can be other stuff but this is enough
+
+
+Special methods
+======================================================================
+
+<init>: instance initialization method
+------------------------------------------------------------
+Because everything for us is static, all we need to do is
+call the parent's initializer.
+It's fine to simply print the same (or almost if it needs a class name)
+code each time and use the instructor's code.
+
+Java main
+------------------------------------------------------------
+public static void main(String[] args)
+
+    should call user-generated
+
+    public static int main()
+
+    For part 5: also print the returned integer from int main()
+
+
+<clinit>: class initialization method
+------------------------------------------------------------
+Needed to initialize static "global" variables
+
+  * arrays need to be built!
+
+  * any variable initializations
+
+
+int x=3;
+int A[50];
+
+
+
+
+
