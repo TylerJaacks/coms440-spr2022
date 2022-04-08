@@ -360,6 +360,20 @@ int x=3;
 int A[50];
 
 
+Instructions to build an array
+------------------------------------------------------------
+  newarray char/int/float
 
+stack before:     ..., size
+stack after:      ..., array (as an object)
+
+Experiment with Java and disassembler to see examples:
+
+How you might do this:
+
+    Write a snippet of Java code
+    Compile as usual
+    Disassemble the class file
+    Look at the assembly
 
 
