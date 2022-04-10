@@ -1,0 +1,10 @@
+Line   2: global const float pi
+Line   4: function float radians
+    Line   4: parameter float degrees
+Line   9: function float pi_f
+Line  14: function void tests
+    Line  16: local float x
+    Line  17: expression has type float
+    Line  18: expression has type float
+    Line  19: expression has type float
+    Line  21: expression has type const float

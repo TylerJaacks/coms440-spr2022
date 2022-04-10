@@ -1,0 +1,14 @@
+Type checking error in file arith5.c line 8
+	Invalid operand types int[] + int[]
+Type checking error in file arith5.c line 9
+	Invalid operand types int[] - int[]
+Type checking error in file arith5.c line 10
+	Invalid operand types int[] * int[]
+Type checking error in file arith5.c line 11
+	Invalid operand types int[] / int[]
+Type checking error in file arith5.c line 12
+	Invalid operand types int[] % int[]
+Type checking error in file arith5.c line 13
+	Invalid operand types int[] & int[]
+Type checking error in file arith5.c line 14
+	Invalid operand types int[] | int[]

@@ -1,0 +1,14 @@
+Type checking error in file arith5.c line 8
+	No match for binary operation int[] + int[]
+Type checking error in file arith5.c line 9
+	No match for binary operation int[] - int[]
+Type checking error in file arith5.c line 10
+	No match for binary operation int[] * int[]
+Type checking error in file arith5.c line 11
+	No match for binary operation int[] / int[]
+Type checking error in file arith5.c line 12
+	No match for binary operation int[] % int[]
+Type checking error in file arith5.c line 13
+	No match for binary operation int[] & int[]
+Type checking error in file arith5.c line 14
+	No match for binary operation int[] | int[]

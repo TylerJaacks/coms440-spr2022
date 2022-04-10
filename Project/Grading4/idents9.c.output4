@@ -1,0 +1,10 @@
+Line   2: function float avg
+    Line   2: parameter float A[]
+    Line   2: parameter int n
+    Line   4: local int i
+    Line   5: expression has type float[]
+    Line   6: expression has type int
+    Line   7: expression has type int
+Line  10: function void puts
+    Line  10: parameter char msg[]
+    Line  12: expression has type char[]

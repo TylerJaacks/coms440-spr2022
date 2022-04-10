@@ -1,0 +1,2 @@
+Type checking error in file proto2.c line 6
+	function thingy prototype conflicts with earlier one on line 2

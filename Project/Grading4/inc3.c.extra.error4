@@ -1,0 +1,8 @@
+Type checking error in file inc3.c line 8
+	No match for int[] ++
+Type checking error in file inc3.c line 9
+	No match for ++ int[]
+Type checking error in file inc3.c line 10
+	No match for int[] --
+Type checking error in file inc3.c line 11
+	No match for -- int[]

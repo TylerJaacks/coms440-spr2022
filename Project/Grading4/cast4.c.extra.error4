@@ -1,0 +1,6 @@
+Type checking error in file cast4.c line 6
+	Cannot cast expression of type void to char
+Type checking error in file cast4.c line 7
+	Cannot cast expression of type void to int
+Type checking error in file cast4.c line 8
+	Cannot cast expression of type void to float

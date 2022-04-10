@@ -1,0 +1,6 @@
+Type checking error in file cast3.c line 6
+	Can't cast from int[] to char
+Type checking error in file cast3.c line 7
+	Can't cast from int[] to int
+Type checking error in file cast3.c line 8
+	Can't cast from int[] to float

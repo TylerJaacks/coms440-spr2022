@@ -1,0 +1,6 @@
+Line   2: global struct pair
+    Line   3: member int x
+    Line   3: member int y
+Line   6: function struct pair getOrigin
+    Line   6: parameter int something
+    Line   8: local struct pair P

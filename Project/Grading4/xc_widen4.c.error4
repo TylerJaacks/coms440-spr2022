@@ -1,0 +1,8 @@
+Type checking error in file xc_widen4.c line 4
+	Mismatched operand types int + float
+Type checking error in file xc_widen4.c line 6
+	Mismatched ternary operands char ? int : float
+Type checking error in file xc_widen4.c line 7
+	Mismatched ternary operands int ? float : char
+Type checking error in file xc_widen4.c line 8
+	Mismatched ternary operands float ? int : char

@@ -1,0 +1,6 @@
+Line  10: function void test
+    Line  12: expression has type void
+    Line  13: expression has type int
+    Line  14: expression has type char
+    Line  16: expression has type void
+    Line  18: expression has type int

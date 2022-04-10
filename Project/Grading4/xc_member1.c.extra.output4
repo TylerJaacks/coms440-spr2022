@@ -1,0 +1,13 @@
+Line   2: global struct stack
+    Line   3: member int data[100]
+    Line   4: member int top
+Line   7: global struct stack S
+Line   9: function void test
+    Line  11: expression has type struct stack
+    Line  12: expression has type int
+    Line  13: expression has type int[]
+    Line  14: expression has type int
+Line  17: function void push
+    Line  17: parameter int x
+    Line  20: expression has type int
+Line  23: function int pop

@@ -1,0 +1,8 @@
+Type checking error in file xc_widen2.c line 6
+	Invalid assignment: float = int
+Type checking error in file xc_widen2.c line 7
+	Invalid assignment: float = char
+Type checking error in file xc_widen2.c line 9
+	Invalid assignment: float += int
+Type checking error in file xc_widen2.c line 10
+	Invalid assignment: float -= char

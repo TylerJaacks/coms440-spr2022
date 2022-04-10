@@ -1,0 +1,3 @@
+Type checking error in file idents4.c line 16
+	Parameter 'a' duplicates parameter declared in
+		file idents4.c line 16

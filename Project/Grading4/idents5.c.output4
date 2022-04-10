@@ -1,0 +1,11 @@
+Line   2: function void myfunc
+    Line   4: local int a
+    Line   4: local int b
+    Line   4: local int C[50]
+    Line   5: local float d
+    Line   6: local char message[1024]
+    Line   8: expression has type int
+    Line   9: expression has type int
+    Line  10: expression has type int[]
+    Line  11: expression has type float
+    Line  12: expression has type char[]

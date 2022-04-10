@@ -1,0 +1,5 @@
+Type checking error in file proto1.c line 14
+	Function int other_function(float)
+	conflicts with earlier prototype
+	float other_function(float)
+	defined in file proto1.c line 2

@@ -1,0 +1,2 @@
+Type checking error in file unary3.c line 4
+	operand for ! should be numeric type, was void

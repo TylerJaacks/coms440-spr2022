@@ -1,0 +1,10 @@
+Line   2: function void func
+    Line   4: expression has type const int
+    Line   5: expression has type const int
+    Line   6: expression has type const int
+    Line   8: expression has type const char
+    Line   9: expression has type const char
+    Line  10: expression has type const char
+    Line  12: expression has type const float
+    Line  13: expression has type const float
+    Line  14: expression has type const float

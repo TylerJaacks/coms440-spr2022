@@ -1,0 +1,4 @@
+Line   2: function void test
+    Line   4: expression has type const int
+    Line   5: expression has type const float
+    Line   6: expression has type const float

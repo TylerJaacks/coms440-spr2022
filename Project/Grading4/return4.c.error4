@@ -1,0 +1,2 @@
+Type checking error in file return4.c line 28
+	Return type mismatch: was char[], expected float

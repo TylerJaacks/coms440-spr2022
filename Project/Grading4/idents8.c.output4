@@ -1,0 +1,49 @@
+Line   2: function void everything
+    Line   2: parameter int a
+    Line   4: local int b
+    Line   5: local char c[17]
+    Line   6: local float d
+    Line   7: local int e
+    Line   7: local int f[5]
+    Line   7: local int g
+    Line   9: expression has type int
+    Line  10: expression has type int
+    Line  11: expression has type char[]
+    Line  12: expression has type float
+    Line  13: expression has type int
+    Line  14: expression has type int[]
+    Line  15: expression has type int
+Line  18: global float b
+Line  18: global float a
+Line  18: global float d
+Line  20: function int still_good
+    Line  20: parameter int a
+    Line  20: parameter int b
+    Line  20: parameter int c
+    Line  20: parameter int e
+    Line  20: parameter int f
+    Line  20: parameter int g
+    Line  22: local float h
+    Line  22: local float i
+    Line  22: local float j
+    Line  23: local char k
+    Line  25: expression has type int
+    Line  26: expression has type int
+    Line  27: expression has type int
+    Line  28: expression has type float
+    Line  29: expression has type int
+    Line  30: expression has type int
+    Line  31: expression has type int
+    Line  32: expression has type float
+    Line  33: expression has type float
+    Line  34: expression has type float
+    Line  35: expression has type char
+Line  38: global int i
+Line  38: global int j
+Line  40: function void thing
+    Line  40: parameter char a
+    Line  42: expression has type char
+    Line  43: expression has type float
+    Line  44: expression has type float
+    Line  45: expression has type int
+    Line  46: expression has type int

@@ -1,0 +1,2 @@
+Type checking error in file return3.c line 27
+	Return type mismatch: was float, expected int

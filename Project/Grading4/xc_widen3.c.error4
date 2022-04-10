@@ -1,0 +1,6 @@
+Type checking error in file xc_widen3.c line 4
+	Mismatched operand types int + char
+Type checking error in file xc_widen3.c line 5
+	Mismatched operand types int - float
+Type checking error in file xc_widen3.c line 6
+	Mismatched operand types float * char

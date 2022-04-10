@@ -1,0 +1,9 @@
+Type checking error in file xc_widen7.c line 7
+	Parameter mismatch in call to foo(int)
+	Passed parameter #1 has type char
+Type checking error in file xc_widen7.c line 10
+	Parameter mismatch in call to bar(float)
+	Passed parameter #1 has type char
+Type checking error in file xc_widen7.c line 11
+	Parameter mismatch in call to bar(float)
+	Passed parameter #1 has type int

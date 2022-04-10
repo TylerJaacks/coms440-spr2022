@@ -1,0 +1,3 @@
+Type checking error in file fcall3.c line 26
+	Parameter mismatch in call to int func1(int)
+	Passed parameter #1 has type int[]

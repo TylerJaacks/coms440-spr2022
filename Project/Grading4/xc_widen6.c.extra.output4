@@ -1,0 +1,4 @@
+Line   2: function int foo
+Line   7: function float bar
+Line  12: function void test
+    Line  14: expression has type float

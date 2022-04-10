@@ -1,0 +1,2 @@
+Type checking error in file array3.c line 10
+	Array index should be integer, was float

@@ -1,0 +1,12 @@
+Line   2: function void tests
+    Line   2: parameter int i
+    Line   2: parameter float f
+    Line   4: expression has type char
+    Line   5: expression has type char
+    Line   6: expression has type char
+    Line   8: expression has type char
+    Line   9: expression has type char
+    Line  11: expression has type char
+    Line  13: expression has type char
+    Line  15: expression has type char
+    Line  17: expression has type char

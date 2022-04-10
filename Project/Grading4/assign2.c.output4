@@ -1,0 +1,22 @@
+Line   2: function void tests
+    Line   2: parameter int a
+    Line   2: parameter float b
+    Line   2: parameter char c
+    Line   4: local int A
+    Line   5: local float B
+    Line   6: local char C
+    Line   8: expression has type int
+    Line   9: expression has type float
+    Line  10: expression has type char
+    Line  12: expression has type int
+    Line  13: expression has type float
+    Line  14: expression has type char
+    Line  16: expression has type int
+    Line  17: expression has type float
+    Line  18: expression has type char
+    Line  20: expression has type int
+    Line  21: expression has type float
+    Line  22: expression has type char
+    Line  24: expression has type int
+    Line  25: expression has type float
+    Line  26: expression has type char

@@ -1,0 +1,6 @@
+Type checking error in file xc_widen6.c line 4
+	Return type mismatch: was char, expected int
+Type checking error in file xc_widen6.c line 9
+	Return type mismatch: was int, expected float
+Type checking error in file xc_widen6.c line 14
+	Mismatched operand types int + float

@@ -1,0 +1,20 @@
+Type checking error in file assign3.c line 9
+	Assignment mismatch int[] = int[]
+Type checking error in file assign3.c line 10
+	Assignment mismatch int[] += int[]
+Type checking error in file assign3.c line 11
+	Assignment mismatch int[] -= int[]
+Type checking error in file assign3.c line 12
+	Assignment mismatch int[] *= int[]
+Type checking error in file assign3.c line 13
+	Assignment mismatch int[] /= int[]
+Type checking error in file assign3.c line 15
+	Assignment mismatch int[] = const int
+Type checking error in file assign3.c line 16
+	Assignment mismatch int[] += const int
+Type checking error in file assign3.c line 17
+	Assignment mismatch int[] -= const int
+Type checking error in file assign3.c line 18
+	Assignment mismatch int[] *= const int
+Type checking error in file assign3.c line 19
+	Assignment mismatch int[] /= const int

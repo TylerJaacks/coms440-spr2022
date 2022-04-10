@@ -1,0 +1,5 @@
+Type checking error in file xc_widen9.c line 10
+	Parameter mismatch in call to nope(int[])
+	Passed parameter #1 has type char[]
+Type checking error in file xc_widen9.c line 11
+	Invalid assignment: int = char

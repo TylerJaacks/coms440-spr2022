@@ -1,0 +1,2 @@
+Type checking error in file return1.c line 24
+	Return type mismatch: was void, expected char

@@ -1,0 +1,2 @@
+Type checking error in file idents2.c line 21
+	Variable 'x' has type void

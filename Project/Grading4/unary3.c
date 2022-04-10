@@ -1,0 +1,6 @@
+
+void what()
+{
+  !what();
+}
+

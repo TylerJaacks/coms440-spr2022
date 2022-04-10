@@ -1,0 +1,17 @@
+Line   4: global struct pair
+    Line   5: member int x
+    Line   5: member int y
+Line   8: global struct window
+    Line   9: member struct pair upper_left
+    Line  10: member struct pair size
+    Line  11: member char title[256]
+Line  14: global struct screen
+    Line  15: member struct window W[1000]
+    Line  16: member int num_windows
+Line  19: function void test
+    Line  21: local struct pair P
+    Line  22: local struct window W
+    Line  23: local struct screen S
+    Line  25: expression has type struct pair
+    Line  26: expression has type struct window
+    Line  27: expression has type struct screen

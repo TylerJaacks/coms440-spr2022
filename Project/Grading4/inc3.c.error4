@@ -1,0 +1,8 @@
+Type checking error in file inc3.c line 8
+	Operator ++ needs numeric operand; type was int[]
+Type checking error in file inc3.c line 9
+	Operator ++ needs numeric operand; type was int[]
+Type checking error in file inc3.c line 10
+	Operator -- needs numeric operand; type was int[]
+Type checking error in file inc3.c line 11
+	Operator -- needs numeric operand; type was int[]

@@ -1,0 +1,9 @@
+Line   2: function void test
+    Line   2: parameter const int i
+    Line   2: parameter int j
+    Line   4: expression has type const int
+    Line   5: expression has type const int
+    Line   6: expression has type int
+    Line   7: expression has type int
+    Line   8: expression has type const int
+    Line   9: expression has type const char

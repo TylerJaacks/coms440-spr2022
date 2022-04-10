@@ -1,0 +1,18 @@
+Type checking error in file xc_widenA.c line 9
+	Parameter mismatch in call to crust(int, float)
+	Passed parameter #2 has type int
+Type checking error in file xc_widenA.c line 10
+	Parameter mismatch in call to crust(int, float)
+	Passed parameter #1 has type char
+Type checking error in file xc_widenA.c line 10
+	Parameter mismatch in call to crust(int, float)
+	Passed parameter #2 has type char
+Type checking error in file xc_widenA.c line 12
+	Parameter mismatch in call to foo()
+	Expected 0, received 1 parameters
+Type checking error in file xc_widenA.c line 14
+	Parameter mismatch in call to crust(int, float)
+	Passed parameter #1 has type void
+Type checking error in file xc_widenA.c line 14
+	Parameter mismatch in call to crust(int, float)
+	Passed parameter #2 has type void

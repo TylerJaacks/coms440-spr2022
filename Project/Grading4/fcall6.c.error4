@@ -1,0 +1,3 @@
+Type checking error in file fcall6.c line 27
+	Parameter mismatch in call to thing(char, int, float)
+	Expected 3, received 2 parameters

@@ -1,0 +1,16 @@
+Type checking error in file xc_widen8.c line 5
+	Mismatched operand types char != int
+Type checking error in file xc_widen8.c line 6
+	Mismatched operand types char > int
+Type checking error in file xc_widen8.c line 8
+	Mismatched operand types int >= float
+Type checking error in file xc_widen8.c line 9
+	Mismatched operand types float <= int
+Type checking error in file xc_widen8.c line 11
+	Mismatched operand types int && float
+Type checking error in file xc_widen8.c line 13
+	Mismatched operand types char != float
+Type checking error in file xc_widen8.c line 15
+	Mismatched operand types char && float
+Type checking error in file xc_widen8.c line 17
+	Mismatched operand types char || int

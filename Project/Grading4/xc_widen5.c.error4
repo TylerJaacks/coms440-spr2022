@@ -1,0 +1,2 @@
+Type checking error in file xc_widen5.c line 7
+	Array index should be integer, was char

@@ -1,0 +1,19 @@
+Line   2: global int a
+Line   2: global int b
+Line   2: global int c
+Line   3: global float x
+Line   3: global float y
+Line   3: global float z
+Line   5: function void tests
+    Line   5: parameter char p
+    Line   5: parameter char q
+    Line   5: parameter char r
+    Line   7: expression has type int
+    Line   8: expression has type float
+    Line   9: expression has type char
+    Line  11: expression has type int
+    Line  12: expression has type float
+    Line  13: expression has type char
+    Line  15: expression has type int
+    Line  16: expression has type float
+    Line  17: expression has type char

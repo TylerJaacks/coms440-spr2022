@@ -1,0 +1,2 @@
+Type checking error in file idents1.c line 8
+	global float b duplicates global int b on line 2

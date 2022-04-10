@@ -1,0 +1,5 @@
+Type checking error in file proto3.c line 4
+	Function void print(float)
+	conflicts with earlier prototype
+	void print(int)
+	defined in file proto3.c line 2

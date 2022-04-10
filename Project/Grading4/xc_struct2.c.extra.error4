@@ -1,0 +1,2 @@
+Type checking error in file xc_struct2.c line 12
+	Struct 'basic' already declared in file xc_struct2.c line 2

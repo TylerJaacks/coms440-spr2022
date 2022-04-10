@@ -1,0 +1,3 @@
+Type checking error in file fcall2.c line 10
+	Parameter mismatch in call to foo(int)
+	Expected 1, received 0 parameters

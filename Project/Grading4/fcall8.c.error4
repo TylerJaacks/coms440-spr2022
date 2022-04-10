@@ -1,0 +1,3 @@
+Type checking error in file fcall8.c line 10
+	Parameter mismatch in call to test(int, int, int, int)
+	Expected 4, received 7 parameters

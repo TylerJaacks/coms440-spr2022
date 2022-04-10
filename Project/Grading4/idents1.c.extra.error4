@@ -1,0 +1,3 @@
+Type checking error in file idents1.c line 8
+	Global variable 'b' duplicates global variable declared in
+		file idents1.c line 2

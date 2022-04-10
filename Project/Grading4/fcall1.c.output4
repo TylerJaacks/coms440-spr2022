@@ -1,0 +1,11 @@
+Line   2: function void func1
+    Line   4: local int a
+Line   7: function int func2
+    Line   9: local char b
+Line  12: function float func3
+    Line  14: local int x
+Line  17: function void func4
+    Line  19: expression has type void
+    Line  20: expression has type int
+    Line  21: expression has type float
+    Line  22: expression has type void

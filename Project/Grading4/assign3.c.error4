@@ -1,0 +1,20 @@
+Type checking error in file assign3.c line 9
+	Invalid assignment: int[] = int[]
+Type checking error in file assign3.c line 10
+	Invalid assignment: int[] += int[]
+Type checking error in file assign3.c line 11
+	Invalid assignment: int[] -= int[]
+Type checking error in file assign3.c line 12
+	Invalid assignment: int[] *= int[]
+Type checking error in file assign3.c line 13
+	Invalid assignment: int[] /= int[]
+Type checking error in file assign3.c line 15
+	Invalid assignment: int[] = int
+Type checking error in file assign3.c line 16
+	Invalid assignment: int[] += int
+Type checking error in file assign3.c line 17
+	Invalid assignment: int[] -= int
+Type checking error in file assign3.c line 18
+	Invalid assignment: int[] *= int
+Type checking error in file assign3.c line 19
+	Invalid assignment: int[] /= int

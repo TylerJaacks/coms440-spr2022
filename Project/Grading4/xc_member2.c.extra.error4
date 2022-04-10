@@ -1,0 +1,2 @@
+Type checking error in file xc_member2.c line 24
+	Unknown member 'z' in struct thing2

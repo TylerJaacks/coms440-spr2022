@@ -1,0 +1,13 @@
+Line   2: global float a
+Line   3: global int b
+Line   4: global char c
+Line   6: function void func
+    Line   8: expression has type char
+    Line   9: expression has type char
+    Line  10: expression has type char
+    Line  12: expression has type int
+    Line  13: expression has type int
+    Line  14: expression has type int
+    Line  16: expression has type float
+    Line  17: expression has type float
+    Line  18: expression has type float

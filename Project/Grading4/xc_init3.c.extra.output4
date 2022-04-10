@@ -1,0 +1,7 @@
+Line   2: global float f
+Line   4: function void test
+    Line   4: parameter int a
+    Line   6: local int b
+    Line   8: local float g
+    Line  10: local int c
+    Line  10: local int d

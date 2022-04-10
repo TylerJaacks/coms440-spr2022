@@ -1,0 +1,2 @@
+Type checking error in file xc_init5.c line 9
+	Initialization for 'A' has wrong type: const float

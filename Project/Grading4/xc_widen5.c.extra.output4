@@ -1,0 +1,5 @@
+Line   2: function void test
+    Line   4: local int A[50]
+    Line   5: expression has type int[]
+    Line   6: expression has type int
+    Line   7: expression has type int

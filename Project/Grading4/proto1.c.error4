@@ -1,0 +1,2 @@
+Type checking error in file proto1.c line 14
+	function other_function prototype conflicts with earlier one on line 2

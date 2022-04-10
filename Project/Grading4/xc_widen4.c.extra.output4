@@ -1,0 +1,8 @@
+Line   2: function void test
+    Line   2: parameter int a
+    Line   2: parameter float b
+    Line   2: parameter char c
+    Line   4: expression has type float
+    Line   6: expression has type float
+    Line   7: expression has type float
+    Line   8: expression has type int

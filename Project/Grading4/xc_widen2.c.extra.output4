@@ -1,0 +1,6 @@
+Line   2: global float f
+Line   4: function void test
+    Line   6: expression has type float
+    Line   7: expression has type float
+    Line   9: expression has type float
+    Line  10: expression has type float

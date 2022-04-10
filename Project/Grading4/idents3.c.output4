@@ -1,0 +1,8 @@
+Line   2: function void myfunc
+    Line   2: parameter int a
+    Line   2: parameter float b
+    Line   2: parameter char c
+Line   6: global int a
+Line   8: function int foo
+    Line   8: parameter int b
+    Line  10: local int c

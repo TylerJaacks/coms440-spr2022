@@ -1,0 +1,55 @@
+Line   2: global struct bigint
+    Line   3: member char digits[1000]
+    Line   4: member int size
+Line   7: global struct rational
+    Line   8: member struct bigint numerator
+    Line   8: member struct bigint denominator
+Line  11: global struct node
+    Line  12: member char type
+    Line  13: member struct rational value
+    Line  14: member int left
+    Line  14: member int right
+    Line  15: member char op
+Line  18: global struct formula
+    Line  19: member struct node instr[256]
+    Line  20: member int size
+Line  23: global struct location
+    Line  24: member char filename[128]
+    Line  25: member int line
+Line  28: global struct stmt
+    Line  29: member struct location where
+    Line  30: member struct formula how
+Line  33: global struct function
+    Line  34: member char name[50]
+    Line  35: member struct stmt exec[256]
+    Line  36: member int size
+Line  39: global struct module
+    Line  40: member struct function funcs[256]
+    Line  41: member int size
+Line  44: global struct program
+    Line  45: member struct module mods[256]
+    Line  46: member int size
+Line  49: function void test
+    Line  51: local struct program P
+    Line  53: expression has type struct program
+    Line  54: expression has type int
+    Line  55: expression has type struct module[]
+    Line  56: expression has type struct module
+    Line  57: expression has type struct function[]
+    Line  58: expression has type struct function
+    Line  59: expression has type char[]
+    Line  60: expression has type struct stmt[]
+    Line  61: expression has type struct stmt
+    Line  62: expression has type struct location
+    Line  63: expression has type char[]
+    Line  64: expression has type char
+    Line  66: expression has type struct formula
+    Line  67: expression has type int
+    Line  68: expression has type struct node[]
+    Line  69: expression has type struct node
+    Line  70: expression has type char
+    Line  71: expression has type struct rational
+    Line  72: expression has type struct bigint
+    Line  73: expression has type int
+    Line  74: expression has type char[]
+    Line  75: expression has type char

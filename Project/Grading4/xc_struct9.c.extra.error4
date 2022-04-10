@@ -1,0 +1,2 @@
+Type checking error in file xc_struct9.c line 14
+	Unknown struct 'local'

@@ -1,0 +1,19 @@
+Line   2: global int a
+Line   3: global float b
+Line   4: global char c
+Line   6: function void tests
+    Line   8: expression has type int
+    Line   9: expression has type float
+    Line  10: expression has type char
+    Line  12: expression has type int
+    Line  13: expression has type float
+    Line  14: expression has type char
+    Line  16: expression has type int
+    Line  17: expression has type float
+    Line  18: expression has type char
+    Line  20: expression has type int
+    Line  21: expression has type float
+    Line  22: expression has type char
+    Line  24: expression has type int
+    Line  25: expression has type float
+    Line  26: expression has type char

@@ -1,0 +1,5 @@
+Line   2: global float pi
+Line   4: global int i
+Line   4: global int j
+Line   4: global int k
+Line   6: global char c

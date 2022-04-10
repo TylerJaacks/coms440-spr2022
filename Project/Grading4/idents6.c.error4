@@ -1,0 +1,2 @@
+Type checking error in file idents6.c line 24
+	local int bad duplicates local int bad on line 23

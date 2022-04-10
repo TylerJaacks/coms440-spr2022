@@ -1,0 +1,2 @@
+Type checking error in file proto3.c line 4
+	function print prototype conflicts with earlier one on line 2

@@ -1,0 +1,6 @@
+Line   2: function void test
+    Line   4: local float pi
+    Line   6: local int i
+    Line   6: local int j
+    Line   6: local int k
+    Line   8: local char c

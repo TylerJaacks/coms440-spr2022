@@ -1,0 +1,2 @@
+Type checking error in file ternary4.c line 8
+	Mismatched ternary operands char ? int[] : float[]

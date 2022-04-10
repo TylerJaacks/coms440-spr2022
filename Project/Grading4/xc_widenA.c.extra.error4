@@ -1,0 +1,6 @@
+Type checking error in file xc_widenA.c line 12
+	Parameter mismatch in call to char foo()
+	Expected 0, received 1 parameters
+Type checking error in file xc_widenA.c line 14
+	Parameter mismatch in call to void crust(int, float)
+	Passed parameter #1 has type void

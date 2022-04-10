@@ -1,0 +1,7 @@
+Line   2: global struct basic
+    Line   3: member int x
+    Line   3: member int y
+    Line   4: member char name[50]
+    Line   5: member float depth
+Line   8: global int filler
+Line  10: global struct basic B

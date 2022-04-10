@@ -1,0 +1,6 @@
+Line   2: global struct point
+    Line   3: member float x
+    Line   3: member float y
+    Line   3: member float z
+Line   8: function float Area2
+    Line   8: parameter struct point Triangle[]

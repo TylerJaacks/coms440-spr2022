@@ -1,0 +1,2 @@
+Type checking error in file xc_const4.c line 6
+	Cannot modify const item A[]

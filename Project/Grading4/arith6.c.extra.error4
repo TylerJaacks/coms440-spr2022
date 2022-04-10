@@ -1,0 +1,14 @@
+Type checking error in file arith6.c line 6
+	No match for binary operation const char[] + const char[]
+Type checking error in file arith6.c line 7
+	No match for binary operation const char[] - const char[]
+Type checking error in file arith6.c line 8
+	No match for binary operation const char[] * const char[]
+Type checking error in file arith6.c line 9
+	No match for binary operation const char[] / const char[]
+Type checking error in file arith6.c line 10
+	No match for binary operation const char[] % const char[]
+Type checking error in file arith6.c line 11
+	No match for binary operation const char[] & const char[]
+Type checking error in file arith6.c line 12
+	No match for binary operation const char[] | const char[]

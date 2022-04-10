@@ -1,0 +1,4 @@
+Type checking error in file array4.c line 8
+	Variable 'A' is not an array
+Type checking error in file array4.c line 9
+	Variable 'A' is not an array

@@ -1,0 +1,11 @@
+Line   2: function void test
+    Line   4: local struct local
+        Line   5: member int x
+        Line   5: member int y
+        Line   5: member int z
+    Line   8: local int first
+    Line  10: local struct local L1
+    Line  12: local int second
+    Line  14: expression has type int
+    Line  15: expression has type struct local
+    Line  16: expression has type int

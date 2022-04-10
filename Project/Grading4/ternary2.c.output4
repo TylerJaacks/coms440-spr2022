@@ -1,0 +1,6 @@
+Line   5: function void tests
+    Line   5: parameter char t
+    Line   7: local int A[50]
+    Line   8: local int B[50]
+    Line  10: expression has type int[]
+    Line  11: expression has type void

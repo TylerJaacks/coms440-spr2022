@@ -1,0 +1,10 @@
+Type checking error in file assign4.c line 5
+	Assignment mismatch int[] = const int
+Type checking error in file assign4.c line 6
+	Assignment mismatch int[] += const int
+Type checking error in file assign4.c line 7
+	Assignment mismatch int[] -= const int
+Type checking error in file assign4.c line 8
+	Assignment mismatch int[] *= const int
+Type checking error in file assign4.c line 9
+	Assignment mismatch int[] /= const int
