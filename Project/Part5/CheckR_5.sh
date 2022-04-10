@@ -4,7 +4,7 @@ KPATH="$HOME/Krakatau"
 
 ASSEMBLE=""
 
-TIMEOUT=30
+TIMEOUT=10
 SCRIPT=$0
 MODE=5
 DASHO=""
@@ -259,7 +259,7 @@ compareOut()
 testOuts()
 {
   cp -p $1.c $1.c.backup
-  echo "" > student.error.txt
+  echo "" > student.error
   echo "" > $1.j
   printf "$1.c"
   timeoutCompile $1.c $1.j student.error
@@ -276,10 +276,10 @@ testOuts()
     echo "         ---------------------------------------------------------"
     awk '(NR<21) {print "         | " $0}' student.error
     echo "         ---------------------------------------------------------"
-    rm student.error.txt $1.j
+    rm student.error $1.j
     return 0
   fi
-  rm student.error.txt
+  rm student.error
   green "    No compile errors" ", running assembler\n"
   if $ASSEMBLE $1.j > /dev/null 2> student.log ; then
     green "    Target code assembles" ", running tests\n"
@@ -438,8 +438,8 @@ for arg; do
     timeoutCompile $BASE.c $BASE.j student.error
     printf "\n"
     compareInvalid $BASE.error student.error
-    touch student.error
-    rm student.error
+    touch student.error $BASE.j
+    rm student.error $BASE.j
     continue
   fi
   testOuts $BASE
