@@ -1,0 +1,123 @@
+
+Translation of expressions
+======================================================================
+
+* Use attribute grammar for expressions
+
+* Attributes needed for code generation
+
+* For 3-address code
+
+* (Synthesized attributes)
+
+* Attributes:
+      * code (as a massive string) to compute the expression
+      * addr: the address that holds the result of computation.
+              (literals, variables, or compiler temps.)
+
+* Simple grammar
+
+      E -> E + E
+      E -> E * E
+      E -> -E
+      E -> ( E )
+      E -> id = E
+      E -> number
+      E -> id
+
+(Assume there are disambiguating rules for the parser...)
+
+We write this as "production" plus "semantic rules"
+
+
+Production:             Rules:
+--------------------    -----------------------------------------------------
+E -> id                 {  E.addr = symbol_table_entry_for(id.name);
+                           E.code = "";
+                        }
+
+E -> number             {  E.addr = constant_table_entry(number.value);
+                           E.code = "";
+                        }
+
+E -> ( E1 )             {  E.addr = E1.addr;
+                           E.code = E1.code;
+                        }
+
+E -> -E1                {  E.addr = new_temporary();
+                           E.code = concatenate(
+                                        E1.code,
+                                        instruction(E.addr, " = -", E1.addr)
+                                    );
+                        }
+
+E -> E1 * E2            {  E.addr = new_temporary();
+                           E.code = concatenate(
+                                        E1.code,
+                                        E2.code,
+                                        instruction(E.addr, " = ",
+                                              E1.addr, " * ", E2.addr)
+                                    );
+                        }
+
+E -> E1 + E2            {  E.addr = new_temporary();
+                           E.code = concatenate(
+                                        E1.code,
+                                        E2.code,
+                                        instruction(E.addr, " = ",
+                                              E1.addr, " + ", E2.addr)
+                                    );
+                        }
+
+
+Incremental translation
+======================================================================
+
+Observations:
+
+    * The code strings are never modified, just concatenated in order
+      with new instructions on the end.
+
+    * With a proper (sibling order) traversal, instructions will remain
+      in the order they are generated.
+
+    * Don't need code strings, just assume we have "output_instruction"
+      that will either
+            * write instructions to a file
+            * write instructions into a buffer
+              then we can optimize on the buffer
+
+    * In practice: all this string concatenation will get expensive.
+
+
+We can then rewrite the semantic rules:
+
+Production:             Rules:
+--------------------    -----------------------------------------------------
+E -> id                 {  E.addr = symbol_table_entry_for(id.name);
+                        }
+
+E -> number             {  E.addr = constant_table_entry(number.value);
+                        }
+
+E -> ( E1 )             {  E.addr = E1.addr;
+                        }
+
+E -> -E1                {  E.addr = new_temporary();
+                           output_instruction(E.addr, " = -", E1.addr);
+                        }
+
+E -> E1 * E2            {  E.addr = new_temporary();
+                           output_instruction(E.addr, " = ",
+                                              E1.addr, " * ", E2.addr);
+                        }
+
+E -> E1 + E2            {  E.addr = new_temporary();
+                           output_instruction(E.addr, " = ",
+                                              E1.addr, " + ", E2.addr);
+                        }
+
+
+Next time: all this for stack machines
+
+

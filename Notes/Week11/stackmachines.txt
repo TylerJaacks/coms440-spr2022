@@ -1,0 +1,113 @@
+
+Stack machines:
+======================================================================
+In a stack machine, most operations pull their arguments from
+a runtime stack.
+  -> need operations to push literals, vars, etc onto the stack
+  -> operations don't specify addresses
+
+
+Common instruction forms:
+
+(1)   push  x
+        x is a program variable or literal
+
+      push  x[i]
+        if x is an array
+        x, i could come from the stack
+
+
+(2)   pop  x
+        pop and store into x and
+
+      pop  x[i]
+        again x, i might come from the stack
+
+
+
+(3)   binary operations: x = y (op) z
+
+      (op)
+
+        e.g. + or "integer +"
+
+      instruction "+" would mean
+          pop the right arg
+          pop the left arg
+          push left + right
+
+
+(3')  unary operations:  x = (op) z
+
+      (op)
+
+        e.g. "unary - on integers"
+
+      instruction "unary -" would mean
+          pop an argument
+          push -argument
+
+
+(4)   uncondition jump:     goto L5
+
+(5)   conditional jumps:      iftrue x goto L
+          the thing we're checking for true (x)
+          will be popped off the stack
+
+      iftrue goto L5:
+          pop x off the stack
+          if x is true then goto L5
+
+(6)   fancy conditional jumps
+
+      if relop goto L
+
+      e.g.
+
+      if < goto L:
+          pop right off the stack
+          pop left off the stack
+          if left < right goto L
+
+(7)   function calls:
+
+      usually assume parameters are already on the stack
+      so no "param" statements
+
+        call procedure p,n
+            pop the n parameters for procedure p, then call p(...)
+
+
+
+Example:
+
+Source:
+
+    do {
+      i = i + 1;
+    } while (a[i] < v);
+
+Three-address:
+    L:
+        t1 = i + 1;
+        i  = t1;
+        t2 = i * 8;     // elements are 8 bytes each
+        t3 = a[t2];
+        if (t3 < v) goto L;
+
+
+Stack machine:
+    L:
+        push i
+        push 1
+        + (int)
+        pop i
+        push a
+        push i
+        push 8
+        * (int)     /* stack is now a, i*8 */
+        []          /* get array element */
+        push v
+        if < goto L
+
+

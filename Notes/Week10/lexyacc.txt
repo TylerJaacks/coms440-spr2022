@@ -1,0 +1,123 @@
+
+How do attributes / rules work in lex/yacc?
+
+* need lex to set attributes for terminals
+  (or we do it in our C code)
+
+* need to specify the attributes for symbols in yacc
+
+* need to specify the rules in yacc
+
+
+Attributes in yacc/bison
+======================================================================
+
+* Each symbol has at most one attribute
+  -> no problem b/c we have structs in C
+
+* In declarations section, declare all the attribute types
+    that could be associated with some symbol
+
+  %union
+  {
+        type   field_name;
+        type   field_name;
+        ...
+  }
+
+  type is a C type
+
+  -> like a C union, b/c that's what's used underneath.
+
+
+* Then assign types to symbols (terminals or non-terminals)
+  (default is no attribute)
+
+  For terminals:
+
+      %token <field_name>   SYMBOL SYMBOL SYMBOL ...
+                            ^
+                            these were the token names
+
+              ^ this is one of the field names in our %union above
+
+  For non-terminals:
+
+      %type <field_name>  SYMBOL SYMBOL SYMBOL ...
+                          ^ non-terminal symbols
+
+
+======================================================================
+How to use attributes in the yacc rules
+
+Suppose we have a production   A -> X1 X2 X3 X4
+
+in bison/yacc file we have:
+
+  A : X1 X2 X3 X4
+    ;
+
+
+Put the rule after in braces then put C code inside
+
+  A : X1 X2 X3 X4       {  /* C code here */ }
+    ;
+
+
+But how to refer to attributes of X1 X2 etc in the C code?
+
+  $$:   attribute for LHS (in above it's As attribute)
+
+  $1:   attribute for first symbol on RHS (X1's attribute)
+
+  $2:   attribute for the second symbol on RHS (X2's attribute)
+
+  for sure $$ is writable.
+
+Tiny example:
+
+  expr : expr + expr {  $$ = $1 + $2; }
+
+                        ^ this says, build attribute for LHS by summing
+                        attributes of RHS
+
+Attributes will be kept on a stack so $$ is new stack entry,
+      $1 is top, $2 is "two down", $3 is "three down" etc.
+
+
+You do get type checking b/c yacc knows the type of each symbol.
+
+I think there's a default if you don't specify any C code
+
+  S : P
+    ;
+
+I think the default rule is { $$ = $1; }
+This is a common enough rule that it makes sense as a default sort of.
+
+
+
+======================================================================
+How to assign attributes to tokens / terminals in lex
+
+* Global variable named:  yylval
+
+  type is union of the fields from our %union declaration in yacc file
+  -> yacc -d to generate the header with token names
+      header file also will contain a union declaration
+
+  -> #include this header in your lexer (should be doing that already
+      for the token identifier names)
+
+* (Default is yylval is integer)
+
+* Set the attributes yourself by hand when you match a token
+
+Tiny example:
+
+[0-9]+                    { yylval.number = atol(yytext); return NUMBER; }
+[a-zA-Z_][a-zA-Z_0-9]*    { yylval.ident = strdup(yytext); return IDENT; }
+
+
+
+
