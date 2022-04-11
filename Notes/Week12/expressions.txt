@@ -1,0 +1,291 @@
+
+Incremental translation
+======================================================================
+
+Observations:
+
+    * The code strings are never modified, just concatenated in order
+      with new instructions on the end.
+
+    * With a proper (sibling order) traversal, instructions will remain
+      in the order they are generated.
+
+    * Don't need code strings, just assume we have "output_instruction"
+      that will either
+            * write instructions to a file
+            * write instructions into a buffer
+              then we can optimize on the buffer
+
+    * In practice: all this string concatenation will get expensive.
+
+
+We can then rewrite the semantic rules:
+
+Production:             Rules:
+--------------------    -----------------------------------------------------
+E -> id                 {  E.addr = symbol_table_entry_for(id.name);
+                        }
+
+E -> number             {  E.addr = constant_table_entry(number.value);
+                        }
+
+E -> id = E1            {
+                           output_instruction(id.name, "=", E1.addr);
+                           E.addr = id.name;
+                        }
+
+E -> ( E1 )             {  E.addr = E1.addr;
+                        }
+
+E -> -E1                {  E.addr = new_temporary();
+                           output_instruction(E.addr, " = -", E1.addr);
+                        }
+
+E -> E1 * E2            {  E.addr = new_temporary();
+                           output_instruction(E.addr, " = ",
+                                              E1.addr, " * ", E2.addr);
+                        }
+
+E -> E1 + E2            {  E.addr = new_temporary();
+                           output_instruction(E.addr, " = ",
+                                              E1.addr, " + ", E2.addr);
+                        }
+
+
+
+Stack machines
+======================================================================
+
+* Don't use temporary variables
+
+* Instead we use the stack for temporaries
+
+* Generated code for an expression must
+    (1) remove from the stack, items produced by rhs of production
+    (2) Generate code to compute the expression and
+        leave the result on the top of the stack.
+        (Unless the result is a void, in which case, don't leave it
+         on the stack.)
+
+
+
+Production:             Rules:
+--------------------    -----------------------------------------------------
+E -> id                 { output_instruction("push ", id.name);
+                        }
+
+E -> number             { output_instruction("push ", number.value);
+                        }
+
+E -> id = E1            {
+                           // Method #1:
+                           output_instruction("pop ", id.name);
+                           output_instruction("push ", id.name);
+
+                           // Method #2:
+                           output_instruction("duplicate");
+                           output_instruction("pop ", id.name);
+                        }
+
+E -> ( E1 )             {  // Nothing to do here!
+                        }
+
+E -> -E1                {
+                           output_instruction("uminus");
+                        }
+
+E -> E1 * E2            {  output_instruction("*");
+                        }
+
+E -> E1 + E2            {  output_instruction("+");
+                        }
+
+======================================================================
+Longish example for three-address code
+
+
+AST for expression  x = x + 3 * (y+1)
+
+
+
+                   E                   (9) code: x = t3
+                  /|\
+                 / | \
+                /  |  \
+               /   |   \
+              id   =    E              (8) addr=t3
+              |        /|\                 code: t3 = x + t2
+              |       / | \
+              x      /  |  \
+(1) addr=x          E   +   E          (7) addr=t2
+                   /       /|\             code: t2 = 3 * t1
+                  /       / | \
+                 id      /  |  \
+(2) addr=3       /   (2)E   *   E      (6) addr=t1
+                /      /       /|\
+               x      /       / | \
+                    number   /  |  \
+                      |     (   E   )   (5) addr=t1
+                      |        /|\          code: t1 = y + 1
+                      3       / | \
+                             /  |  \
+(3) addr=y              (3) E   +   E   (4) addr=1
+                           /         \
+                          /           \
+                         id           number
+                          |              |
+                          |              |
+                          y              1
+
+
+Output code:
+(5)   t1 = y + 1
+(7)   t2 = 3 * t1
+(8)   t3 = x + t2
+(9)    x = t3
+
+Does that implement:
+  x = x + 3 * (y+1)
+
+Yes but efficiency could be improved (that's next pass)
+
+
+
+======================================================================
+Longish example for stack machine code
+
+
+AST for expression  x = x + 3 * (y+1)
+
+
+
+                   E                   (9) duplicate
+                  /|\                      pop x
+                 / | \
+                /  |  \
+               /   |   \
+              id   =    E              (8) +
+              |        /|\
+              |       / | \
+              x      /  |  \
+(1) push x      (1) E   +   E          (7) *
+                   /       /|\
+                  /       / | \
+                 id      /  |  \
+(2) push 3       /   (2)E   *   E      (6) // nothing
+                /      /       /|\
+               x      /       / | \
+                    number   /  |  \
+                      |     (   E   )   (5) +
+                      |        /|\
+                      3       / | \
+                             /  |  \
+(3) push y              (3) E   +   E   (4) push 1
+                           /         \
+                          /           \
+                         id           number
+                          |              |
+                          |              |
+                          y              1
+
+
+Output code:
+1) push x
+2) push 3
+3) push y
+4) push 1
+5) +
+6) // nothing
+7) *
+8) +
+9) duplicate
+   pop x
+
+
+Does this implement: x = x + 3 * (y+1)
+
+Stack after each of the above instructions:
+
+(0)     empty
+(1)     x
+(2)     x, 3
+(3)     x, 3, y
+(4)     x, 3, y, 1
+(5)     x, 3, y + 1
+(7)     x, 3 * (y+1)
+(8)     x + (3 * (y+1))
+        x + (3 * (y+1)), x + (3 * (y+1))
+        x + (3 * (y+1)) and we assigned x = x + (3 * (y+1))
+
+
+What about:
+
+ statement : expression  ;
+
+    The expression will (unless it's a void function call)
+    leave the expression result on top of the stack, so you'll need to
+    pop and discard that.
+
+
+
+
+======================================================================
+How should I store instructions if needed?
+======================================================================
+
+For part 5, 6 it is possible to complete without ever "storing" instructions.
+
+But if not, how should I store them?
+
+    We could just use strings.
+    But you're throwing away info that could be useful.
+    What if I want to retain some of that?
+
+That brings us to: intermediate code representations
+
+======================================================================
+Quadruples or quads
+======================================================================
+  Essentially, a struct with 4 fields:
+      op: operator, as an internal code
+      arg1: first argument
+      arg2: second argument
+      result: where stored
+
+  (Not all of these may be needed for each instruction)
+
+  For example:
+      x = y + 7
+
+      op: integer +       ( INTEGER_PLUS ? )
+      arg1: y
+      arg2: 7
+      result: x
+
+
+  Example where we don't need all 4 items:
+
+      x = -y
+
+      op: INTEGER_UMINUS
+      arg1: y
+      arg2: unused
+      result: x
+
+      param x
+
+        op: param
+        arg1: x
+
+
+      if x < y goto L3
+
+        op: <
+        arg1: x
+        arg2: y
+        result: L3
+
+
+Example next time.
+
+
