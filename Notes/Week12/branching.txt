@@ -1,0 +1,70 @@
+
+Translation and control flow
+======================================================================
+
+How do we translate boolean operations like && and ||
+
+Simple approach: do just like we did for expressions
+
+Production:         Rule:
+
+E -> E1 && E2       { E.addr = new_temporary();
+                      output_instruction(E.addr, " = ",
+                                  E1.addr, " && ", E2.addr);
+                    }
+
+Problem:
+  in most languages (including C, C++, Java, Python, ...)
+  boolean operators "short circuit"
+
+
+What is short circuiting?
+  because "false and x" is false, and "true or x" is true,
+  regardless of x, we can stop evaluating once we get false in
+  a sequence of ands, and once we get true in a sequence of ors.
+
+Programmers use this all the time:
+
+  if (ptr && ptr[0] < 7) ....
+
+  if ( i<50 && A[i] != 12) ...
+
+These all break if && does not short circuit.
+
+
+Consider the boolean expression
+
+    t = (x>15) || (y<0) && (z<0)
+
+assuming && has higher precedence than ||
+and everything short circuits, how could we as humans
+write three-address code to implement this?
+
+    if x > 15 goto yes
+    if y >= 0 goto no
+    if z >= 0 goto no
+yes:
+    t = true
+    goto done
+no:
+    t = false
+done:
+    (next instructions)
+
+
+As the example suggests (maybe): we won't "ever" evaluate comparisons,
+  ands, ors, nots, etc. but instead will just jump to appropriate places.
+
+Want a "true location" and "false location" as targets for jumping,
+and possibly also a "next instruction" target.
+
+This suggests attributes:
+    * true part : label to jump to when true
+    * false part: label to jump to when false
+    * next part : label to jump to for next statement.
+
+These will be synthesized attributes so joy!
+
+Next time: start on translation!
+
+

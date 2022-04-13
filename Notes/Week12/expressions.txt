@@ -286,6 +286,232 @@ Quadruples or quads
         result: L3
 
 
-Example next time.
+
+Quad example:
+
+source code:
+
+    do {
+      i = i + 1;
+    } while (a[i] < v)
+
+
+Three-address code:
+
+    L:
+        t1 = i + 1
+        i = t1
+        t2 = i * 8
+        t3 = a[t2]
+        if t3 < v goto L
+
+
+Quads:
+
+          op    |   arg1    |   arg2    |   result
+      ----------+-----------+-----------+------------
+L:      int +   |    i      |     1     |   t1
+                |           |           |
+        copy    |    t1     |           |   i
+                |           |           |
+        int *   |    i      |     8     |   t2
+                |           |           |
+        read[]  |    a      |    t2     |   t3
+                |           |           |
+        if<     |    t3     |    v      |   L
+                |           |           |
+
+
+As usual: vars are probably pointers into the symbol table
+
+
+======================================================================
+Triples
+======================================================================
+
+* Like quads but struct/object/record with 3 fields
+      op      : operation
+      arg1    : first arg
+      arg2    : second arg
+
+* Triples are numbered, and the result is usually stored in
+    the position indicated by the triple index.
+
+    -> quads that are storing into temporary results
+        will cut the result to obtain the triple.
+
+* We can use a position (the triple #) as an address
+    similar to the value number method.
+
+* Some operations will require more than one triple
+  e.g:
+        x[i] = y
+
+  so we can do something hacky like:
+      indicate x[i] in one triple
+      and the y assignment in the next triple
+
+        x = y[i]
+
+      indicate y[i] in one triple (save as temp)
+      copy temp into x in next triple.
+
+
+Example with triples:
+
+source code:
+
+    do {
+      i = i + 1;
+    } while (a[i] < v)
+
+
+Three-address code:
+
+    L:
+        t1 = i + 1
+        i = t1
+        t2 = i * 8
+        t3 = a[t2]
+        if t3 < v goto L
+
+
+Triples:
+
+pos.      op    |   arg1    |   arg2
+      ----------+-----------+----------
+L 0      int +  |    i      |    1
+                |           |
+  1      copy=  |    i      |   (0)        (#) means use triple pos#
+                |           |
+  2      int *  |    i      |    8
+                |           |
+  3      read[] |    a      |   (2)
+                |           |
+  4      int<   |   (3)     |    v
+                |           |
+  5      iftrue |   (4)     |    L
+
+
+
+Comparison: triples vs quadruples
+
+  *  It's easier to reorder instructions using quads
+      b/c the position of the triple is significant
+      but the position of the quad is not.
+
+  * reorder triples: must update positions
+
+    or use something called "indirect triples"
+
+      -> have an array of pointers to triples,
+          that tells the order of instructions
+
+      -> reorder instructions: just rearrange the array of pointers
+
+pos.      op    |   arg1    |   arg2
+      ----------+-----------+----------
+L 0      int +  |    i      |    1
+                |           |
+  1      copy=  |    i      |   (0)        (#) means use triple pos#
+                |           |
+  2      int *  |    i      |    8
+                |           |
+  3      read[] |    a      |   (2)
+                |           |
+  5      int<   |   (3)     |    v
+                |           |
+  4      iftrue |   (5)     |    L
+
+
+instruction order:
+
+    0 : 0
+    1 : 1
+    2 : 2
+    3 : 3
+    4 : 5
+    5 : 4
+
+
+======================================================================
+Static single-assignment form (SSA)
+======================================================================
+
+Essentially, three-address code with restriction:
+    All assignments are to variables with distinct names.
+    (i.e., we don't assign to the same variable twice.)
+
+* This is helpful for some code optimizations (later!)
+
+* Use subscripts on program variables to generate unique names.
+
+E.g.:
+
+  for (i=0; i<N; i++)
+      print(i);
+
+three-address:
+
+      i = 0
+  start:
+      t1 = i < N
+      iffalse t1 goto end
+      param i
+      call print,1
+      i = i + 1
+      goto start
+  end:
+
+
+SSA:
+      i1 = 0
+  start:
+      t1 = i1 < N
+      iffalse t1 goto end
+      param i1
+      call print,1
+      i2 = i1 + 1
+      goto start
+  end:
+
+
+This gets strange when we have assignments that can differ
+in different control paths (e.g., if)
+
+for example:
+
+  if (foo)
+      x = 3;
+  else
+      x = 5;
+
+  y = x*2;
+
+
+SSA:
+  iffalse foo goto else
+  x1 = 3
+  goto next
+else:
+  x2 = 5
+next:
+  y1 = x? * 2
+
+
+SSA uses a special notation called phi-function for this
+
+  phi(x1, x2) : has value x1 if control went through the x1 assignment
+                has value x2 if control went through the x2 assignment
+
+so it should be:
+
+next:
+  y1 = phi(x1, x2) * 2
+
+or maybe
+  x3 = phi(x1, x2)
+  y1 = x3 * 2
+
 
 
