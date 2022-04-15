@@ -65,6 +65,239 @@ This suggests attributes:
 
 These will be synthesized attributes so joy!
 
-Next time: start on translation!
+======================================================================
+Start with a very basic if statement:
 
+B is a generic, boolean expression
+
+
+stmt -> if ( B )  stmt1 ;
+
+For now, consider that stmt1 is a single statement; later we will
+discuss blocks of statements.
+
+Our code should look like this:
+
+------------------------------------------------------------
+    (magic code to determine B with short circuiting)
+  B.true:
+    (code generated for stmt1 here)
+  B.false:
+  S.next:
+    (code for any instructions after this one go here)
+------------------------------------------------------------
+
+
+Semantic rules (dragon book):
+{
+    B.true = new_label();   // compiler-generated label
+    B.false = stmt.next;    // whatever's after this statement
+    stmt1.next = stmt.next;
+    stmt.code = concatenate(
+        B.code,
+        label(B.true),
+        stmt1.code
+    );
+}
+
+true label, false label, next label are inherited attributes
+code attribute is synthesized
+
+What about incremental translation?
+    (issue is: we need to "insert" a label for B.true,
+      in between the code for B and the code for stmt1)
+
+How to do incremental translation?
+
+Method 1:
+------------------------------------------------------------
+add a "marker" to the production
+    -> grammar symbol that produces epsilon
+    -> used only to allow us to output some code where we want.
+
+Essentially: add a node to the AST just for spitting out code.
+
+in this case:
+
+Production:         Semantic rule:
+---------------     --------------------------------------------------
+L -> epsilon        { output_label(L.label); }
+                                    ^ inherited!
+
+S -> if (B) L S1    {
+                        B.true = new_label();
+                        L.label = B.true;
+                        B.false = S.next;
+                        S1.next = S.next;
+                    }
+
+THis works b/c code for B, L, S1 are output in that order when
+we traverse the AST.
+
+
+Method 2:
+------------------------------------------------------------
+Traverse the AST
+  Assume we have an object for each node in the AST
+  and we call a generate() method to generate code.
+    -> generate() method for each production
+
+  any inherited attributes can be passed to the generate() method.
+
+Again we have:
+    statements:  generate(label next)     only label next is inherited
+    booleans:    generate(label truept, label falsept)
+
+Now then:
+
+Production
+    S -> if (B) S1
+
+void generate(label next)   // generate for S
+{
+    label truept = new_label();
+    B.generate(truept, next);
+    output_label(truept);
+    S1.generate(next);
+}
+
+
+My hope for method 2
+    (1) Closer to implementation
+    (2) easier to see inherited attributes
+    (3) works "easily" with incremental code generation
+    (4) "easy" to incorporate into rec.desc. parsing
+
+======================================================================
+Production:
+  S -> if ( B ) S1 ; else S2 ;
+
+
+------------------------------------------------------------
+    (magic code to determine B with short circuiting)
+  B.true:
+    (code generated for stmt1 here)
+    goto S.next
+  B.false:
+    (code generated for stmt2 here)
+  S.next:
+    (code for any instructions after this one go here)
+------------------------------------------------------------
+
+
+S.generate(label next)
+{
+    label tpart = new_label();
+    label fpart = new_label();
+    B.generate(tpart, fpart);
+    output_label(tpart);
+    S1.generate(next);  // be clever about next!
+    output_instruction("goto", next);
+    output_label(fpart);
+    S2.generate(next);
+}
+
+======================================================================
+Production:
+  S -> while ( B ) S1 ;
+
+------------------------------------------------------------
+  loop:
+    (magic code to determine B with short circuiting)
+  B.true:
+    (code generated for stmt1 here)
+    goto loop
+  B.false:
+  S.next:
+    (code for any instructions after this one go here)
+------------------------------------------------------------
+
+S.generate(label next)
+{
+    label loop = new_label();
+    label tpart = new_label();
+    output_label(loop);
+    B.generate(tpart, next);
+    output_label(tpart);
+    S1.generate(loop);    // loop b/c after S1, we go back to start of loop
+    output_instruction("goto", loop);
+}
+
+======================================================================
+Production:
+  S -> S1 S2
+
+This is for handling blocks of statements
+
+Desired code:
+------------------------------------------------------------
+    (code for S1)
+  S1.next:
+    (code for S2)
+------------------------------------------------------------
+
+This might be wasteful of labels if S1 never needs a goto
+to S1.next.
+
+You could track for each label, is there a jump to it, and if
+not, don't output the label in the code.
+
+Or we might not care.
+
+generate(label next)
+{
+    label middle = new_label();
+    S1.generate(middle);
+    output_label(middle);     // take care of this.
+    S2.generate(next);
+}
+
+======================================================================
+What about the ternary operator?
+
+Production:
+E -> B ? E1 : E2
+
+Kind of like if-then-else but use address to store result of E1 or E2
+
+Desired code:
+------------------------------------------------------------
+    (short circuit B)
+  B.true:
+    (code to compute E1)
+    E.addr = E1.addr
+    goto done
+  B.false:
+    (code to compute E2)
+    E.addr = E2.addr
+  done:
+    (rest of code)
+------------------------------------------------------------
+
+Ideally: expressions also have a next label attribute
+or we can just hack and add a label at the end of E.generate()
+for the ternary operator.
+
+generate(label next)
+{
+  label tpart = new_label();
+  label fpart = new_label();
+  E.addr = new_temporary();
+  B.generate(tpart, fpart);
+  output_label(tpart);
+  E1.generate(next);
+  // assume we get address using E1.addr
+  output_instruction(E.addr, " = ", E1.addr);
+  output_instruction("goto", next);
+  output_label(fpart);
+  E2.generate(next);
+  output_instruction(E.addr, " = ", E2.addr);
+
+  // could cheat here:
+  // output_label(next);
+}
+
+
+Next time:
+  How to generate code for boolean expressions
 
