@@ -71,8 +71,10 @@ checkEnviron()
     fi
   fi
 
-
-  $EXE -0 | awk '{print "  | " $0}' > .exeout
+  #
+  # Check executable
+  #
+  $1 -0 | awk '{print "  | " $0}' > .exeout
   if [ -s .exeout ]; then
     echo Running tests using compiler:
     cat .exeout
@@ -80,7 +82,7 @@ checkEnviron()
   else
     rm .exeout
     echo
-    echo "Error running compiler executable: $EXE"
+    echo "Error running compiler executable: $1"
     echo "But this might be an error in mode 0."
     echo "Run script with no arguments to see usage instructions."
     echo
@@ -237,13 +239,15 @@ compareOut()
   if [ ! -f $2 ]; then
     return 0
   fi
-  showinput=""
-  if [ "$3" ]; then
-    showinput=" on input $3"
-  fi
   printf "    "
   echo "" > student.out.txt
-  timeoutJava $1 student.out.txt $3
+  if [ -f $3 ]; then
+    showinput=" on input $3"
+    timeoutJava $1 student.out.txt $3
+  else
+    showinput=""
+    timeoutJava $1 student.out.txt
+  fi
   if diff -q student.out.txt $2 > /dev/null; then
     green "output matches" "$showinput\n"
   else
@@ -301,18 +305,18 @@ testOuts()
     return 0
   fi
 
-  lastin=""
-  for infile in $1.input*; do
-    if [ ! -f $infile ]; then
+  notests="y"
+  for outfile in $1.output*; do
+    if [ ! -f $outfile ]; then
       continue
     fi
-    lastin="$infile"
-    outfile=`sed "s/$1.input/$1.output/" <<< $infile`
+    notests=""
+    infile=`sed "s/$1.output/$1.input/" <<< $outfile`
     compareOut $1 $outfile $infile
   done
-  if [ ! "$lastin" ]; then
-# No input files; that means the program does not take input.
-    compareOut $1 $1.output
+
+  if [ "$notests" ]; then
+    red "    No test outputs; check with another script" "\n"
   fi
 
   rm $1.class
@@ -387,7 +391,7 @@ fi
 
 checkEnviron $EXE
 
-echo " "
+echo
 
 Fnext=""
 TOnext=""

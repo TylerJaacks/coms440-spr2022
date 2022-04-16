@@ -72,10 +72,27 @@ checkEnviron()
   fi
 
 
-  # Make sure executable works
-  if [ ! -x $1 ]; then
-    echo "Can't execute $1"
-    usage 1
+  #
+  # Check executable
+  #
+  $1 -0 | awk '{print "  | " $0}' > .exeout
+  if [ -s .exeout ]; then
+    echo Running tests using compiler:
+    cat .exeout
+    rm .exeout
+  else
+    rm .exeout
+    echo
+    echo "Error running compiler executable: $1"
+    echo "But this might be an error in mode 0."
+    echo "Run script with no arguments to see usage instructions."
+    echo
+    printf "Continuing in aa seconds..."
+    for w in 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1; do
+      printf "\b\b\b\b\b\b\b\b\b\b\b\b\b%02d seconds..." "$w"
+      sleep 1
+    done
+    printf "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b.                \n"
   fi
 }
 
@@ -198,10 +215,10 @@ timeoutCompile()
   outfile=$2
   errfile=$3
   if [ $DASHO ]; then
-    nice ./$EXE -$MODE $FLAGS -o $outfile $infile 2> $errfile &
+    nice $EXE -$MODE $FLAGS -o $outfile $infile 2> $errfile &
     timeout $! "Timeout exceeded"
   else
-    nice ./$EXE -$MODE $FLAGS $infile 1> $outfile 2> $errfile &
+    nice $EXE -$MODE $FLAGS $infile 1> $outfile 2> $errfile &
     timeout $! "Timeout exceeded"
   fi
 }
@@ -229,13 +246,15 @@ compareOut()
   if [ ! -f $2 ]; then
     return 0
   fi
-  showinput=""
-  if [ "$3" ]; then
-    showinput=" on input $3"
-  fi
   printf "    "
   echo "" > student.out.txt
-  timeoutJava $1 student.out.txt $3
+  if [ -f $3 ]; then
+    showinput=" on input $3"
+    timeoutJava $1 student.out.txt $3
+  else
+    showinput=""
+    timeoutJava $1 student.out.txt
+  fi
   if diff -q student.out.txt $2 > /dev/null; then
     green "output matches" "$showinput\n"
   else
@@ -292,19 +311,20 @@ testOuts()
     return 0
   fi
 
-  lastin=""
-  for infile in $1.input*; do
-    if [ ! -f $infile ]; then
+  notests="y"
+  for outfile in $1.output*; do
+    if [ ! -f $outfile ]; then
       continue
     fi
-    lastin="$infile"
-    outfile=`sed "s/$1.input/$1.output/" <<< $infile`
+    notests=""
+    infile=`sed "s/$1.output/$1.input/" <<< $outfile`
     compareOut $1 $outfile $infile
   done
-  if [ ! "$lastin" ]; then
-# No input files; that means the program does not take input.
-    compareOut $1 $1.output
+
+  if [ "$notests" ]; then
+    red "    No test outputs; check with another script" "\n"
   fi
+
 
   rm $1.class
 }
@@ -361,7 +381,7 @@ if [ $# -eq 0 ]; then
   usage 0
 fi
 
-EXE=$1
+EXE="$1"
 shift
 
 if [ "x-G" == "x$EXE" ]; then
@@ -378,10 +398,7 @@ fi
 
 checkEnviron $EXE
 
-echo Running tests using compiler:
-./$EXE -0 | awk '{print "  | " $0}'
-
-echo " "
+echo
 
 Fnext=""
 TOnext=""
