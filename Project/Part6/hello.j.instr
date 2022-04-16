@@ -1,0 +1,66 @@
+.class public hello
+.super java/lang/Object
+
+
+.method public static prints : ([C)V
+    .code stack 2 locals 2
+        ;; parameter 0 s hello.c 2
+        ;; local 1 i hello.c 4
+        ;; expression hello.c 5
+        iconst_0
+        istore_1 ; store to i
+        ; While condition follows
+     L2:
+        ; if false jump
+        aload_0 ; load from s
+        iload_1 ; load from i
+        caload
+        ifeq L3
+        ; while body
+        ;; expression hello.c 7
+        aload_0 ; load from s
+        iload_1 ; load from i
+        iinc 1 1
+        caload
+        invokestatic Method libc putchar (I)I
+        pop
+        goto L2
+     L3:
+        ;; return hello.c 9
+        return
+        ; stack current: 0
+        ; stack maximum: 2
+    .end code
+.end method
+
+.method public static main : ()I
+    .code stack 1 locals 0
+        ;; expression hello.c 13
+        ldc 'Hello, world!\n\0'
+        invokevirtual Method java/lang/String toCharArray ()[C
+        invokestatic Method hello prints ([C)V
+        ;; return hello.c 14
+        iconst_0
+        ireturn
+        ; stack current: 0
+        ; stack maximum: 1
+    .end code
+.end method
+
+; Special methods
+
+.method <init> : ()V
+    .code stack 1 locals 1
+        aload_0
+        invokespecial Method java/lang/Object <init> ()V
+        return
+    .end code
+.end method
+
+.method public static main : ([Ljava/lang/String;)V
+    .code stack 1 locals 1
+        invokestatic Method hello main ()I
+        pop
+        return
+    .end code
+.end method
