@@ -9,7 +9,7 @@ SCRIPT=$0
 MODE=6
 DASHO=""
 FLAGS=""
-DETAIL=""
+DETAIL="y"
 
 usage()
 {
@@ -17,9 +17,9 @@ usage()
   echo "Any infile without corresponding output files will be skipped"
   echo "Options: "
   echo "  -c S: Use additional compiler switches in string S"
-  echo "  -d:   more detailed comparison"
   echo "  -G:   generate test outputs with gcc"
   echo "  -o:   use -o instead of stdout to collect output"
+  echo "  -s:   short comparison; doesn't show diff"
   echo "  -t N: set timeout to N seconds (default is $TIMEOUT)"
   echo "        0 seconds uses no timeout"
   exit $1
@@ -74,7 +74,7 @@ checkEnviron()
   #
   # Check executable
   #
-  $1 -0 | awk '{print "  | " $0}' > .exeout
+  $EXE -0 | awk '{print "  | " $0}' > .exeout
   if [ -s .exeout ]; then
     echo Running tests using compiler:
     cat .exeout
@@ -82,7 +82,7 @@ checkEnviron()
   else
     rm .exeout
     echo
-    echo "Error running compiler executable: $1"
+    echo "Error running compiler executable: $EXE"
     echo "But this might be an error in mode 0."
     echo "Run script with no arguments to see usage instructions."
     echo
@@ -389,7 +389,7 @@ if [ "x-G" == "x$EXE" ]; then
   exit 0
 fi
 
-checkEnviron "$EXE"
+checkEnviron
 
 echo
 
@@ -417,8 +417,8 @@ for arg; do
         continue
         ;;
 
-    -d)
-        DETAIL="y"
+    -s)
+        DETAIL=""
         continue
         ;;
 
