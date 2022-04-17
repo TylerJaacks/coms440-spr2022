@@ -389,7 +389,7 @@ if [ "x-G" == "x$EXE" ]; then
   exit 0
 fi
 
-checkEnviron $EXE
+checkEnviron "$EXE"
 
 echo
 
