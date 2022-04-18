@@ -1,0 +1,188 @@
+.class public fib
+.super java/lang/Object
+
+
+.method public static print : (I)V
+    .code stack 2 locals 1
+        ;; parameter 0 x fib.c 5
+        ; If-then-else condition follows
+        iload_0 ; load from x
+        iconst_0
+        ; inverted comparison
+        if_icmpge L1
+        ; then portion only
+        ;; expression fib.c 8
+        bipush 45
+        invokestatic Method libc putchar (I)I
+        pop
+        ;; expression fib.c 9
+        iload_0 ; load from x
+        ineg
+        invokestatic Method fib print (I)V
+        ;; return fib.c 10
+        return
+     L1:
+        ; If-then-else condition follows
+        iload_0 ; load from x
+        bipush 9
+        ; inverted comparison
+        if_icmple L2
+        ; then portion only
+        ;; expression fib.c 13
+        iload_0 ; load from x
+        bipush 10
+        idiv
+        invokestatic Method fib print (I)V
+     L2:
+        ;; expression fib.c 15
+        iload_0 ; load from x
+        bipush 10
+        irem
+        istore_0 ; store to x
+        ;; expression fib.c 16
+        bipush 48
+        iload_0 ; load from x
+        iadd
+        invokestatic Method libc putchar (I)I
+        pop
+        ;; return fib.c 17
+        return
+        ; stack current: 0
+        ; stack maximum: 2
+    .end code
+.end method
+
+.method public static print_two : (I)V
+    .code stack 3 locals 1
+        ;; parameter 0 x fib.c 19
+        ; If-then-else condition follows
+        iload_0 ; load from x
+        bipush 9
+        ; inverted comparison
+        if_icmple L1
+        ; then portion
+        ;; expression fib.c 22
+        bipush 48
+        iload_0 ; load from x
+        bipush 10
+        idiv
+        iadd
+        invokestatic Method libc putchar (I)I
+        pop
+        goto L2
+        ; else portion
+     L1:
+        ;; expression fib.c 24
+        bipush 32
+        invokestatic Method libc putchar (I)I
+        pop
+     L2:
+        ;; expression fib.c 26
+        bipush 48
+        iload_0 ; load from x
+        bipush 10
+        irem
+        iadd
+        invokestatic Method libc putchar (I)I
+        pop
+        ;; expression fib.c 27
+        bipush 32
+        invokestatic Method libc putchar (I)I
+        pop
+        ;; expression fib.c 28
+        bipush 58
+        invokestatic Method libc putchar (I)I
+        pop
+        ;; expression fib.c 29
+        bipush 32
+        invokestatic Method libc putchar (I)I
+        pop
+        ;; return fib.c 30
+        return
+        ; stack current: 0
+        ; stack maximum: 3
+    .end code
+.end method
+
+.method public static main : ()I
+    .code stack 2 locals 4
+        ;; local 0 i fib.c 34
+        ;; local 1 f1 fib.c 34
+        ;; local 2 f2 fib.c 34
+        ;; local 3 f3 fib.c 34
+        ;; expression fib.c 35
+        iconst_0
+        istore_1 ; store to f1
+        ;; expression fib.c 36
+        iconst_1
+        istore_2 ; store to f2
+        ;; expression fib.c 37
+        iconst_0
+        invokestatic Method fib print_two (I)V
+        ;; expression fib.c 38
+        iconst_0
+        invokestatic Method fib print (I)V
+        ;; expression fib.c 39
+        bipush 10
+        invokestatic Method libc putchar (I)I
+        pop
+        ;; expression fib.c 40
+        bipush 40
+        istore_0 ; store to i
+        ; While condition follows
+     L2:
+        ; if false jump
+        iload_0 ; load from i
+        ifeq L3
+        ; while body
+        ;; expression fib.c 42
+        bipush 40
+        iinc 0 -1
+        iload_0 ; load from i
+        isub
+        invokestatic Method fib print_two (I)V
+        ;; expression fib.c 43
+        iload_2 ; load from f2
+        invokestatic Method fib print (I)V
+        ;; expression fib.c 44
+        bipush 10
+        invokestatic Method libc putchar (I)I
+        pop
+        ;; expression fib.c 45
+        iload_1 ; load from f1
+        iload_2 ; load from f2
+        iadd
+        istore_3 ; store to f3
+        ;; expression fib.c 46
+        iload_2 ; load from f2
+        istore_1 ; store to f1
+        ;; expression fib.c 47
+        iload_3 ; load from f3
+        istore_2 ; store to f2
+        goto L2
+     L3:
+        ;; return fib.c 49
+        iconst_0
+        ireturn
+        ; stack current: 0
+        ; stack maximum: 2
+    .end code
+.end method
+
+; Special methods
+
+.method <init> : ()V
+    .code stack 1 locals 1
+        aload_0
+        invokespecial Method java/lang/Object <init> ()V
+        return
+    .end code
+.end method
+
+.method public static main : ([Ljava/lang/String;)V
+    .code stack 1 locals 1
+        invokestatic Method fib main ()I
+        pop
+        return
+    .end code
+.end method

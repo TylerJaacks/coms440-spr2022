@@ -6,7 +6,7 @@ ASSEMBLE=""
 
 TIMEOUT=10
 SCRIPT=$0
-MODE=5
+MODE=6
 DASHO=""
 FLAGS=""
 DETAIL="y"
@@ -71,7 +71,6 @@ checkEnviron()
     fi
   fi
 
-
   #
   # Check executable
   #
@@ -115,21 +114,15 @@ red()
 augment_source()
 {
   echo "#include <stdio.h>"
-
-  sed 's/int main/int __main/' $1
-cat <<EOF
-
-  int main()
-  {
-    printf("Return code: %d\n", __main());
-    return 0;
-  }
-EOF
+  cat $1
 }
 
 # Arg1: base source file
 generateGCCOuts()
 {
+  if ! grep -q "int main()" $1.c; then
+    return 0
+  fi
   echo "Generating files for $1.c"
   augment_source $1.c > __$1.c
   if gcc __$1.c; then
@@ -302,6 +295,7 @@ testOuts()
   green "    No compile errors" ", running assembler\n"
   if $ASSEMBLE $1.j > /dev/null 2> student.log ; then
     green "    Target code assembles" ", running tests\n"
+    rm student.log
     rm $1.j
   else
     red "    Target code assembly failed:" "\n"
@@ -324,7 +318,6 @@ testOuts()
   if [ "$notests" ]; then
     red "    No test outputs; check with another script" "\n"
   fi
-
 
   rm $1.class
 }

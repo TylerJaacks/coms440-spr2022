@@ -1,0 +1,142 @@
+.class public short
+.super java/lang/Object
+
+
+.method public static and : (I)V
+    .code stack 2 locals 1
+        ;; parameter 0 x short.c 8
+        ; If-then-else condition follows
+        bipush 65
+        invokestatic Method libc putchar (I)I
+        iload_0 ; load from x
+        ; inverted comparison
+        if_icmpge L1
+        bipush 75
+        invokestatic Method libc putchar (I)I
+        iload_0 ; load from x
+        ; inverted comparison
+        if_icmpge L1
+        bipush 85
+        invokestatic Method libc putchar (I)I
+        iload_0 ; load from x
+        ; inverted comparison
+        if_icmpge L1
+        ; then portion
+        ;; expression short.c 12
+        bipush 33
+        invokestatic Method libc putchar (I)I
+        pop
+        goto L2
+        ; else portion
+     L1:
+        ;; expression short.c 14
+        bipush 46
+        invokestatic Method libc putchar (I)I
+        pop
+     L2:
+        ;; expression short.c 16
+        bipush 10
+        invokestatic Method libc putchar (I)I
+        pop
+        ;; return short.c 17
+        return
+        ; stack current: 0
+        ; stack maximum: 2
+    .end code
+.end method
+
+.method public static or : (I)V
+    .code stack 2 locals 1
+        ;; parameter 0 x short.c 19
+        ; If-then-else condition follows
+        bipush 65
+        invokestatic Method libc putchar (I)I
+        iload_0 ; load from x
+        ; normal comparison
+        if_icmpgt L1
+        bipush 75
+        invokestatic Method libc putchar (I)I
+        iload_0 ; load from x
+        ; normal comparison
+        if_icmpgt L1
+        bipush 85
+        invokestatic Method libc putchar (I)I
+        iload_0 ; load from x
+        ; inverted comparison
+        if_icmple L2
+     L1:
+        ; then portion
+        ;; expression short.c 23
+        bipush 33
+        invokestatic Method libc putchar (I)I
+        pop
+        goto L3
+        ; else portion
+     L2:
+        ;; expression short.c 25
+        bipush 46
+        invokestatic Method libc putchar (I)I
+        pop
+     L3:
+        ;; expression short.c 27
+        bipush 10
+        invokestatic Method libc putchar (I)I
+        pop
+        ;; return short.c 28
+        return
+        ; stack current: 0
+        ; stack maximum: 2
+    .end code
+.end method
+
+.method public static main : ()I
+    .code stack 1 locals 0
+        ;; expression short.c 32
+        bipush 60
+        invokestatic Method short and (I)V
+        ;; expression short.c 33
+        bipush 70
+        invokestatic Method short and (I)V
+        ;; expression short.c 34
+        bipush 80
+        invokestatic Method short and (I)V
+        ;; expression short.c 35
+        bipush 90
+        invokestatic Method short and (I)V
+        ;; expression short.c 37
+        bipush 60
+        invokestatic Method short or (I)V
+        ;; expression short.c 38
+        bipush 70
+        invokestatic Method short or (I)V
+        ;; expression short.c 39
+        bipush 80
+        invokestatic Method short or (I)V
+        ;; expression short.c 40
+        bipush 90
+        invokestatic Method short or (I)V
+        ;; return short.c 41
+        iconst_0
+        ireturn
+        ; stack current: 0
+        ; stack maximum: 1
+    .end code
+.end method
+
+; Special methods
+
+.method <init> : ()V
+    .code stack 1 locals 1
+        aload_0
+        invokespecial Method java/lang/Object <init> ()V
+        return
+    .end code
+.end method
+
+.method public static main : ([Ljava/lang/String;)V
+    .code stack 1 locals 1
+        invokestatic Method short main ()I
+        pop
+        return
+    .end code
+.end method

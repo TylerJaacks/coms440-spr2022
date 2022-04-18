@@ -1,0 +1,62 @@
+.class public break1
+.super java/lang/Object
+
+
+.method public static main : ()I
+    .code stack 2 locals 1
+        ;; local 0 a break1.c 4
+        ; for initialization
+        bipush 48
+        istore_0 ; store to a
+        ; for condition
+     L2:
+        ; for body
+        ;; expression break1.c 7
+        iload_0 ; load from a
+        iconst_1
+        iadd
+        istore_0 ; store to a
+        ; If-then-else condition follows
+        iload_0 ; load from a
+        bipush 55
+        ; inverted comparison
+        if_icmple L3
+        ; then portion only
+        ; break
+        goto L4
+     L3:
+        ;; expression break1.c 9
+        iload_0 ; load from a
+        invokestatic Method libc putchar (I)I
+        pop
+        goto L2
+     L4:
+        ;; expression break1.c 11
+        bipush 10
+        invokestatic Method libc putchar (I)I
+        pop
+        ;; return break1.c 12
+        iconst_0
+        ireturn
+        ; stack current: 0
+        ; stack maximum: 2
+    .end code
+.end method
+
+; Special methods
+
+.method <init> : ()V
+    .code stack 1 locals 1
+        aload_0
+        invokespecial Method java/lang/Object <init> ()V
+        return
+    .end code
+.end method
+
+.method public static main : ([Ljava/lang/String;)V
+    .code stack 1 locals 1
+        invokestatic Method break1 main ()I
+        pop
+        return
+    .end code
+.end method

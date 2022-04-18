@@ -1,0 +1,231 @@
+.class public fact
+.super java/lang/Object
+
+
+.method public static print2 : (I)V
+    .code stack 3 locals 1
+        ;; parameter 0 x fact.c 2
+        ; If-then-else condition follows
+        iload_0 ; load from x
+        bipush 9
+        ; inverted comparison
+        if_icmple L1
+        ; then portion
+        ;; expression fact.c 5
+        bipush 48
+        iload_0 ; load from x
+        bipush 10
+        idiv
+        iadd
+        invokestatic Method libc putchar (I)I
+        pop
+        goto L2
+        ; else portion
+     L1:
+        ;; expression fact.c 7
+        bipush 32
+        invokestatic Method libc putchar (I)I
+        pop
+     L2:
+        ;; expression fact.c 9
+        bipush 48
+        iload_0 ; load from x
+        bipush 10
+        irem
+        iadd
+        invokestatic Method libc putchar (I)I
+        pop
+        ;; return fact.c 10
+        return
+        ; stack current: 0
+        ; stack maximum: 3
+    .end code
+.end method
+
+.method public static printi : (I)V
+    .code stack 5 locals 3
+        ;; parameter 0 i fact.c 12
+        ;; local 1 d fact.c 14
+        ;; local 2 digits fact.c 14
+        ; Building array digits
+        bipush 30
+        newarray int
+        astore_2 ; store to digits
+        ; If-then-else condition follows
+        iload_0 ; load from i
+        iconst_0
+        ; inverted comparison
+        if_icmpge L3
+        ; then portion only
+        ;; expression fact.c 17
+        bipush 45
+        invokestatic Method libc putchar (I)I
+        pop
+     L3:
+        ;; expression fact.c 20
+        iconst_0
+        istore_1 ; store to d
+        ; do-while block
+     L4:
+        ;; expression fact.c 22
+        aload_2 ; load from digits
+        iload_1 ; load from d
+        iload_0 ; load from i
+        bipush 10
+        irem
+        iastore
+        ; If-then-else condition follows
+        aload_2 ; load from digits
+        iload_1 ; load from d
+        iaload
+        iconst_0
+        ; inverted comparison
+        if_icmpge L5
+        ; then portion
+        ;; expression fact.c 24
+        aload_2 ; load from digits
+        iload_1 ; load from d
+        bipush 48
+        aload_2 ; load from digits
+        iload_1 ; load from d
+        iaload
+        isub
+        iastore
+        goto L6
+        ; else portion
+     L5:
+        ;; expression fact.c 26
+        aload_2 ; load from digits
+        dup
+        iload_1 ; load from d
+        dup_x1
+        iaload
+        bipush 48
+        iadd
+        iastore
+     L6:
+        ;; expression fact.c 28
+        iload_0 ; load from i
+        bipush 10
+        idiv
+        istore_0 ; store to i
+        ;; expression fact.c 29
+        iinc 1 1
+        ; do-while condition
+        ; if true jump
+        iload_0 ; load from i
+        ifne L4
+        ; While condition follows
+     L7:
+        ; if false jump
+        iload_1 ; load from d
+        ifeq L8
+        ; while body
+        ;; expression fact.c 33
+        aload_2 ; load from digits
+        iinc 1 -1
+        iload_1 ; load from d
+        iaload
+        invokestatic Method libc putchar (I)I
+        pop
+        ; If-then-else condition follows
+        iload_1 ; load from d
+        iconst_0
+        ; inverted comparison
+        if_icmple L7
+        iconst_0
+        iload_1 ; load from d
+        iconst_3
+        irem
+        ; inverted comparison
+        if_icmpne L7
+        ; then portion only
+        ;; expression fact.c 34
+        bipush 44
+        invokestatic Method libc putchar (I)I
+        pop
+        goto L7
+     L8:
+        ;; return fact.c 36
+        return
+        ; stack current: 0
+        ; stack maximum: 5
+    .end code
+.end method
+
+.method public static main : ()I
+    .code stack 2 locals 2
+        ;; local 0 i fact.c 40
+        ;; local 1 f fact.c 40
+        ;; expression fact.c 41
+        iconst_1
+        istore_1 ; store to f
+        ; for initialization
+        iconst_1
+        istore_0 ; store to i
+        ; for condition
+     L2:
+        iload_0 ; load from i
+        bipush 13
+        ; inverted comparison
+        if_icmpge L3
+        ; for body
+        ;; expression fact.c 43
+        iload_0 ; load from i
+        invokestatic Method fact print2 (I)V
+        ;; expression fact.c 44
+        bipush 33
+        invokestatic Method libc putchar (I)I
+        pop
+        ;; expression fact.c 45
+        bipush 32
+        invokestatic Method libc putchar (I)I
+        pop
+        ;; expression fact.c 46
+        bipush 61
+        invokestatic Method libc putchar (I)I
+        pop
+        ;; expression fact.c 47
+        bipush 32
+        invokestatic Method libc putchar (I)I
+        pop
+        ;; expression fact.c 48
+        iload_1 ; load from f
+        iload_0 ; load from i
+        imul
+        dup
+        istore_1 ; store to f
+        invokestatic Method fact printi (I)V
+        ;; expression fact.c 49
+        bipush 10
+        invokestatic Method libc putchar (I)I
+        pop
+        ; for update
+        iinc 0 1
+        goto L2
+     L3:
+        ;; return fact.c 51
+        iconst_0
+        ireturn
+        ; stack current: 0
+        ; stack maximum: 2
+    .end code
+.end method
+
+; Special methods
+
+.method <init> : ()V
+    .code stack 1 locals 1
+        aload_0
+        invokespecial Method java/lang/Object <init> ()V
+        return
+    .end code
+.end method
+
+.method public static main : ([Ljava/lang/String;)V
+    .code stack 1 locals 1
+        invokestatic Method fact main ()I
+        pop
+        return
+    .end code
+.end method

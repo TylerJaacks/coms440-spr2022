@@ -1,0 +1,2 @@
+Type checking error in file badif.c line 9
+	if condition has non-numeric type void
