@@ -1,0 +1,214 @@
+
+How to build up boolean expressions for conditions
+======================================================================
+
+* All of this assuming we want short circuiting
+
+* Otherwise just build up a boolean expression like we did for
+  arithmetic with + - * / %
+
+* Instead of computing the value, jump to the true or false label
+  based on the value.
+
+* If you do need the value:
+
+  bool b = (x>15) || (y<0) && (z>0);
+
+
+  Then you can treat this like the ternary operator
+
+  bool b = ((x>15) || (y<0) && (z>0)) ? true : false;
+
+
+So we want productions for a "boolean expression", and
+a generate(label t, label f) method
+
+
+Production:         generate(label t, label f)
+---------------    --------------------------------------------------
+B -> true           { output_instruction("goto", t); }
+B -> false          { output_instruction("goto", f); }
+
+B -> ident          { output_instruction("iftrue ", ident.addr, " goto", t);
+                      output_instruction("goto", f); }
+
+B -> ( B1 )         { B1.generate(t, f); }
+
+B -> ! B1           { B1.generate(f, t); }
+
+B -> E1 relop E2    {
+                        label next1 = new_label();
+                        E1.generate(next1);
+                        output_label(next1);
+                        label next2 = new_label();
+                        E2.generate(next2);
+                        output_label(next2);
+                        output_instruction("if", E1.addr, relop, E2.addr,
+                              "goto", t);
+                        output_instruction("goto", f);
+                    }
+
+B -> B1 && B2       {
+                        label b1t = new_label();
+                        B1.generate(b1t, f);
+                        output_label(b1t);
+                        B2.generate(t, f);
+                    }
+
+B -> B1 || B2       {
+                        label b1f = new_label();
+                        B1.generate(t, b1f);
+                        output_label(b1f);
+                        B2.generate(t, f);
+                    }
+
+
+Massive example:
+
+Source code:
+
+    if ((x>15) || ( (y<0) && (z<0) ) )
+        func1();
+    else
+        func2();
+    func3();
+
+AST that's relevant:
+
+                                  (1) S
+                          ____________|______________
+                         /                           \
+                 (2)   S1                             S2 (10)
+        _______________|___________________             \
+       /       |               \     \     \             \
+     if  (3) ( B )         (8)  S3   else   S4  (9)       ...
+         ____/ | \_______         \           \_____         \
+        /                \         \__________      \         func3()
+       /      ||      (5)  B2                 \      \
+      /                   / | \               S3      S4
+     /                  /   |   \             |        |
+    /                 /     |     \           |        |
+(4) B1         (6)  B3     &&   (7) B4        E        E
+   /|\             /|\             /|\        |        |
+  / | \           / | \           / | \       |        |
+ /  |  \         /  |  \         /  |  \     fcall     fcall
+E1  >  E2       E3  <  E4       E5  <  E6     |        |
+|      |        |      |        |      |      |        |
+|      |        |      |        |      |     func1()   func2()
+id     val      id     val      id     val
+|      |        |      |        |      |
+|      |        |      |        |      |
+x      15       y      0        z      0
+
+
+Code generation in order:
+------------------------------------------------------------
+
+(1)  S -> S1 S2
+          copied from generate() earlier:
+
+    label middle = new_label();     // L1
+    S1.generate(middle);            // L1
+    output_label(middle);
+(a) S2.generate(next);              // next is irrelevant
+
+
+(2) S1 generate with next label L1
+
+      label tpart = new_label();      // L2
+      label fpart = new_label();      // L3
+  (3) B.generate(L2, L3);
+      output_label(L2);
+  (8) S3.generate(L1);  // be clever about next!
+      output_instruction("goto", L1);
+      output_label(L3);
+  (9) S4.generate(L1);
+
+
+(3) B.generate(L2, L3)      B -> B1 || B2
+
+      label b1f = new_label();    // L4
+  (4) B1.generate(L2, L4);
+      output_label(L4);
+  (5) B2.generate(L2, L3);
+
+
+(4) B1.generate(L2, L4)     B1 -> E1 > E2
+
+      E1.generate();
+      E2.generate();
+      output_instruction("if", x, >, 15, "goto", L2);
+      output_instruction("goto", L4);
+
+(5) B2.generate(L2, L3)     B2 -> B3 && B4
+
+      label b1t = new_label();    // L5
+  (6) B3.generate(L5, L3);
+      output_label(L5);
+  (7) B4.generate(L2, L3);
+
+
+(6) B3.generate(L5, L3)     B3 ->  E3 (y) < E4 (0)
+
+      E3.generate();
+      E4.generate();
+      output_instruction("if", y, <, 0, "goto", L5);
+      output_instruction("goto", L3);
+
+(7) B4.generate(L2, L3);    B4 -> E5 (z) < E6 (0);
+
+      E5.generate();
+      E6.generate();
+      output_instruction("if", z, <, 0, "goto", L2);
+      output_instruction("goto", L3);
+
+Output code:
+------------------------------------------------------------
+
+    if x > 15 goto L2
+    goto L4
+L4:
+    if y < 0  goto L5
+    goto L3
+L5:
+    if z < 0  goto L2
+    goto L3
+L2:
+    call func1, 0
+    goto L1
+L3:
+    call func2, 0
+L1:
+    call func3, 0
+
+
+Human version:
+    if x > 15 goto yes
+    if y >= 0 goto no
+    if z >= 0 goto no
+yes:
+    call func1, 0
+    goto done
+no:
+    call func2, 0
+done:
+    call func3, 0
+
+
+Does that implement:
+
+    if ((x>15) || ( (y<0) && (z<0) ) )
+        func1();
+    else
+        func2();
+    func3();
+
+Yes it is correct!
+
+
+Notes:
+    * This is far from optimal
+    * we could do something clever during optimization
+    * could try to reduce unnecessary gotos during translation
+      in a clever way.    (Next lecture.)
+
