@@ -1,20 +1,25 @@
 #!/bin/bash
 
+#
+# Use this for single comparisons (extra credit only, basic only)
+#
+
 TIMEOUT=10
 SCRIPT=$0
 DASHO=""
 SUMMARY=""
+ERRLINES=10
+MODE=2
 
 usage()
 {
   echo "Usage: $SCRIPT executable [options] infile infile ..."
-	echo "Run compiler executable, in mode 2, on specified input files"
+	echo "Run compiler executable, in mode $MODE, on specified input files"
 	echo "and compare with expected output files."
   echo "Any infile without corresponding output files will be skipped"
   echo "Options: "
   echo "  -d:   detailed output (default)"
-  echo "  -gb:  generate non-extra credit output files"
-  echo "  -ge:  generate extra credit output files"
+  echo "  -go:  generate output files"
   echo "  -o:   use -o instead of stdout to collect output"
   echo "  -s:   summary output (opposite of -d)"
   echo "  -t N: set timeout to N seconds (default is $TIMEOUT)"
@@ -25,6 +30,11 @@ usage()
 green()
 {
   printf "[1;32m$1[0;39m$2"
+}
+
+cyan()
+{
+  printf "[1;36m$1[0;39m$2"
 }
 
 yellow()
@@ -57,10 +67,10 @@ timeoutCompile()
   infile=$1
   outfile=$2
   if [ $DASHO ]; then
-    nice $EXE -2 -o $outfile.output2 $infile 2> $outfile.error2 &
+    nice $EXE -$MODE -o $outfile.output$MODE $infile 2> $outfile.error$MODE &
     PID=$!
   else
-    nice $EXE -2 $infile 1> $outfile.output2 2> $outfile.error2 &
+    nice $EXE -$MODE $infile 1> $outfile.output$MODE 2> $outfile.error$MODE &
     PID=$!
   fi
   if [ $TIMEOUT -lt 1 ]; then
@@ -96,8 +106,8 @@ timeoutCompile()
 #
 cleanup()
 {
-  touch $STUB.output2 $STUB.error2 $STUB
-  rm $STUB.output2 $STUB.error2 $STUB
+  touch $STUB.output$MODE $STUB.error$MODE $STUB
+  rm $STUB.output$MODE $STUB.error$MODE $STUB
 }
 
 bailout()
@@ -107,18 +117,6 @@ bailout()
   echo
   cleanup
   exit 1
-}
-
-checkDuplicate()
-{
-  mainfile=$1
-  extrafile=$2
-  if [ -e $mainfile -a -e $extrafile ]; then
-      if diff -b $mainfile $extrafile > /dev/null; then
-        echo "  collapsing equal $extrafile"
-        rm $extrafile
-      fi
-  fi
 }
 
 #
@@ -171,10 +169,12 @@ compareValid()
 # Arg2: student error file
 #
 # Writes:
-#   . missing oracle
+#   : missing oracle
 #   g first error matches perfectly (green)
+#   c first line of error matches (cyan)
 #   y first error line numbers match  (yellow)
 #   r first errors different  (red)
+#   m no error detected       (red)
 compareInvalid()
 {
   if [ ! -f $1 ]; then
@@ -188,12 +188,24 @@ compareInvalid()
     return 0
   fi
 
+  linetextoracle=`head -n 1 <<< "$firstoracle"`
+  linetextstudent=`head -n 1 <<< "$firststudent"`
+  if [ "$linetextoracle" == "$linetextstudent" ]; then
+    echo "c"
+    return 0
+  fi
+
   lineoracle=`striplines <<< "$firstoracle"`
   linestudent=`striplines <<< "$firststudent"`
   if [ "$lineoracle" == "$linestudent" ]; then
     echo "y"
-  else
+    return 0
+  fi
+
+  if [ "$linestudent" ]; then
     echo "r"
+  else
+    echo "m"
   fi
 }
 
@@ -216,6 +228,8 @@ showStatus()
     yellow "First error same line" "$2"
   elif [ "$1" == "r" ]; then
     red    "First error different" "$2"
+  elif [ "$1" == "m" ]; then
+    red    "Did not find error(s)" "$2"
   else
     printf "                     " "$2"
   fi
@@ -224,7 +238,6 @@ showStatus()
 #
 # $1: infile
 # $2: basic status
-# $3: extra status
 #
 # All empty? Prints header line.
 #
@@ -238,26 +251,23 @@ summaryLine()
 {
   infile=$1
   basic=$2
-  extra=$3
 
   if [ $infile ]; then
     printf "%-25s   " $infile
-    showStatus $basic "    "
-    showStatus $extra
+    showStatus $basic
 		printf "\n"
   else
-    printf "%-25s   ---------------------    ---------------------\n" "-------------------------"
-    printf "%-25s   Basic Implementation     Extra Implementation \n" "Test file"
-    printf "%-25s   ---------------------    ---------------------\n" "-------------------------"
+    printf "%-25s   ---------------------\n" "-------------------------"
+    printf "%-25s   Compared w/Instructor\n" "Test file"
+    printf "%-25s   ---------------------\n" "-------------------------"
   fi
 }
 
 # Arg1: status
-# Arg2: type (basic or extra)
-# Arg3: oracle output
-# Arg4: oracle error
-# Arg5: student output
-# Arg6: student error
+# Arg2: oracle output
+# Arg3: oracle error
+# Arg4: student output
+# Arg5: student error
 detailLine()
 {
   st=$1
@@ -267,7 +277,7 @@ detailLine()
   if [ "$st" == ":" ]; then
     return 0
   fi
-  printf "    $2 Implementation Comparison: "
+  printf "    Implementation Comparison: "
   showStatus $st "\n"
   if [ "$st" == "G" ]; then
     return 0
@@ -276,28 +286,28 @@ detailLine()
     return 0
   fi
   if [ "$st" == "R" ]; then
-    diff -w $3 $5 | awk '{print "        | " $0}'
+    diff -w $2 $4 | awk '{print "        | " $0}'
     st="Y"
   fi
   if [ "$st" == "Y" ]; then
-    echo "        Complete error stream given (should be empty):"
+    echo "        First $ERRLINES lines of error stream (should be empty):"
     echo "        ---------------------------------------------------------"
-    awk '{print "        | " $0}' $6
+    awk "(NR<=$ERRLINES){print \"        | \" \$0}" $5
     echo "        ---------------------------------------------------------"
     return 0
   fi
   echo "        Expected first error:"
   echo "        ---------------------------------------------------------"
-  firstError $4 | awk '{print "        | " $0}'
+  firstError $3 | awk '{print "        | " $0}'
   echo "        ---------------------------------------------------------"
   echo
   echo "        Given first error:"
   echo "        ---------------------------------------------------------"
-  firstError $6 | awk '{print "        | " $0}'
+  firstError $5 | awk '{print "        | " $0}'
   echo "        ---------------------------------------------------------"
-  echo "        Complete error stream given:"
+  echo "        First $ERRLINES lines of error stream:"
   echo "        ---------------------------------------------------------"
-  awk '{print "        | " $0}' $6
+  awk "(NR<=$ERRLINES){print \"        | \" \$0}" $5
   echo "        ---------------------------------------------------------"
 }
 
@@ -320,8 +330,7 @@ shift
   # usage 1
 # fi
 
-GENBASIC=""
-GENEXTRA=""
+GENOUT=""
 
 
 echo Running tests using compiler:
@@ -347,13 +356,8 @@ for arg; do
         continue
         ;;
 
-    -gb)
-        GENBASIC="y"
-        continue
-        ;;
-
-    -ge)
-        GENEXTRA="y"
+    -go)
+        GENOUT="y"
         continue
         ;;
 
@@ -376,28 +380,15 @@ for arg; do
   esac
 
 
-  EXOUT="$arg.extra.output2"
-  EXERR="$arg.extra.error2"
-  BAOUT="$arg.output2"
-  BAERR="$arg.error2"
+  BAOUT="$arg.output$MODE"
+  BAERR="$arg.error$MODE"
 
 # are we generating outputs?
 
-  if [ $GENBASIC ]; then
-    echo generating regular outputs for $arg in mode 2
+  if [ $GENOUT ]; then
+    echo generating outputs for $arg in mode $MODE
     $EXE -2 -o $BAOUT $arg 2> $BAERR
     removeRedundant $BAOUT $BAERR
-    checkDuplicate $BAOUT $EXOUT
-    checkDuplicate $BAERR $EXERR
-    continue
-  fi
-
-  if [ $GENEXTRA ]; then
-    echo generating extra credit outputs for $arg in mode 2
-    $EXE -2 -o $EXOUT $arg 2> $EXERR
-    removeRedundant $EXOUT $EXERR
-    checkDuplicate $BAOUT $EXOUT
-    checkDuplicate $BAERR $EXERR
     continue
   fi
 
@@ -418,25 +409,18 @@ for arg; do
 # Get error/output stati
 #
   if [ -f $BAERR ]; then
-    STAT_BA=`compareInvalid $BAERR $STUB.error2`
+    STAT_BA=`compareInvalid $BAERR $STUB.error$MODE`
   else
-    STAT_BA=`compareValid $BAOUT $STUB.output2 $STUB.error2`
-  fi
-
-  if [ -f $EXERR ]; then
-    STAT_EX=`compareInvalid $EXERR $STUB.error2`
-  else
-    STAT_EX=`compareValid $EXOUT $STUB.output2 $STUB.error2`
+    STAT_BA=`compareValid $BAOUT $STUB.output$MODE $STUB.error$MODE`
   fi
 
   if [ $SUMMARY ]; then
-    summaryLine $arg $STAT_BA $STAT_EX
+    summaryLine $arg $STAT_BA
   else
-    detailLine $STAT_BA "Basic" $BAOUT $BAERR $STUB.output2 $STUB.error2
-    detailLine $STAT_EX "Extra Credit" $EXOUT $EXERR $STUB.output2 $STUB.error2
+    detailLine $STAT_BA $BAOUT $BAERR $STUB.output$MODE $STUB.error$MODE
   fi
 
-  rm $STUB.output2 $STUB.error2
+  rm $STUB.output$MODE $STUB.error$MODE
 done
 cleanup
 
