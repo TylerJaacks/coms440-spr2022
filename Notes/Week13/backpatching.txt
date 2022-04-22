@@ -1,0 +1,209 @@
+
+Backpatching: (6.7)
+======================================================================
+
+Idea: how to deal with inherited attributes if we're doing
+      bottom-up parsing or want to use synthesized attributes only?
+
+      Build a list of everything that needs the inherited attribute
+      (list is synthesized), then once you know the attribute, you
+      traverse the list and fill in the attribute.
+
+      Example:
+        int i, j, k;
+
+        var_decl -> type varlist ;
+
+        varlist -> varlist , ident
+        varlist -> ident
+
+        We want types to get to idents for the symbol table but
+        that requires an inherited atttribute OR to build a list
+        of identifiers, then fill in the type when we get to the
+        var_decl.
+
+
+    We can do the same with labels -> backpatching.
+
+    true label -> true list of instructions
+
+    false label -> false list of instruction
+
+    next label -> next list of instructions
+
+
+Idea again in more detail:
+
+*   Generate code but leave blanks for gotos when we don't know the label
+    yet e.g. "goto _" or "if x > 3 goto _"
+
+    (since we want to plug in later, maybe think about a good way to store
+    these instructions so that we can "easily" change the label)
+
+*   Keep list of instructions that need gotos filled in
+
+    -> within a list, all instructions will go to the same label,
+        but we don't know the label yet.
+
+    -> once we know the label, traverse the list and fill in the blanks
+        and discard the list.
+
+    -> rule of thumb: any inherited attribute for label becomes
+        a synthesized list of instructions
+
+
+Note:
+
+* This affects incremental translation somewhat.
+      -> buffer the instructions so we can "easily" fill in the goto
+         targets later
+         only flush buffer for instructions without blanks
+
+      -> write instructions to a file, then modify the file later
+
+* Like observer pattern but only update once.
+
+Notes will be fairly "simple" design but good OO design can help here.
+
+Helper functions and other design for the notes:
+
+  (1) Instructions stored in an array, assume it is large enough.
+
+  (2) Instruction pointers for lists will be indexes into the array.
+
+  (3) Global variable "nextinstr" that gives the index of the next instruction.
+
+  (4) Assume our function "output_instruction" will add the instruction to
+      the array in the correct slot, and return the slot#
+
+  (5) makelist(i) : create and return a new list containing index i
+
+  (6) mergelists(p1, p2, ...): merge lists p1, p2, ... and return the
+                    new merged list
+
+  (7) backpatch(p, i):  traverse list p, fill in all _ with instruction at
+                    slot i, then destroy list p.
+
+
+We also need to update the grammar to have a marker:
+
+Production:       Semantic rules
+---------------  --------------------------------------------------
+M -> epsilon      { M.instr = nextinstr; }
+
+B -> true
+
+                  Old rule:
+                  { code: goto true label}
+
+                  Backpatching rule:
+                  {
+                    B.truelist = makelist(
+                        output_instruction("goto _")
+                    );
+                    B.falselist = empty list;
+                    // from now on: assume empty list if not specified
+                  }
+
+B -> false
+                  Backpatching rule:
+                  {
+                    B.falselist = makelist(
+                        output_instruction("goto _")
+                    )
+                  }
+
+B -> E1 relop E2
+                  {
+                      E1.generate(...)
+                      E2.generate(...)
+
+                      B.truelist = makelist(
+                          output_instruction("if ", E1.addr, relop, E2.addr,
+                              "goto _");
+                      );
+                      B.falselist = makelist(
+                          output_instruction("goto _");
+                      );
+                  }
+
+B -> ! B1
+                  {
+                      // generate code for B1 if needed
+                      B.truelist = B1.falselist;
+                      B.falselist = B1.truelist;
+                  }
+
+
+B -> B1 || M B2
+
+                  Old rule:
+                  {
+                      label mid = new label;
+                      B1.generate(t, mid);
+                      output_label(mid);
+                      B2.generate(t, f);
+                  }
+
+                  Backpatching rule:
+                  {
+                    // assume B1, M, B2 already generated
+                    B.truelist = mergelist(B1.truelist, B2.truelist);
+                    B.falselist = B2.falselist;
+                    backpatch(B1.falselist, M.instr);
+                  }
+
+B -> B1 && M B2
+                  Backpatching rule:
+                  {
+                    // assume B1, M, B2 already generated
+                    B.truelist = B2.truelist;
+                    B.falselist = mergelist(B1.falselist, B2.falselist);
+                    backpatch(B1.truelist, M.instr);
+                  }
+
+
+Now we do the flow control statements
+With statements we only have a "nextlist".
+
+Let L be a list of statements
+
+Production:       Semantic rules
+---------------  --------------------------------------------------
+L -> L1 M S       {
+                    L.nextlist = S.nextlist;
+                    backpatch(L1.nextlist, M.instr);
+                  }
+
+L -> S            {
+                    L.nextlist = S.nextlist;
+                  }
+
+S -> { L }        {
+                    S.nextlist = L.nextlist;
+                  }
+
+
+S -> if ( B ) M S1
+                  {
+                     backpatch(B.truelist, M.instr);
+                     S.nextlist = mergelist(B.falselist, S1.nextlist);
+                  }
+
+
+N -> epsilon      { // need a goto statement
+                      N.nextlist = makelist(
+                          output_instruction("goto _");
+                      );
+                  }
+
+S -> if ( B ) M1 S1 N else M2 S2
+
+                  {
+                     backpatch(B.truelist, M1.instr);
+                     backpatch(B.falselist, M2.instr);
+                     S.nextlist = mergelist(S1.nextlist, S2.nextlist, N.nextlist);
+                  }
+
+While: try yourself for fun!
+

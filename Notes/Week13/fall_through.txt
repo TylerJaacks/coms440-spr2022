@@ -153,7 +153,7 @@ Code generation in order:
           copied from generate() earlier:
 
       label middle = new_label();     // L1
-      S1.generate(middle);            // L1
+ (2)  S1.generate(middle);            // L1
       output_label(middle);
  (10) S2.generate(next);              // next is irrelevant
 
@@ -203,4 +203,17 @@ Code generation in order:
 
 Output code:
 ------------------------------------------------------------
+(4)       if x > 15 goto L3
+(6)       if y >= 0 goto L2
+(7)       if z >= 0 goto L2
+(3)   L3:
+(8)       call func1, 0
+(2)       goto L1
+      L2:
+(9)       call func2, 0
+(1)   L1:
+(10)      call func3, 0
+
+This matches a (clever) human-generated code.
+
 
