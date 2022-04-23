@@ -1,0 +1,15 @@
+        ;; parameter 0 a user.c 4
+        ;; return user.c 6
+        ;; local 0 b user.c 11
+        ;; expression user.c 12
+        ;; return user.c 13
+        ;; parameter 0 a user.c 16
+        ;; parameter 1 b user.c 16
+        ;; parameter 2 c user.c 16
+        ;; parameter 3 f user.c 16
+        ;; local 4 d user.c 18
+        ;; local 5 e user.c 18
+        ;; expression user.c 19
+        ;; return user.c 20
+        ;; expression user.c 25
+        ;; return user.c 26
