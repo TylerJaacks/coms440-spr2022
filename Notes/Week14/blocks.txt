@@ -1,0 +1,35 @@
+
+Basic blocks and flow graphs
+======================================================================
+
+Essentially: we will preprocess the IR code to help with "optimizations"
+
+
+Basic block:
+    a maximal sequence of consecutive (3-address) instructions such that:
+
+        (1) Flow of control can only enter the beginning of the block.
+              (no jumps to the middle)
+
+        (2) No gotos, return, halt allowed inside the block except as
+            the last instruction.
+
+
+    This means: we will either execute ALL of the basic block, or NONE.
+
+
+Flow graphs:
+    graphs with
+        * Nodes are basic blocks
+        * edges between blocks B1 and B2  (B1 -> B2)
+          block B2 can be executed after B1
+              either B2 follows B1 and B1 doesn't end with an uncond. goto
+              or the end of B1 is a goto to B2
+
+
+
+Next time:
+  how to determine the basic blocks.
+  and some examples.
+
+
