@@ -28,8 +28,248 @@ Flow graphs:
 
 
 
-Next time:
-  how to determine the basic blocks.
-  and some examples.
+
+How to determine basic blocks?
+======================================================================
+Algorithm
+    Input: A sequence of 3-addr (or stack machine) instructions
+           for a function
+
+    Output: list of basic blocks for that sequence.
+            each instruction is assigned to exactly one basic block.
+
+
+Idea:
+    determine instructions that are first in some basic block.
+    These are called "leaders".
+
+
+Rules to find leaders:
+
+  (1) The first instruction is a leader
+
+  (2) Any instruction that is the target of a goto
+      (conditional or unconditional) is a leader.
+
+  (3) Any instruction that immediately follows a goto
+      (conditional or unconditional) is a leader.
+
+
+Then the basic blocks:  all instructions from a leader until
+    (one before the next leader) or
+    (end of the sequence)
+
+Later: for optimizations, will be either of the form:
+    rearrange the blocks
+    rearrange within a block
+
+
+Example
+
+Source code:
+
+    int i, j;
+    for (i=2; i<N; i++) {
+      a[i] = 1;
+    }
+    for (i=2; i*i < N; i++) {
+        if (a[i]) {
+            printf("%d is prime\n", i);
+            for (j=2*i; j<N; j+=i)
+                a[j] = 0;
+        }
+    }
+
+
+Three-address code:
+
+-------------------------------------------
+    i = 2
+    goto L2
+-------------------------------------------
+L1: a[i] = 1
+    i = i + 1
+-------------------------------------------
+L2: ifTrue i<N goto L1
+-------------------------------------------
+    i = 2
+    goto L7
+-------------------------------------------
+L3: t1 = a[i]
+    ifzero t1 goto L6
+-------------------------------------------
+    param "%d is prime\n"
+    param i
+    call printf, 2
+    j = 2*i
+    goto L5
+-------------------------------------------
+L4: a[j] = 0
+    j = j + i
+-------------------------------------------
+L5: ifTrue j<N goto L4
+-------------------------------------------
+L6: i = i + 1
+-------------------------------------------
+L7: t2 = i * i
+    ifTrue t2 < N goto L3
+-------------------------------------------
+
+
+
+Flow graphs:
+======================================================================
+Start with the basic blocks then add edges based on goto / fall through,
+and add the following special nodes:
+
+  ENTRY: this is an imaginary node before the first instruction,
+         with an edge to the first basic block
+
+  EXIT:  this is an imaginary node at the end of the function,
+         has an incoming edge from any instruction that could be
+         the last one executed.
+            -> last instruction in a sequence
+            -> return instructions (assuming a function)
+            -> exit or halt maybe?
+            -> jumps to outside of the sequence
+
+
+Draw the graph from the earlier example:
+
+      ENTRY
+        |
+        v
+B1
+    i = 2
+    goto B3
+  /
+  |   B2       <------+
+  |       a[i] = 1    |
+  |       i = i + 1   |
+  |       |           |
+  v       v           |
+B3                    /
+    ifTrue i<N goto B2
+      |
+      v
+B4
+    i = 2
+    goto B10
+
+B5
+    t1 = a[i]
+    ifzero t1 goto B9
+
+B6
+    param "%d is prime\n"
+    param i
+    call printf, 2
+    j = 2*i
+    goto L5
+
+B7
+    a[j] = 0
+    j = j + i
+
+B8
+    ifTrue j<N goto B7
+
+B9
+    i = i + 1
+
+B10
+    t2 = i * i
+    ifTrue t2 < N goto B5
+
+    |
+    |
+    v
+
+EXIT
+
+
+    entry
+      |
+      v
+      B1
+        \
+         \
+  B3      |
+   |      v
+   v      B2
+  B4      |
+    \     |
+     \    |
+      \   |
+       v  v
+        B5
+        |
+        v
+      exit
+
+In the above: we could remove B3 and B4 because clearly they cannot
+ever execute.
+
+
+Analyzing loops
+======================================================================
+We can identify and analyize loops in the flow graph.
+
+* A set of nodes L in a flow graph is a loop IF L contains
+    a special node e, the loop entry, such that:
+
+  (1) e is not the special node, ENTRY
+  (2) Except for e, no node in L has an incoming edge from outside of L.
+  (3) Every node in L has a non-empty path within L to e.
+      If this implies that from e we have to leave and then come back
+      (non-empty) then OK this is a loop for sure.
+
+// (mine)  Every node in L has an incoming edge.
+
+
+Example from earlier:
+
+                      <---
+Entry -->  B1  --> B3  --> B2
+                   |
+                   v
+                   B4
+                   |
+                   v
+
+                  B10  <--- B9
+                           ^  ^
+                   |      /   |
+                   v     /    |
+                        /     |
+                  B5 ---      |
+                              |
+                   |          |
+                   v          |
+                             /
+                  B6        /
+                           /
+                   |      /
+                   v     /
+                        /
+                  B8  --
+                 ^ |
+                 | v
+                  B7
+
+
+
+Some loops from this graph:
+
+1.  { B2, B3 } with entry B3
+          nothing into { B2, B3 } except through B3
+
+2.  { b7, B8} with entry B8
+
+    { B5, B9, B10} is NO because there's two entries into the loop,
+        through B9 and B10
+
+3.  { B5, B6, B7, B8, B9, B10 } with entry B10
+
 
 
