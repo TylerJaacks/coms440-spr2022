@@ -1,0 +1,97 @@
+
+Target code generation (Ch 8)
+======================================================================
+
+Input:
+  * IR of generated code (quadruples, etc.)
+  * Symbol table
+
+  (Parsing, type checking, intermediate code gen is done)
+
+
+Output:
+  * Target program
+    Often will be assembly / ML code designed to run on a specific OS
+
+
+Most important criteria: correctness.
+  target program must behave the same as the source program for
+  all possible inputs
+
+Ideally we will try to "optimize" code for other criteria
+  * speed
+  * size
+  * power consumption
+
+
+Note it is impossible to *optimize* code in the sense of
+"find the smallest" equivalent program. (Undecidable)
+
+-> everything will be heuristics
+
+
+* Code generation maps IR program (or a short sequence)
+    into target machine code sequences
+
+* "Instruction selection": decide which target machine instruction(s)
+    to use to implement IR instructions
+
+* Complicated by the fact that we have a finite number of registers.
+
+
+Eg suppose we don't care about efficiency.  Then we can do really simple
+mappings from IR to assembly
+
+  x = y + z
+
+  -> R0 = y;    // loads
+     R1 = z;
+     R2 = R1 + R0;
+     x = R2;    //stores
+
+this will likely have lots of redundant loads/stores
+b/c we didn't take into account what's happening with x after this!
+
+
+Another example:
+
+  x = 0;
+
+If x is in register 0, then we could just do something like
+
+  load R0, 0
+
+but we could also do
+
+  sub R0, R0
+
+Might take fewer cycles!
+
+
+Other fun: evaluation order
+
+* Reordering instructions could lead to improved register usage
+
+* Optimal order will be NP complete.
+
+Register allocation:
+
+* How to determine which values (local vars, global vars, compiler-generated
+  temporaries) to hold in which registers?
+  (otherwise need to store in memory somewhere)
+
+Usually split this into two problems:
+
+  (1) register allocation: select set of variables to reside in registers
+          at each program point
+
+  (2) register assignment: select a register to hold a program variable
+
+Optimal assignment / allocation NP complete.
+
+
+Everything will be heuristics.
+
+
+Next: basic blocks and flow graphs
+

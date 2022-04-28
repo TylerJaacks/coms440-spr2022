@@ -1,0 +1,66 @@
+
+What about break, continue?
+======================================================================
+
+Clearly, a break / continue instruction (in C) will generate
+a goto statement.  The trick is knowing where to go.
+
+
+break:    break out of the enclosing loop.
+
+  while (1)
+  {
+    while (1)
+    {
+        ...
+
+        if (cond) break;
+    }
+    // <- where we break out of
+
+  }
+
+
+  for (init; cond; update)
+  {
+      break;    // skips cond, update
+  }
+
+
+continue: go back to start of loop
+          while:    re-evaluate condition
+          do-while: re-evaluate condition
+          for:      do the update, re-evaluate condition
+
+
+Two ways to deal with this
+
+(1) Inherited attributes
+
+    Expand the list of inherited attributes for statements
+        "next instruction" label
+
+    Now also have
+        "where to break out of a loop" label
+        "where to jump on continue" label
+
+
+(2) Backpatching
+
+    Expand the number of lists of instructions that need backpatching
+        "nextlist"
+    now have
+        "breaklist"
+        "contlist"
+
+
+These are fairly straightforward extensions to what we already saw for
+loops and boolean expressions.
+
+
+That's it for intermediate code generation.
+
+Nothing after this is critical to know for implementing project.
+
+After this: target code generation, optimizations, maybe function calls, ?
+

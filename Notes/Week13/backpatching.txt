@@ -205,5 +205,16 @@ S -> if ( B ) M1 S1 N else M2 S2
                      S.nextlist = mergelist(S1.nextlist, S2.nextlist, N.nextlist);
                   }
 
-While: try yourself for fun!
+
+
+S -> while M1 ( B ) M2 S1
+
+                  {
+                      backpatch(B.truelist, M2.instr);
+                      backpatch(S1.nextlist, M1.instr);
+                      S.nextlist = B.falselist;
+                      output_instruction("goto ", M1.instr);
+                  }
+
+That's it for backpatching.
 
