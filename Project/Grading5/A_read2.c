@@ -1,4 +1,6 @@
 
+void test(float f);
+
 void test1()
 {
   char A[10];
@@ -8,16 +10,18 @@ void test1()
   return;
 }
 
+int a;
+
 void test2(int b)
 {
   int A[11];
-  A[ A[1] ];
+  a = A[ A[1] ];
   return;
 }
 
 void test3(int i)
 {
   float A[12];
-  A[i*i+1];
+  test(A[i*i+1]);
   return;
 }
