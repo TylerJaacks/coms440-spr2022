@@ -8,15 +8,15 @@ void func1(int a)
 
 void func2()
 {
-    int b;
-    b;
+  int b;
+  x=b;
   return;
 }
 
 void func3(int a, int b, char c, float f)
 {
     int d, e;
-    a+b+(int)c+(int)f;
+    x=a+b+(int)c+(int)f;
     return;
 }
 

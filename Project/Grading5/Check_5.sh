@@ -5,6 +5,8 @@ SCRIPT=$0
 MODE=5
 MYCC=""
 OPTIONS=""
+DASHO=""
+DASHF=""
 
 
 debug()
@@ -18,7 +20,9 @@ usage()
   echo "Usage: $SCRIPT \"executable\" (switches) infile infile ..."
   echo
   echo "Supported switches: "
-  echo "    -O option : invoke compiler with given option string"
+  echo "    -f         : compiler uses fixed output file"
+  echo "    -o         : use -o instead of stdout to collect output"
+  echo "    -S options : invoke compiler with given option string"
   echo
   exit $1
 }
@@ -100,7 +104,10 @@ timeoutCompile()
   infile=$1
   outfile=$2
   errfile=$3
-  if [ $DASHO ]; then
+  if [ $DASHF ]; then
+    nice $MYCC -$MODE $OPTIONS  $infile 2> $errfile &
+    timeout $! "Timeout exceeded"
+  elif [ $DASHO ]; then
     nice $MYCC -$MODE $OPTIONS -o $outfile $infile 2> $errfile &
     timeout $! "Timeout exceeded"
   else
@@ -470,15 +477,23 @@ $MYCC -0 | awk '{print "  | " $0}'
 echo " "
 
 
-dasho=""
+dashs=""
 for args; do
-  if [ "$dasho" ]; then
+  if [ "$dashs" ]; then
     OPTIONS="$args"
-    dasho=""
+    dashs=""
     continue
   fi
-  if [ "$args" == "-O" ]; then
-    dasho="y"
+  if [ "$args" == "-f" ]; then
+    DASHF="y"
+    continue
+  fi
+  if [ "$args" == "-S" ]; then
+    dashs="y"
+    continue
+  fi
+  if [ "$args" == "-o" ]; then
+    DASHO="y"
     continue
   fi
   #
