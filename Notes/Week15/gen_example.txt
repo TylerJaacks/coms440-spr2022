@@ -1,0 +1,58 @@
+
+"Huge" example
+
+block:
+  t1 = a - b
+  t2 = a - c
+  t3 = t1 + t2
+  a = d
+  d = t3 + t2
+
+
+Notes:
+  t1, t2, t3 are temporaries, used only within this block.
+
+  a, b, c, d are variables that are live on exit
+
+  getReg is a black box for now
+
+
+
+3-addr        getReg      code                descriptor updates
+----------    --------    ---------------     --------------------
+t1 = a - b     a: R1      LD R1, a            R1 += a   a += R1
+               b: R2      LD R2, b            R2 += b   b += R2
+              t1: R2      SUB R2, R1, R2      R2 = t1   b = b   t1 = R2
+
+----------    --------    ---------------     --------------------
+t2 = a - c     a: R1
+               c: R3      LD R3, c            R3 += c   c += R3
+              t2: R1      SUB R1, R1, R3      R1 = t2   a = a   t2 = R1
+
+----------    --------    ---------------     --------------------
+t3 = t1+t2    t1: R2      ADD R3, R2, R1      R3 = t3   c = c   t3 = R3
+              t2: R1
+              t3: R3
+
+----------    --------    ---------------     --------------------
+a = d          d: R2      LD R2, d            R2 = d, d += R2, t1 =
+                                              R2 += a    a = R2
+
+----------    --------    ---------------     --------------------
+d = t3+t2     t3: R3
+              t2: R1
+               d: R1      ADD R1, R3, R1      R1 = d, t2 =
+                                              d = R1, R2 -= d
+
+----------    --------    ---------------     --------------------
+(end block)
+                          ST a, R2
+                          ST d, R1
+
+Register descriptors:             Address descriptors
+
+  R1    R2    R3                  a     b     c     d     t1    t2    t3
++----+-----+-----+             +-----+-----+-----+-----+-----+-----+-----+
+| d  | a   |  t3 |             |  R2 |  b  |  c  | R1  |     |     |  R3 |
+
+

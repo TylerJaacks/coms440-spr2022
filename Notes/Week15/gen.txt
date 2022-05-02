@@ -1,0 +1,94 @@
+
+A simple code generator ctd.
+======================================================================
+
+From last week:
+
+Machine instructions for operations
+======================================================================
+For a generic 3-addr instruction  x = y <op> z, do:
+
+(1) Use getReg(x = y <op> z), to select registers for x, y, z;
+    call that Rx, Ry, Rz.
+
+(2) Check register descriptor for Ry
+    if y is not currently in Ry, issue instruction
+          LD Ry, y.addr
+    where y.addr is a memory location for y
+
+(3) Same for Rz and z
+
+(4) Issue instruction
+        OP Rx, Ry, Rz
+
+
+======================================================================
+For a copy instruction   x = y, do:
+
+(1) Use getReg(x = y), which will return the same registers for x and y.
+
+(2) same as (2) above
+
+(3) no z operand so skip
+
+(4) NO INSTRUCTIONS issued!
+
+
+
+Updating the descriptors
+======================================================================
+(1) When we issue a load instruction LD R, x.addr:
+      (a) Change register descriptor for R to hold only x.
+      (b) Change address descriptor for x: add R as a location.
+
+(2) When we issue a store instruction ST x.addr, R:
+      (a) Change address descriptor for x: add x.addr as a location.
+
+
+(3) When we issue instruction OP Rx, Ry, Rz
+    which implements x = y <op> z
+
+    (a) For each variable other than x in register descriptor for Rx:
+        remove Rx from address descriptor for that variable
+
+    (b) Remove x from all register descriptors except Rx
+        (can do this by examining address descriptor for x to get those
+        registers)
+
+    (c) Change register descriptor for Rx so it holds only x.
+
+    (d) Change address descriptor for x so its only location is Rx.
+
+
+(4) When we issue instruction x = y
+    after dealing with the load of y into Ry  (step 1 above)
+
+    (a) Add x to register descriptor for Ry.
+
+    (b) Remove x from all reg. descriptors except Ry.
+
+    (c) Change address descriptor for x so its only location is Ry.
+
+
+
+======================================================================
+How to end the block:
+
+
+At the end of the block, we need to store any vars whose only
+location is a register.
+
+Only need to do this for vars that are "live on exit"
+  in practice this means don't bother for compiler-generated temps.
+
+
+For each block variable x that is "live on exit"
+  check address descriptor for x
+    if location for x is only registers, not memory, then issue
+          ST x, R
+    to save the value of x into its memory location.
+
+
+
+
+
