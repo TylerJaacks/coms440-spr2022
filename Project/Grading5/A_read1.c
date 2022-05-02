@@ -1,4 +1,6 @@
 
+void test(float f);
+
 void test1()
 {
   char A[10];
@@ -19,6 +21,6 @@ void test2(int b)
 void test3(int i)
 {
   float F[12];
-  F[i];
+  test(F[i]);
   return;
 }

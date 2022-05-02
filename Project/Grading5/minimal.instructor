@@ -7,6 +7,8 @@
         ;; return minimal.c 3
         iconst_0
         ireturn
+        ; stack current: 0
+        ; stack maximum: 1
     .end code
 .end method
 
