@@ -55,8 +55,8 @@ striplines()
 # Arg1: error file
 firstError()
 {
-  awk '/^.* error in .*line *[0-9]*/ { errors++; if (errors>1) exit }\
-       /^.* warning in .*line *[0-9]*/ { errors++; if (errors>1) exit }\
+  awk '/^.* error in .*/ { errors++; if (errors>1) exit }\
+       /^.* warning in .*/ { errors++; if (errors>1) exit }\
                               { if (errors) print }' $1
 }
 
@@ -147,11 +147,16 @@ removeRedundant()
 #   G output matches and empty error (Green)
 #   Y output matches but nonempty error (Yellow)
 #   R output different (Red)
+#   N no output (Red)
 #
 compareValid()
 {
   if [ ! -f $1 ]; then
     echo "."
+    return 0
+  fi
+  if [ ! -s $2 ]; then
+    echo "N"
     return 0
   fi
   if diff -w -q $1 $2 > /dev/null; then
@@ -181,8 +186,15 @@ compareInvalid()
     echo ":"
     return 0
   fi
+
   firstoracle=`firstError $1`
   firststudent=`firstError $2`
+
+  if [ ! "$firststudent" ]; then
+    echo "m"
+    return 0
+  fi
+
   if [ "$firstoracle" == "$firststudent" ]; then
     echo "g"
     return 0
@@ -202,11 +214,7 @@ compareInvalid()
     return 0
   fi
 
-  if [ "$linestudent" ]; then
-    echo "r"
-  else
-    echo "m"
-  fi
+  echo "r"
 }
 
 
@@ -222,6 +230,8 @@ showStatus()
     yellow "Output OK; has errors" "$2"
   elif [ "$1" == "R" ]; then
     red    "Output  is  different" "$2"
+  elif [ "$1" == "N" ]; then
+    red    "Empty  output  stream" "$2"
   elif [ "$1" == "g" ]; then
     green  "First  error  matches" "$2"
   elif [ "$1" == "y" ]; then
@@ -289,6 +299,11 @@ detailLine()
     diff -w $2 $4 | awk '{print "        | " $0}'
     st="Y"
   fi
+  if [ "$st" == "N" ]; then
+    if [ -s $5 ]; then
+      st="Y"
+    fi
+  fi
   if [ "$st" == "Y" ]; then
     echo "        First $ERRLINES lines of error stream (should be empty):"
     echo "        ---------------------------------------------------------"
@@ -301,10 +316,12 @@ detailLine()
   firstError $3 | awk '{print "        | " $0}'
   echo "        ---------------------------------------------------------"
   echo
-  echo "        Given first error:"
-  echo "        ---------------------------------------------------------"
-  firstError $5 | awk '{print "        | " $0}'
-  echo "        ---------------------------------------------------------"
+  if [ "$st" != "m" ]; then
+    echo "        Given first error:"
+    echo "        ---------------------------------------------------------"
+    firstError $5 | awk '{print "        | " $0}'
+    echo "        ---------------------------------------------------------"
+  fi
   echo "        First $ERRLINES lines of error stream:"
   echo "        ---------------------------------------------------------"
   awk "(NR<=$ERRLINES){print \"        | \" \$0}" $5
