@@ -339,6 +339,12 @@ compareInvalid()
 {
   firstoracle=`firstError $1`
   firststudent=`firstError $2`
+
+  if [ ! "$firststudent" ]; then
+    red "    Missing error message" "\n"
+    return 0
+  fi
+
   if [ "$firstoracle" == "$firststudent" ]; then
     green "    First error messages match" "\n"
     return 0
@@ -348,10 +354,8 @@ compareInvalid()
   linestudent=`striplines <<< "$firststudent"`
   if [ "$lineoracle" == "$linestudent" ]; then
     cyan "    First error messages match lines" "\n"
-  elif [ "$linestudent" ]; then
-    yellow "    First error message lines different" "\n"
   else
-    red "    Missing error message" "\n"
+    yellow "    First error message lines different" "\n"
   fi
   displayError $1 "Expected error stream"
   displayError $2 "Student's error stream"
