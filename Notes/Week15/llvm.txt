@@ -1,0 +1,231 @@
+
+LLVM
+======================================================================
+
+https://llvm.org
+
+Why?
+  * Nice case study
+  * Useful framework if you want to build a "real" compiler.
+
+What?
+  * Open-source compiler & toolchain
+
+  Core:
+  ------------------------------------------------------------
+  optimizers, target code generators, from
+  LLVM internal representation (LLVM IR)
+    -> quite elaborate, SSA-based 3-addr code
+
+  handy utils:
+    lli - interpreter / JIT compiler for LLVM IR
+    llc - LLVM IR -> native assembly
+
+  lldb: debugger
+
+  Clang:  C/C++/Objective C compiler
+      used by Xcode on Mac
+
+
+  Cool trick:
+    Clang to LLVM IR:
+
+        clang -S -emit-llvm  source.c
+
+        will produce source.ll
+            this is the LLVM IR "compiled" from source.c
+
+
+LLVM IR
+======================================================================
+Goal is to be "universal" and extensible
+IR is "typed"
+
+
+types:
+------------------------------------------------------------
+    void
+    iN  - (2s complement) integer with (at least) N bits
+          i1  : boolean
+          i8  : 8-bit integer (char)
+          i32, i64, etc.
+
+     N can be 1 to 2^23
+
+
+     float
+     double
+
+    (others)
+
+    label  - targets of jumps
+
+    pointers - kind of like C
+        type * for a pointer of given type
+            e.g. i8*
+        or ptr for a generic pointer
+
+      strange exceptions:   no void*
+
+                           no label*
+
+    arrays
+    structs       { double, i32, double }
+
+
+Literals:
+------------------------------------------------------------
+
+    true, false: type i1
+
+    integer constants:   4, -17
+
+    float-point constants
+          decimal 1.25
+          expo    1.25e+2
+          hex
+
+    REQUIRES AN EXACT VALUE
+          e.g.   1.3 is not allowed
+
+
+    null  for null pointer
+
+
+
+Global/local vars, naming :
+------------------------------------------------------------
+    Global identifiers:   @
+    Local identifiers:    %
+
+    One of:
+        Named value (e.g. program variable)
+              zero or more letter, _, $, ., -, digit
+              don't start with digit
+
+        un-named values (e.g., compiler temporaries)
+              unsigned numeric value
+              e.g.,   %5
+
+        constants
+
+  Numbering:
+      * Unsigned temps are numbered sequentially starting from 0
+      * Different counter per function
+      * Numbering is used for unnamed params, compiler temps, and
+        labels!
+
+
+Functions
+------------------------------------------------------------
+can specify lots of attributes (linkage, visibility, etc.)
+
+but basics are:
+
+define result-type @func_name ( arg-list )
+{
+    instrs
+}
+
+
+Terminator Instructions
+------------------------------------------------------------
+
+  ret type value
+          (return from a function)
+          (omit value if void function)
+
+
+  br i1 <condition>, label <iftrue>, label <iffalse>
+
+        if i1 is true, goto true label, else goto false label
+
+  br label <dest>
+
+        unconditional jump
+
+
+  unreachable
+          -> tell optimizer that this code is not reachable
+
+
+
+
+Instructions
+------------------------------------------------------------
+
+function calls:
+
+      result = call type funcptr ( args )
+
+unary ops:
+
+      result = fneg type opnd
+
+              ^ floating point negation
+
+binary ops:
+
+      result = operator type left, right
+
+    operators:
+        add, fadd     : add for integers, fadd for floating-point
+        sub, fsub
+        mul, fmul
+
+        udiv, sdiv, fdiv
+                u is for unsigned int division
+                s is for signed int division
+                f for floating point
+
+        urem, srem, frem
+
+        and, or, xor  (bitwise)
+
+        shl - shift left
+        lshr, ashr   logicial/arith shift right
+
+
+loads & stores:
+
+    result = load <type>, <type>* <pointer>
+
+    store <type> <value> , <type>* <pointer>
+
+
+Comparisons:
+
+    result = icmp   <comparison>  <type>  left, right
+
+        comparison is one of:
+
+            eq, ne, ult, ule, ugt, uge, slt, sle, sgt, sge
+                u/s for unsigned/signed
+
+    result = fcmp <comparison> <type> left, right
+
+        comparison is one of:
+            u/o  unordered (one can be NAN)
+                 ordered (neither is NAN)
+
+            ueq, une, ugt, uge, ult, ule
+
+            oeq, one, ogt, oge, olt, ole
+
+            uno - either is NAN
+
+            false, true:
+
+
+
+Other random stuff then fun examples then end of semester!
+
+    result = alloca <type>
+
+    result = alloca <type>, <type> num_elems
+
+    Allocates memory on the runtime stack (e.g., for function variables)
+
+    Will be released automatically on function return
+
+
