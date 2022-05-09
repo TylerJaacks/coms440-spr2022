@@ -1,0 +1,280 @@
+
+"Optimizations"
+======================================================================
+
+Some is stuff we've seen like
+  * redundant gotos
+  * redundant load/stores
+
+Some stuff we maybe hinted at
+  * literals known at compile time like
+
+        const double pi = 3.14159...;
+
+        const double twopi = 2.0 * pi;
+
+
+Things like rearranging basic blocks
+
+  note: arrows between basic blocks (in flow graph)
+        do not require a goto stmt when blocks are in order
+
+
+    B1      last stmt in B1 does not need to be "goto B2"
+    |
+    v
+    B2
+
+
+    B2      last stmt in B1 must be goto B2
+    ^ \
+    |  |
+    B1 v
+
+
+    We did this kind of stuff before using the special "Fall-through" label.
+    We could instead do some flow graph analysis to eliminate these gotos.
+
+
+Peephole optimization  (8.7 in dragon book)
+======================================================================
+
+Idea:
+  * examine a small target window (peephole) of instructions
+  * look for sequences that can be replaced by an equivalent
+      but more efficient sequence
+
+  * slide window over all instructions
+
+  * If anything was changed, might take another pass over the code
+    b/c changes could mean that new stuff can now be replaced
+
+  * Instructions in a "window" are not necessarily contiguous
+
+  * could be applied both to intermediate code and target code
+
+
+Things we could replace:
+
+Redundant loads/stores
+
+In sequence:
+    LD R, a
+    ST a, R     // this is a pointless instruction
+
+    replace with just
+
+    LD R, a
+
+Also
+
+    ST a, R
+    LD R, a     // this also is pointless
+
+    replace with just
+
+    ST R, a
+
+
+Except:
+
+    LD R, a
+L3: ST a, R
+
+If we have a jump to L3 then we can't (necessarily) remove ST a, R
+
+So check for that, or apply only within a basic block, or ...
+
+
+Flow of control:
+
+  Eliminate jumps to jumps
+
+  if (cond) goto L1    or   goto L1
+
+    ...
+
+  L1: goto L2
+
+
+Ideally: replace any "goto L1" with "goto L2"
+
+What does this flow graph look like?
+
+
+
+    ---------------
+    | L1: goto L2 |
+    ---------------
+          |
+          V
+    ---------------
+    | L2: ...     |
+    ---------------
+
+
+If we discover a basic block that contains only "goto B2" then
+any jumps to that block can be replaced with jumps to B2.
+
+After doing this, the block with "L1: goto L2" will not have any incoming
+edges.  Can eliminate those blocks in a dead code elimination pass later.
+
+
+More flow of control stuff:
+
+      goto L          // can remove this goto L stmt because sequential flow
+  L:  ...
+
+
+      if (cond) goto L      // can remove this too!
+  L:  ...
+
+
+
+      if (cond) goto L1
+      goto L2
+  L1:
+
+
+        |
+        |
+        V
+
+      if (!cond) goto L2
+  L1:
+
+
+Other stuff you wouldn't think matters, but does:
+
+
+if true goto L        -> goto L
+if false goto L       ->
+
+
+This could happen naturally in at least 2 cases:
+
+(1) #define DEBUG 1
+
+    ...
+
+    if (DEBUG==1) ...
+
+
+(2) if (sizeof(int) == 4)
+
+
+(3) C++ funky template stuff
+
+    template <int n>
+    class thingy {
+        ...
+
+        if (n==4) {
+        }
+    };
+
+
+Other things to check for:
+
+    x = x + 0         -> nothing
+    x = y + 0         -> x = y
+
+    x = x * 1         -> nothing
+    x = y * 1         -> x = y
+
+    x = y + y   vs.  x = y * 2  vs.   x = y << 1      (bit shift to the right)
+
+    (use the fastest one)
+
+
+    similarly
+
+    y^2  or  y ** 2   ==  y*y
+
+    y*y is for sure faster than for example pow(y, 2)
+
+
+
+Machine idioms
+------------------------------------------------------------
+
+  * Target machine may have special instructions
+
+  * Want to detect those situations and replace when possible
+
+examples:
+
+  ++ and -- were added to C b/c the underlying hardware supported it
+
+
+  peephole:
+      x = x + 1   could be instead x++
+
+
+example:
+
+  JVM
+
+      iload 7
+      iconst 1
+      iadd
+      istore 7
+
+      ->
+
+      iinc 7 1
+
+
+Unreachable code / dead code
+============================================================
+By this I mean "basic blocks in the flow graph that cannot be
+reached from the entry node"
+
+Just do a DFS from the entry node, and mark which nodes we reached.
+Anything unreachable - can eliminate.
+
+
+Entry
+  |
+  v
+  B1  <======>  B3
+                  \
+                   \
+  B2  <======> B4   \
+                 \  |
+                  \ |
+                   ||
+                   vv
+                   B5
+                    |
+                    v
+                  exit
+
+What's reachable from Entry?
+
+  Entry, V1, B3, B5, Exit
+
+
+We can eliminate B2, B4.
+
+Then get flow graph:
+
+Entry -> B1 <==> B3 ---> B5 -> exit
+
+
+
+The end for optimizations (that are easy)
+
+For more (probably): Com S 413/513 Program Analysis
+
+
+
+
+
+
+
+    x = 6+y*12;
+      ...
+
+    x = 4;
+

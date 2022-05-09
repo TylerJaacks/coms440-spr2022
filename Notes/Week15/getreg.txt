@@ -1,0 +1,74 @@
+
+How to design getReg()
+======================================================================
+
+Here's one simple way to implement getReg()
+
+Suppose the instruction is x = y <op> z
+
+
+(1) Select a register Ry for y using the following rules.
+
+    (i)   If y is already in a register:
+          pick a register already containing y as Ry
+          (If there's more than one, use a heuristic to
+          decide which one.)
+
+    (ii)  If y is not in a register, and there is an empty one
+          then pick one of the empty registers as Ry
+
+    (iii) If y is not in a register and all registers are in use:
+          We need to re-use some register.
+          Consider a candidate register R, and let v be a variable
+          held by r.
+
+          (next steps: make sure v is held somewhere else, or store it)
+
+          (a) If address descriptor says v is somewhere else besides R
+              then we don't need to store v.
+
+          (b) If v is x (the lhs of our instruction)
+              and v is not y or z (not on rhs of our instruction)
+              we don't need to store v b/c it will be overwritten
+              before it needs to be used.
+
+          (c) If v is not used later (after this instruction)
+              in the "live" sense, don't need to store v.
+
+          (d) Otherwise if a-c don't apply, we must store v.
+
+          R could hold several variables, count how many stores would
+          be required if we used R, and minimize the number of stores.
+          (Heuristic!)
+
+          One way or another if R is chosen, then any vars that must be
+          stored, we will need to issue a
+                ST v, R
+          instruction  (did we do that already in the notes?)
+
+(2) Select a register Rz for z using the same rules.
+
+(3) Select a register Rx for x using similar rules
+    with the following changes.
+
+    (i)   If x is already in a register:
+          pick a register already containing x as Rx
+          (Ideally: pick a register that contains ONLY x,
+          otherwise minimize number of other vars held in Rx)
+
+          iThis works also if x is one or both of y, z
+
+    (ii), (iii) are the same as above but try (i') first
+
+    (i')  If y is not used (in the "live" sense) after this instruction,
+          we can use Ry as Rx.
+
+          Similarly if z is not used we can use Rz as Rx.
+
+
+======================================================================
+Special case for the copy instruction x = y
+
+      Choose Ry using rule (1) above and then always use Rx = Ry.
+
+
