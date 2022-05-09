@@ -1,13 +1,13 @@
 
-%token number
+%token number plus star
 
 %%
 
-S : S '+' P
+S : S plus P
   | P
   ;
 
-P : P '*' number
+P : P star number
   | number
   ;
 
