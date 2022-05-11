@@ -100,6 +100,11 @@ green()
   printf "[1;32m$1[0;39m$2"
 }
 
+cyan()
+{
+  printf "[1;36m$1[0;39m$2"
+}
+
 yellow()
 {
   printf "[1;33m$1[0;39m$2"

@@ -8,6 +8,7 @@ TIMEOUT=10
 SCRIPT=$0
 MODE=5
 DASHO=""
+DASHF=""
 FLAGS=""
 DETAIL="y"
 
@@ -17,9 +18,10 @@ usage()
   echo "Any infile without corresponding output files will be skipped"
   echo "Options: "
   echo "  -c S: Use additional compiler switches in string S"
-  echo "  -G:   generate test outputs with gcc"
-  echo "  -o:   use -o instead of stdout to collect output"
-  echo "  -s:   short comparison; doesn't show diff"
+  echo "  -f  : compiler uses fixed output file"
+  echo "  -G  : generate test outputs with gcc"
+  echo "  -o  : use -o instead of stdout to collect output"
+  echo "  -s  : short comparison; doesn't show diff"
   echo "  -t N: set timeout to N seconds (default is $TIMEOUT)"
   echo "        0 seconds uses no timeout"
   exit $1
@@ -99,6 +101,11 @@ checkEnviron()
 green()
 {
   printf "[1;32m$1[0;39m$2"
+}
+
+cyan()
+{
+  printf "[1;36m$1[0;39m$2"
 }
 
 yellow()
@@ -214,11 +221,14 @@ timeoutCompile()
   infile=$1
   outfile=$2
   errfile=$3
-  if [ $DASHO ]; then
-    nice $EXE -$MODE $FLAGS -o $outfile $infile 2> $errfile &
+  if [ $DASHF ]; then
+    nice $EXE -$MODE $OPTIONS  $infile 2> $errfile &
+    timeout $! "Timeout exceeded"
+  elif [ $DASHO ]; then
+    nice $EXE -$MODE $OPTIONS -o $outfile $infile 2> $errfile &
     timeout $! "Timeout exceeded"
   else
-    nice $EXE -$MODE $FLAGS $infile 1> $outfile 2> $errfile &
+    nice $EXE -$MODE $OPTIONS $infile 1> $outfile 2> $errfile &
     timeout $! "Timeout exceeded"
   fi
 }
@@ -346,6 +356,12 @@ compareInvalid()
 {
   firstoracle=`firstError $1`
   firststudent=`firstError $2`
+
+  if [ ! "$firststudent" ]; then
+    red "    Missing error message" "\n"
+    return 0
+  fi
+
   if [ "$firstoracle" == "$firststudent" ]; then
     green "    First error messages match" "\n"
     return 0
@@ -355,10 +371,8 @@ compareInvalid()
   linestudent=`striplines <<< "$firststudent"`
   if [ "$lineoracle" == "$linestudent" ]; then
     cyan "    First error messages match lines" "\n"
-  elif [ "$linestudent" ]; then
-    yellow "    First error message lines different" "\n"
   else
-    red "    Missing error message" "\n"
+    yellow "    First error message lines different" "\n"
   fi
   displayError $1 "Expected error stream"
   displayError $2 "Student's error stream"
@@ -424,13 +438,18 @@ for arg; do
         continue
         ;;
 
-    -s)
-        DETAIL=""
+    -f)
+        DASHF="y"
         continue
         ;;
 
     -o)
         DASHO="y"
+        continue
+        ;;
+
+    -s)
+        DETAIL=""
         continue
         ;;
 
