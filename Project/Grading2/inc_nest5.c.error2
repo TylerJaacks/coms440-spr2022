@@ -1,0 +1,5 @@
+Preprocessor error in file nope1.h line 1
+    included from nope2.h line 1
+    included from nope3.h line 1
+    included from inc_nest5.c line 2
+	Couldn't open include file nope.h, ignoring

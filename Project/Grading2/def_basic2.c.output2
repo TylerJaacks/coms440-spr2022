@@ -1,0 +1,16 @@
+File def_basic2.c Line     6 Token 301 Text char
+File def_basic2.c Line     6 Token 306 Text strbuf
+File def_basic2.c Line     6 Token  91 Text [
+File def_basic2.c Line     6 macro expansion
+..Macro STRMAX Token 303 Text 1024
+File def_basic2.c Line     6 Token  93 Text ]
+File def_basic2.c Line     6 Token  59 Text ;
+File def_basic2.c Line     7 Token 301 Text char
+File def_basic2.c Line     7 Token 306 Text intbuf
+File def_basic2.c Line     7 Token  91 Text [
+File def_basic2.c Line     7 macro expansion
+..Macro INTMAX Token 303 Text 48
+File def_basic2.c Line     7 Token  93 Text ]
+File def_basic2.c Line     7 Token  59 Text ;
+File def_basic2.c Line     9 macro expansion
+..Macro MAX Token 305 Text "maximum"

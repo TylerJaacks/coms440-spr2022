@@ -1,0 +1,23 @@
+File inc_basic3.c Line     1 include expansion
+..File inc_basic3.h Line     2 Token 301 Text void
+..File inc_basic3.h Line     2 Token 306 Text this_is_a_proper_header
+..File inc_basic3.h Line     2 Token  40 Text (
+..File inc_basic3.h Line     2 Token 301 Text int
+..File inc_basic3.h Line     2 Token 306 Text with
+..File inc_basic3.h Line     2 Token  44 Text ,
+..File inc_basic3.h Line     2 Token 301 Text int
+..File inc_basic3.h Line     2 Token 306 Text prototypes
+..File inc_basic3.h Line     2 Token  41 Text )
+..File inc_basic3.h Line     2 Token  59 Text ;
+..File inc_basic3.h Line     4 Token 301 Text int
+..File inc_basic3.h Line     4 Token 306 Text does_program_halt
+..File inc_basic3.h Line     4 Token  40 Text (
+..File inc_basic3.h Line     4 Token 306 Text FILE
+..File inc_basic3.h Line     4 Token  42 Text *
+..File inc_basic3.h Line     4 Token 306 Text program
+..File inc_basic3.h Line     4 Token  44 Text ,
+..File inc_basic3.h Line     4 Token 306 Text FILE
+..File inc_basic3.h Line     4 Token  42 Text *
+..File inc_basic3.h Line     4 Token 306 Text input
+..File inc_basic3.h Line     4 Token  41 Text )
+..File inc_basic3.h Line     4 Token  59 Text ;

@@ -1,0 +1,12 @@
+File def_undef1.c Line     4 Token 301 Text int
+File def_undef1.c Line     4 macro expansion
+..Macro MAX Token 303 Text 400
+File def_undef1.c Line     4 Token  59 Text ;
+File def_undef1.c Line     8 Token 301 Text int
+File def_undef1.c Line     8 Token 306 Text MAX
+File def_undef1.c Line     8 Token  44 Text ,
+File def_undef1.c Line     8 Token 306 Text MIN
+File def_undef1.c Line     8 Token  59 Text ;
+File def_undef1.c Line    12 Token 301 Text int
+File def_undef1.c Line    12 Token 306 Text MIN
+File def_undef1.c Line    12 Token  59 Text ;

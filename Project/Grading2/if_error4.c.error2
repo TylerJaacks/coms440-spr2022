@@ -1,0 +1,2 @@
+Preprocessor error in file if_error4.c line 6
+	#else without #if, ignoring

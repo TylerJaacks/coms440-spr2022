@@ -1,0 +1,46 @@
+File def_basic3.c Line    13 Token 301 Text int
+File def_basic3.c Line    13 Token 306 Text main
+File def_basic3.c Line    13 Token  40 Text (
+File def_basic3.c Line    13 Token  41 Text )
+File def_basic3.c Line    14 Token 123 Text {
+File def_basic3.c Line    15 Token 306 Text printf
+File def_basic3.c Line    15 Token  40 Text (
+File def_basic3.c Line    15 macro expansion
+..Macro MESSAGE Token 305 Text "Hello, stupid world!"
+File def_basic3.c Line    15 Token  41 Text )
+File def_basic3.c Line    15 Token  59 Text ;
+File def_basic3.c Line    16 Token 301 Text char
+File def_basic3.c Line    16 Token 306 Text buffer
+File def_basic3.c Line    16 Token  91 Text [
+File def_basic3.c Line    16 macro expansion
+..Macro BYTES Token 303 Text 1024
+File def_basic3.c Line    16 Token  93 Text ]
+File def_basic3.c Line    16 Token  59 Text ;
+File def_basic3.c Line    17 Token 306 Text fputc
+File def_basic3.c Line    17 Token  40 Text (
+File def_basic3.c Line    17 macro expansion
+..Macro NEWLINE Token 302 Text '\n'
+File def_basic3.c Line    17 Token  44 Text ,
+File def_basic3.c Line    17 Token 306 Text stdout
+File def_basic3.c Line    17 Token  41 Text )
+File def_basic3.c Line    17 Token  59 Text ;
+File def_basic3.c Line    18 macro expansion
+..Macro BARF Token 306 Text fprintf
+..Macro BARF Token  40 Text (
+..Macro BARF Token 306 Text stderr
+..Macro BARF Token  46 Text .
+..Macro BARF Token 305 Text "An unexpected error has occurred.\n"
+..Macro BARF Token  41 Text )
+File def_basic3.c Line    18 Token  59 Text ;
+File def_basic3.c Line    19 Token 306 Text fopen
+File def_basic3.c Line    19 Token  40 Text (
+File def_basic3.c Line    19 macro expansion
+..Macro PATH Token 305 Text "/usr/local/share/test.txt"
+File def_basic3.c Line    19 Token  44 Text ,
+File def_basic3.c Line    19 Token 305 Text "r"
+File def_basic3.c Line    19 Token  41 Text )
+File def_basic3.c Line    19 Token  59 Text ;
+File def_basic3.c Line    20 Token 303 Text 20
+File def_basic3.c Line    20 macro expansion
+File def_basic3.c Line    20 Token  59 Text ;
+File def_basic3.c Line    21 Token 125 Text }

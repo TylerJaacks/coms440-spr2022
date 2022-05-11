@@ -1,0 +1,22 @@
+File inc_nest2.c Line     2 Token 306 Text nested
+File inc_nest2.c Line     3 Token 306 Text include
+File inc_nest2.c Line     3 Token 305 Text "tests"
+File inc_nest2.c Line     5 include expansion
+..File chain3.h Line     3 Token 304 Text 3.0
+..File chain3.h Line     3 Token  59 Text ;
+..File chain3.h Line     4 include expansion
+....File chain2.h Line     2 Token 302 Text '2'
+....File chain2.h Line     2 Token  59 Text ;
+....File chain2.h Line     3 include expansion
+......File chain1.h Line     1 Token 303 Text 1
+......File chain1.h Line     1 Token  59 Text ;
+......File chain1.h Line     2 Token 303 Text 2
+......File chain1.h Line     2 Token  59 Text ;
+......File chain1.h Line     3 Token 303 Text 3
+......File chain1.h Line     3 Token  59 Text ;
+....File chain2.h Line     4 Token 302 Text '3'
+....File chain2.h Line     4 Token  59 Text ;
+..File chain3.h Line     6 Token 304 Text 6.0
+..File chain3.h Line     6 Token  59 Text ;
+File inc_nest2.c Line     7 Token 403 Text for
+File inc_nest2.c Line     7 Token 306 Text fun

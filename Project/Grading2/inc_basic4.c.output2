@@ -1,0 +1,16 @@
+File inc_basic4.c Line     2 Token 412 Text case
+File inc_basic4.c Line     2 Token 306 Text that
+File inc_basic4.c Line     2 Token 306 Text might
+File inc_basic4.c Line     2 Token 306 Text be
+File inc_basic4.c Line     2 Token 306 Text tricky
+File inc_basic4.c Line     4 Token 306 Text include
+File inc_basic4.c Line     4 Token 305 Text "bad.h"
+File inc_basic4.c Line     8 include expansion
+..File inc_basic4.h Line     2 Token 306 Text line_2
+..File inc_basic4.h Line     4 Token 303 Text 4
+..File inc_basic4.h Line     4 Token  59 Text ;
+..File inc_basic4.h Line     7 Token 304 Text 7.7
+..File inc_basic4.h Line     7 Token  59 Text ;
+File inc_basic4.c Line    10 Token 306 Text stuff_line_10
+File inc_basic4.c Line    12 Token 303 Text 12
+File inc_basic4.c Line    12 Token  59 Text ;

@@ -1,0 +1,2 @@
+Preprocessor error in file if_error1.c line 6
+	#endif without #if, ignoring

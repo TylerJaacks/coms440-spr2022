@@ -1,0 +1,12 @@
+File inc_nest1.c Line     1 include expansion
+..File chain2.h Line     2 Token 302 Text '2'
+..File chain2.h Line     2 Token  59 Text ;
+..File chain2.h Line     3 include expansion
+....File chain1.h Line     1 Token 303 Text 1
+....File chain1.h Line     1 Token  59 Text ;
+....File chain1.h Line     2 Token 303 Text 2
+....File chain1.h Line     2 Token  59 Text ;
+....File chain1.h Line     3 Token 303 Text 3
+....File chain1.h Line     3 Token  59 Text ;
+..File chain2.h Line     4 Token 302 Text '3'
+..File chain2.h Line     4 Token  59 Text ;

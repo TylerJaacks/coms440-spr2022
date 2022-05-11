@@ -1,0 +1,44 @@
+#define I00  0
+#define I01  I00+1
+#define I02  I01+1
+#define I03  I02+1
+#define I04  I03+1
+#define I05  I04+1
+#define I06  I05+1
+#define I07  I06+1
+#define I08  I07+1
+#define I09  I08+1
+#define I10  I09+1
+#define I11  I10+1
+#define I12  I11+1
+#define I13  I12+1
+#define I14  I13+1
+#define I15  I14+1
+#define I16  I15+1
+#define I17  I16+1
+#define I18  I17+1
+#define I19  I18+1
+#define I20  I19+1
+#define I21  I20+1
+#define I22  I21+1
+#define I23  I22+1
+#define I24  I23+1
+#define I25  I24+1
+#define I26  I25+1
+#define I27  I26+1
+#define I28  I27+1
+#define I29  I28+1
+#define I30  I29+1
+#define I31  I30+1
+#define I32  I31+1
+#define I33  I32+1
+#define I34  I33+1
+#define I35  I34+1
+#define I36  I35+1
+#define I37  I36+1
+#define I38  I37+1
+#define I39  I38+1
+#define I40  I39+1
+
+int x = I40;
+

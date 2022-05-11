@@ -1,0 +1,3 @@
+Preprocessor error in macro LOOPA
+    included from def_cycle2.c line 4
+	Macro substitution cycle

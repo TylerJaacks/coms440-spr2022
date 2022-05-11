@@ -1,0 +1,109 @@
+File def_nested3.c Line     1 Token 306 Text TAIL
+File def_nested3.c Line     2 Token 306 Text STOP
+File def_nested3.c Line     3 Token 306 Text START
+File def_nested3.c Line     4 Token 306 Text DELTA
+File def_nested3.c Line     8 macro expansion
+..Macro TAIL Token 306 Text STOP
+..Macro TAIL Token  45 Text -
+..Macro TAIL Token 303 Text 1
+File def_nested3.c Line     9 Token 306 Text STOP
+File def_nested3.c Line    10 Token 306 Text START
+File def_nested3.c Line    11 Token 306 Text DELTA
+File def_nested3.c Line    15 macro expansion
+..Macro TAIL macro expansion
+....Macro STOP Token 306 Text START
+....Macro STOP Token  43 Text +
+....Macro STOP Token 306 Text DELTA
+..Macro TAIL Token  45 Text -
+..Macro TAIL Token 303 Text 1
+File def_nested3.c Line    16 macro expansion
+..Macro STOP Token 306 Text START
+..Macro STOP Token  43 Text +
+..Macro STOP Token 306 Text DELTA
+File def_nested3.c Line    17 Token 306 Text START
+File def_nested3.c Line    18 Token 306 Text DELTA
+File def_nested3.c Line    22 macro expansion
+..Macro TAIL macro expansion
+....Macro STOP macro expansion
+......Macro START Token 303 Text 100
+....Macro STOP Token  43 Text +
+....Macro STOP Token 306 Text DELTA
+..Macro TAIL Token  45 Text -
+..Macro TAIL Token 303 Text 1
+File def_nested3.c Line    23 macro expansion
+..Macro STOP macro expansion
+....Macro START Token 303 Text 100
+..Macro STOP Token  43 Text +
+..Macro STOP Token 306 Text DELTA
+File def_nested3.c Line    24 macro expansion
+..Macro START Token 303 Text 100
+File def_nested3.c Line    25 Token 306 Text DELTA
+File def_nested3.c Line    29 macro expansion
+..Macro TAIL macro expansion
+....Macro STOP macro expansion
+......Macro START Token 303 Text 100
+....Macro STOP Token  43 Text +
+....Macro STOP macro expansion
+......Macro DELTA Token 303 Text 32
+..Macro TAIL Token  45 Text -
+..Macro TAIL Token 303 Text 1
+File def_nested3.c Line    30 macro expansion
+..Macro STOP macro expansion
+....Macro START Token 303 Text 100
+..Macro STOP Token  43 Text +
+..Macro STOP macro expansion
+....Macro DELTA Token 303 Text 32
+File def_nested3.c Line    31 macro expansion
+..Macro START Token 303 Text 100
+File def_nested3.c Line    32 macro expansion
+..Macro DELTA Token 303 Text 32
+File def_nested3.c Line    39 macro expansion
+..Macro A Token 303 Text 10
+File def_nested3.c Line    39 macro expansion
+..Macro C Token  40 Text (
+..Macro C Token 306 Text B
+..Macro C Token  43 Text +
+..Macro C Token 303 Text 1
+..Macro C Token  41 Text )
+File def_nested3.c Line    39 macro expansion
+..Macro E Token  40 Text (
+..Macro E Token 306 Text D
+..Macro E Token  43 Text +
+..Macro E Token 303 Text 1
+..Macro E Token  41 Text )
+File def_nested3.c Line    44 macro expansion
+..Macro A Token 303 Text 10
+File def_nested3.c Line    44 macro expansion
+..Macro C Token  40 Text (
+..Macro C macro expansion
+....Macro B Token  40 Text (
+....Macro B macro expansion
+......Macro A Token 303 Text 10
+....Macro B Token  43 Text +
+....Macro B Token 303 Text 1
+....Macro B Token  41 Text )
+..Macro C Token  43 Text +
+..Macro C Token 303 Text 1
+..Macro C Token  41 Text )
+File def_nested3.c Line    44 macro expansion
+..Macro E Token  40 Text (
+..Macro E macro expansion
+....Macro D Token  40 Text (
+....Macro D macro expansion
+......Macro C Token  40 Text (
+......Macro C macro expansion
+........Macro B Token  40 Text (
+........Macro B macro expansion
+..........Macro A Token 303 Text 10
+........Macro B Token  43 Text +
+........Macro B Token 303 Text 1
+........Macro B Token  41 Text )
+......Macro C Token  43 Text +
+......Macro C Token 303 Text 1
+......Macro C Token  41 Text )
+....Macro D Token  43 Text +
+....Macro D Token 303 Text 1
+....Macro D Token  41 Text )
+..Macro E Token  43 Text +
+..Macro E Token 303 Text 1
+..Macro E Token  41 Text )

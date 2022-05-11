@@ -1,0 +1,13 @@
+File def_basic1.c Line     4 Token 301 Text int
+File def_basic1.c Line     4 Token 306 Text main
+File def_basic1.c Line     4 Token  40 Text (
+File def_basic1.c Line     4 Token  41 Text )
+File def_basic1.c Line     5 Token 123 Text {
+File def_basic1.c Line     6 Token 301 Text int
+File def_basic1.c Line     6 Token 306 Text A
+File def_basic1.c Line     6 Token  91 Text [
+File def_basic1.c Line     6 macro expansion
+..Macro N Token 303 Text 1234
+File def_basic1.c Line     6 Token  93 Text ]
+File def_basic1.c Line     6 Token  59 Text ;
+File def_basic1.c Line     7 Token 125 Text }

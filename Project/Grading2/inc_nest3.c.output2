@@ -1,0 +1,23 @@
+File inc_nest3.c Line     2 include expansion
+..File chain2.h Line     2 Token 302 Text '2'
+..File chain2.h Line     2 Token  59 Text ;
+..File chain2.h Line     3 include expansion
+....File chain1.h Line     1 Token 303 Text 1
+....File chain1.h Line     1 Token  59 Text ;
+....File chain1.h Line     2 Token 303 Text 2
+....File chain1.h Line     2 Token  59 Text ;
+....File chain1.h Line     3 Token 303 Text 3
+....File chain1.h Line     3 Token  59 Text ;
+..File chain2.h Line     4 Token 302 Text '3'
+..File chain2.h Line     4 Token  59 Text ;
+File inc_nest3.c Line     4 include expansion
+..File chain1.h Line     1 Token 303 Text 1
+..File chain1.h Line     1 Token  59 Text ;
+..File chain1.h Line     2 Token 303 Text 2
+..File chain1.h Line     2 Token  59 Text ;
+..File chain1.h Line     3 Token 303 Text 3
+..File chain1.h Line     3 Token  59 Text ;
+File inc_nest3.c Line     6 Token 306 Text should
+File inc_nest3.c Line     6 Token 306 Text be
+File inc_nest3.c Line     6 Token 306 Text no
+File inc_nest3.c Line     6 Token 306 Text problem

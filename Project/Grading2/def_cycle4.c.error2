@@ -1,0 +1,13 @@
+Preprocessor error in macro Z
+    expanded from macro Y
+    expanded from macro X
+    expanded from macro W
+    expanded from macro V
+    expanded from macro S
+    expanded from macro F
+    expanded from macro D
+    expanded from macro I
+    expanded from macro T
+    expanded from macro A
+    included from def_cycle4.c line 25
+	Macro substitution cycle

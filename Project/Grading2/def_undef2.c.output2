@@ -1,0 +1,32 @@
+File def_undef2.c Line     5 Token 301 Text char
+File def_undef2.c Line     5 Token 306 Text strbuf
+File def_undef2.c Line     5 Token  91 Text [
+File def_undef2.c Line     5 macro expansion
+..Macro STRMAX Token 303 Text 1024
+File def_undef2.c Line     5 Token  93 Text ]
+File def_undef2.c Line     5 Token  59 Text ;
+File def_undef2.c Line     6 Token 301 Text char
+File def_undef2.c Line     6 Token 306 Text intbuf
+File def_undef2.c Line     6 Token  91 Text [
+File def_undef2.c Line     6 macro expansion
+..Macro INTMAX Token 303 Text 48
+File def_undef2.c Line     6 Token  93 Text ]
+File def_undef2.c Line     6 Token  59 Text ;
+File def_undef2.c Line    10 Token 402 Text struct
+File def_undef2.c Line    10 Token 306 Text limits
+File def_undef2.c Line    10 Token 123 Text {
+File def_undef2.c Line    11 Token 301 Text int
+File def_undef2.c Line    11 Token 306 Text INTMAX
+File def_undef2.c Line    11 Token  59 Text ;
+File def_undef2.c Line    12 Token 301 Text int
+File def_undef2.c Line    12 macro expansion
+..Macro STRMAX Token 303 Text 1024
+File def_undef2.c Line    12 Token  59 Text ;
+File def_undef2.c Line    13 Token 125 Text }
+File def_undef2.c Line    13 Token  59 Text ;
+File def_undef2.c Line    17 macro expansion
+..Macro INTMAX Token 303 Text 1000
+File def_undef2.c Line    21 Token 306 Text INTMAX
+File def_undef2.c Line    25 macro expansion
+..Macro INTMAX Token 305 Text "intmax"
+File def_undef2.c Line    29 Token 306 Text INTMAX

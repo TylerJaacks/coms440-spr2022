@@ -1,0 +1,8 @@
+Preprocessor error in file loop4.h line 2
+    included from loop5.h line 2
+    included from loop1.h line 2
+    included from loop2.h line 2
+    included from loop3.h line 2
+    included from inc_cycle4.h line 6
+    included from inc_cycle4.c line 2
+	Include cycle

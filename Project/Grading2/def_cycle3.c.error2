@@ -1,0 +1,4 @@
+Preprocessor error in macro BAR
+    expanded from macro FOO
+    included from def_cycle3.c line 11
+	Macro substitution cycle

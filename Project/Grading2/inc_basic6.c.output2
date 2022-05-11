@@ -1,0 +1,30 @@
+File inc_basic6.c Line     2 include expansion
+..File inc_basic6a.h Line     2 Token 303 Text 2
+..File inc_basic6a.h Line     2 Token  59 Text ;
+..File inc_basic6a.h Line     3 Token 302 Text '3'
+..File inc_basic6a.h Line     3 Token  59 Text ;
+..File inc_basic6a.h Line     4 Token 305 Text "4"
+..File inc_basic6a.h Line     4 Token  59 Text ;
+File inc_basic6.c Line     3 Token 301 Text int
+File inc_basic6.c Line     3 Token 306 Text b
+File inc_basic6.c Line     3 Token  59 Text ;
+File inc_basic6.c Line     4 include expansion
+..File inc_basic6b.h Line     1 Token 301 Text int
+..File inc_basic6b.h Line     1 Token 306 Text i
+..File inc_basic6b.h Line     1 Token  59 Text ;
+File inc_basic6.c Line     6 Token 306 Text this
+File inc_basic6.c Line     6 Token 306 Text should
+File inc_basic6.c Line     6 Token 306 Text not
+File inc_basic6.c Line     6 Token 306 Text be
+File inc_basic6.c Line     6 Token 306 Text a
+File inc_basic6.c Line     6 Token 306 Text problem
+File inc_basic6.c Line     6 Token  58 Text :
+File inc_basic6.c Line     8 include expansion
+..File inc_basic6a.h Line     2 Token 303 Text 2
+..File inc_basic6a.h Line     2 Token  59 Text ;
+..File inc_basic6a.h Line     3 Token 302 Text '3'
+..File inc_basic6a.h Line     3 Token  59 Text ;
+..File inc_basic6a.h Line     4 Token 305 Text "4"
+..File inc_basic6a.h Line     4 Token  59 Text ;
+File inc_basic6.c Line    10 Token 306 Text done
+File inc_basic6.c Line    10 Token  59 Text ;

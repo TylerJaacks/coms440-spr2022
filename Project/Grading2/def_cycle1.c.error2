@@ -1,0 +1,3 @@
+Preprocessor error in macro GNU
+    included from def_cycle1.c line 10
+	Macro substitution cycle

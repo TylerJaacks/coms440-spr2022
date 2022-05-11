@@ -1,0 +1,14 @@
+File def_nested1.c Line     5 Token 301 Text int
+File def_nested1.c Line     5 Token 306 Text huge
+File def_nested1.c Line     5 Token  91 Text [
+File def_nested1.c Line     5 macro expansion
+..Macro N3 macro expansion
+....Macro N Token 303 Text 1024
+..Macro N3 Token  42 Text *
+..Macro N3 macro expansion
+....Macro N Token 303 Text 1024
+..Macro N3 Token  42 Text *
+..Macro N3 macro expansion
+....Macro N Token 303 Text 1024
+File def_nested1.c Line     5 Token  93 Text ]
+File def_nested1.c Line     5 Token  59 Text ;
